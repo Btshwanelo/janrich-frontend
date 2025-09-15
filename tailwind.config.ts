@@ -52,8 +52,11 @@ const config: Config = {
         sans: [
           "var(--font-inter)",
           "Inter",
-          "ui-sans-serif",
-          "system-ui",
+          "Inter Fallback",
+          "-apple-system",
+          "Segoe UI",
+          "Roboto",
+          "Arial",
           "sans-serif",
         ],
       },
