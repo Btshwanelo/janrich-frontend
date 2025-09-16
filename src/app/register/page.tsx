@@ -1,24 +1,16 @@
-'use client'
+"use client";
 import React, { useState } from "react";
 import { Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 
-// Alternative: If you prefer react-phone-input-2, install it and use this import instead:
-// import PhoneInput from 'react-phone-input-2'
-// import 'react-phone-input-2/lib/style.css'
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
-// For this example, I'll show you how to structure it with react-phone-number-input
-// Install: npm install react-phone-number-input
-// import PhoneInput from 'react-phone-number-input'
-// import 'react-phone-number-input/style.css'
-
-// Since we can't actually install the library in this environment,
-// I'll create a placeholder component that shows the expected structure
 const PhoneNumberInput = ({ value, onChange, placeholder, className }) => {
-  // This is a placeholder - replace with actual PhoneInput component
   return (
     <div className={`border border-gray-300 rounded-md ${className}`}>
       <div className="flex">
@@ -31,13 +23,37 @@ const PhoneNumberInput = ({ value, onChange, placeholder, className }) => {
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="flex-1 px-3 py-2 rounded-r-md focus:outline-none focus:ring-2 focus:ring-red-500"
+          className="flex-1 px-3 py-2 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 border-0"
         />
       </div>
-      <div className="text-xs text-gray-500 mt-1 px-3">
-        Replace this with: &lt;PhoneInput value={"{value}"} onChange=
-        {"{onChange}"} /&gt;
-      </div>
+    </div>
+  );
+};
+
+const CircularProgressStep = ({ isActive, isCompleted }) => {
+  return (
+    <div className="relative w-12 h-12 flex items-center justify-center">
+      {/* Outermost ring - light gray/pink */}
+      <div
+        className={`absolute inset-[2px] rounded-full border-[4px] ${
+          isActive || isCompleted ? "border-[#E31B54]" : "border-gray-100"
+        }`}
+      ></div>
+
+      {/* White ring */}
+      <div className="absolute inset-1 rounded-full border-2 border-white bg-white"></div>
+
+      {/* Main colored ring */}
+      <div
+        className={`absolute w-[30px] h-[30px] rounded-full border-2 ${
+          isActive || isCompleted
+            ? "border-[#E31B54] bg-[#E31B54]"
+            : "border-gray-200 bg-gray-200"
+        }`}
+      ></div>
+
+      {/* Center white dot */}
+      <div className="w-2 h-2 rounded-full bg-white z-10"></div>
     </div>
   );
 };
@@ -47,9 +63,11 @@ const RegistrationScreen = () => {
     name: "",
     surname: "",
     phoneNumber: "",
+    whatsappSame: true,
     password: "",
     confirmPassword: "",
-    rememberMe: true,
+    agreeTerms: false,
+    rememberMe: false,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -61,8 +79,8 @@ const RegistrationScreen = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePhoneChange = (value) => {
-    setFormData((prev) => ({ ...prev, phoneNumber: value }));
+  const handlePhoneChange = (e) => {
+    setFormData((prev) => ({ ...prev, phoneNumber: e?.target.value }));
   };
 
   const handleSubmit = () => {
@@ -70,253 +88,279 @@ const RegistrationScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Left Panel - Form */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
-        <div className="w-full max-w-md">
-          <div className="mb-8">
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)" }}
+    >
+      {/* Left Panel - Form (Scrollable) */}
+      <div className="flex-1 ">
+        <div className="w-full max-w-md mx-auto flex flex-col bg-white/40 rounded-lg">
+          {/* Fixed Header */}
+          <div className="flex-shrink-0 pt-8 px-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Let's get you started
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mb-8">
               on the journey to paying yourself first!
             </p>
-          </div>
 
-          {/* Progress Steps */}
-          <div className="mb-8">
-            <div className="flex items-center">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  currentStep >= 1
-                    ? "bg-red-500 text-white"
-                    : "bg-gray-200 text-gray-500"
-                }`}
-              >
-                1
-              </div>
-              <div
-                className={`flex-1 h-1 mx-2 ${
-                  currentStep >= 2 ? "bg-red-500" : "bg-gray-200"
-                }`}
-              />
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  currentStep >= 2
-                    ? "bg-red-500 text-white"
-                    : "bg-gray-200 text-gray-500"
-                }`}
-              >
-                2
-              </div>
-              <div
-                className={`flex-1 h-1 mx-2 ${
-                  currentStep >= 3 ? "bg-red-500" : "bg-gray-200"
-                }`}
-              />
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  currentStep >= 3
-                    ? "bg-red-500 text-white"
-                    : "bg-gray-200 text-gray-500"
-                }`}
-              >
-                3
+            {/* Updated Progress Steps */}
+            <div className="mb-8 mx-6">
+              <div className="flex items-center justify-center">
+                <CircularProgressStep
+                  isActive={currentStep >= 1}
+                  isCompleted={currentStep > 1}
+                />
+                <div
+                  className={`flex-1 h-[3px] ${
+                    currentStep >= 2 ? "bg-[#E31B54]" : "bg-[#E31B54]"
+                  }`}
+                />
+                <CircularProgressStep
+                  isActive={currentStep >= 2}
+                  isCompleted={currentStep > 2}
+                />
+                <div
+                  className={`flex-1 h-[3px] ${
+                    currentStep >= 3 ? "bg-[#E31B54]" : "bg-[#E31B54]"
+                  }`}
+                />
+                <CircularProgressStep
+                  isActive={currentStep >= 3}
+                  isCompleted={currentStep > 3}
+                />
               </div>
             </div>
           </div>
 
-          <div className="space-y-6">
-            {/* Name and Surname */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Label
-                  htmlFor="name"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Enter your name"
-                  className="mt-1"
-                  required
-                />
+          {/* Scrollable Form Content */}
+          <div className="flex-1 overflow-y-auto px-6 pb-8">
+            <div className="space-y-6">
+              {/* Name and Surname */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label
+                    htmlFor="name"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Name <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="Enter your name"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label
+                    htmlFor="surname"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Surname <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="surname"
+                    name="surname"
+                    type="text"
+                    value={formData.surname}
+                    onChange={handleInputChange}
+                    placeholder="Enter your surname"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    required
+                  />
+                </div>
               </div>
-              <div>
-                <Label
-                  htmlFor="surname"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Surname <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="surname"
-                  name="surname"
-                  type="text"
-                  value={formData.surname}
-                  onChange={handleInputChange}
-                  placeholder="Enter your surname"
-                  className="mt-1"
-                  required
-                />
-              </div>
-            </div>
 
-            {/* Phone Number with Library */}
-            <div>
-              <Label
-                htmlFor="phoneNumber"
-                className="text-sm font-medium text-gray-700"
+              {/* Phone Number */}
+              <div>
+                <Label
+                  htmlFor="phoneNumber"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Cell Number <span className="text-red-500">*</span>
+                </Label>
+                <div className="mt-1">
+                  <PhoneInput
+                    placeholder="Enter phone number"
+                    value={formData.phoneNumber}
+                    onChange={handlePhoneChange}
+                    defaultCountry="ZA"
+                    className="phone-input"
+                  />
+                </div>
+              </div>
+
+              {/* WhatsApp Toggle */}
+              <div className="flex items-center space-x-3">
+                <Switch
+                  id="whatsappSame"
+                  checked={formData.whatsappSame}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, whatsappSame: checked }))
+                  }
+                  className="data-[state=checked]:bg-[#E31B54]"
+                />
+                <Label
+                  htmlFor="whatsappSame"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  WhatsApp Number is the same as above.
+                </Label>
+              </div>
+
+              {/* Password */}
+              <div>
+                <Label
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Password
+                </Label>
+                <div className="relative mt-1">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    placeholder="Create a password"
+                    className="pr-10 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div>
+                <Label
+                  htmlFor="confirmPassword"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Confirm Password
+                </Label>
+                <div className="relative mt-1">
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    placeholder="Confirm your password"
+                    className="pr-10 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Terms and Conditions */}
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="agreeTerms"
+                  checked={formData.agreeTerms}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, agreeTerms: checked }))
+                  }
+                  className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
+                />
+                <Label
+                  htmlFor="agreeTerms"
+                  className="text-sm text-gray-700 leading-5"
+                >
+                  I agree to the Terms and Conditions by logging and using this
+                  application
+                </Label>
+              </div>
+
+              {/* Remember Me */}
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="rememberMe"
+                  checked={formData.rememberMe}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, rememberMe: checked }))
+                  }
+                  className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
+                />
+                <div>
+                  <Label
+                    htmlFor="rememberMe"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Remember me
+                  </Label>
+                  <p className="text-xs text-gray-500">
+                    Save my login details for next time.
+                  </p>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                onClick={handleSubmit}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-base font-medium"
+                disabled={!formData.agreeTerms}
               >
-                Cell Number <span className="text-red-500">*</span>
-              </Label>
-              <div className="mt-1">
-                <PhoneNumberInput
-                  value={formData.phoneNumber}
-                  onChange={handlePhoneChange}
-                  placeholder="Enter phone number"
-                  className="w-full"
-                />
-              </div>
-            </div>
+                Get started
+              </Button>
 
-            {/* Remember Me Toggle */}
-            <div className="flex items-center space-x-3">
-              <Switch
-                id="rememberMe"
-                checked={formData.rememberMe}
-                onCheckedChange={(checked) =>
-                  setFormData((prev) => ({ ...prev, rememberMe: checked }))
-                }
-                className="data-[state=checked]:bg-red-500"
-              />
-              <div>
-                <Label
-                  htmlFor="rememberMe"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Remember me
-                </Label>
-                <p className="text-xs text-gray-500">
-                  Save my login details for next time.
+              {/* Login Link */}
+              <div className="text-center">
+                <p className="text-sm text-gray-600">
+                  Already have an account?{" "}
+                  <a
+                    href="#"
+                    className="text-[#E31B54] hover:text-[#E31B54] font-medium"
+                  >
+                    Log in
+                  </a>
                 </p>
               </div>
-            </div>
-
-            {/* Password */}
-            <div>
-              <Label
-                htmlFor="password"
-                className="text-sm font-medium text-gray-700"
-              >
-                Password
-              </Label>
-              <div className="relative mt-1">
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="Create a password"
-                  className="pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <Label
-                htmlFor="confirmPassword"
-                className="text-sm font-medium text-gray-700"
-              >
-                Confirm Password
-              </Label>
-              <div className="relative mt-1">
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  placeholder="Confirm your password"
-                  className="pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <Button
-              onClick={handleSubmit}
-              className="w-full bg-red-500 hover:bg-red-600 text-white py-3 text-base font-medium"
-            >
-              Get started
-            </Button>
-
-            {/* Login Link */}
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?{" "}
-                <a
-                  href="#"
-                  className="text-red-500 hover:text-red-600 font-medium"
-                >
-                  Log in
-                </a>
-              </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Right Panel - Testimonial */}
-      <div className="hidden lg:flex flex-1 relative">
-        <div
-          className="w-full bg-cover bg-center relative"
-          style={{
-            backgroundImage: `url('data:image/svg+xml;base64,${btoa(`
-              <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#FFA726;stop-opacity:0.8" />
-                    <stop offset="100%" style="stop-color:#66BB6A;stop-opacity:0.8" />
-                  </linearGradient>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#bg)"/>
-              </svg>
-            `)}')`,
-          }}
-        >
-          {/* Testimonial Card */}
+      {/* Right Panel - Full Height Image with Testimonial */}
+      <div className="hidden lg:flex flex-1 relative min-h-screen">
+        <div className="w-full relative">
+          {/* Background Image */}
+          <img
+            src="/banner.jpg"
+            alt="Background"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+
+          {/* Gradient Overlay */}
+          {/* <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/90 via-orange-400/70 to-green-300/60"></div> */}
+
+          {/* Testimonial Card - Fixed Position */}
           <div className="absolute bottom-8 left-8 right-8">
             <div className="bg-black/30 backdrop-blur-sm rounded-2xl p-8 text-white">
               <div className="flex items-center mb-4">
@@ -332,7 +376,7 @@ const RegistrationScreen = () => {
               </div>
 
               <blockquote className="text-xl font-medium mb-6">
-                "We've been using JanRiches to kick start every new project and
+                "We've been using Untitled to kick start every new project and
                 can't imagine working without it. It's incredible."
               </blockquote>
 
