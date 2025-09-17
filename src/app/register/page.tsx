@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import CircularProgressStep from "@/components/CircularProgressStep";
 
 const PhoneNumberInput = ({ value, onChange, placeholder, className }) => {
   return (
@@ -26,34 +27,6 @@ const PhoneNumberInput = ({ value, onChange, placeholder, className }) => {
           className="flex-1 px-3 py-2 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 border-0"
         />
       </div>
-    </div>
-  );
-};
-
-const CircularProgressStep = ({ isActive, isCompleted }) => {
-  return (
-    <div className="relative w-12 h-12 flex items-center justify-center">
-      {/* Outermost ring - light gray/pink */}
-      <div
-        className={`absolute inset-[2px] rounded-full border-[4px] ${
-          isActive || isCompleted ? "border-[#E31B54]" : "border-gray-100"
-        }`}
-      ></div>
-
-      {/* White ring */}
-      <div className="absolute inset-1 rounded-full border-2 border-white bg-white"></div>
-
-      {/* Main colored ring */}
-      <div
-        className={`absolute w-[30px] h-[30px] rounded-full border-2 ${
-          isActive || isCompleted
-            ? "border-[#E31B54] bg-[#E31B54]"
-            : "border-gray-200 bg-gray-200"
-        }`}
-      ></div>
-
-      {/* Center white dot */}
-      <div className="w-2 h-2 rounded-full bg-white z-10"></div>
     </div>
   );
 };
@@ -93,8 +66,8 @@ const RegistrationScreen = () => {
       style={{ background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)" }}
     >
       {/* Left Panel - Form (Scrollable) */}
-      <div className="flex-1 ">
-        <div className="w-full max-w-md mx-auto flex flex-col bg-white/40 rounded-lg">
+      <div className="flex-1 p-6 sm:p-0">
+        <div className="w-full max-w-md mx-auto flex flex-col bg-white/50 rounded-lg">
           {/* Fixed Header */}
           <div className="flex-shrink-0 pt-8 px-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -105,30 +78,13 @@ const RegistrationScreen = () => {
             </p>
 
             {/* Updated Progress Steps */}
-            <div className="mb-8 mx-6">
+            <div className="mb-8 mx-12">
               <div className="flex items-center justify-center">
-                <CircularProgressStep
-                  isActive={currentStep >= 1}
-                  isCompleted={currentStep > 1}
-                />
-                <div
-                  className={`flex-1 h-[3px] ${
-                    currentStep >= 2 ? "bg-[#E31B54]" : "bg-[#E31B54]"
-                  }`}
-                />
-                <CircularProgressStep
-                  isActive={currentStep >= 2}
-                  isCompleted={currentStep > 2}
-                />
-                <div
-                  className={`flex-1 h-[3px] ${
-                    currentStep >= 3 ? "bg-[#E31B54]" : "bg-[#E31B54]"
-                  }`}
-                />
-                <CircularProgressStep
-                  isActive={currentStep >= 3}
-                  isCompleted={currentStep > 3}
-                />
+                <CircularProgressStep status={"isActive"} />
+                <div className="flex-1 h-[3px] bg-[#E31B54]" />
+                <CircularProgressStep status={""} />
+                <div className="flex-1 h-[3px] bg-[#E31B54]" />
+                <CircularProgressStep status={""} />
               </div>
             </div>
           </div>
@@ -324,7 +280,7 @@ const RegistrationScreen = () => {
               {/* Submit Button */}
               <Button
                 onClick={handleSubmit}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-base font-medium"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-base font-medium"
                 disabled={!formData.agreeTerms}
               >
                 Get started

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ const PaymentSuccessPage = () => {
           />
           <div className="relative">
             <img
-              src="/Illustration.png"
+              src="/illustrator.svg"
               alt="Envelope Icon"
               className="w-full z-10"
             />
