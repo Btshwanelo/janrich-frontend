@@ -78,7 +78,7 @@ const ForgotPasswordScreen = () => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 px-6 pb-8">
+            <div className="flex-1 px-6 py-8">
               <div className="space-y-6">
                 {/* Email Icon */}
                 <div className="flex justify-center mb-6">
@@ -193,9 +193,25 @@ const ForgotPasswordScreen = () => {
     >
       {/* Left Panel - Form */}
       <div className="flex-1 p-6 sm:p-0">
+        <div className="text-center relative mb-8">
+          <div className="mb-6">
+            <img
+              src="/logo-svg.svg"
+              alt="JanRich Logo"
+              className="mx-auto w-12 h-auto"
+            />
+          </div>
+
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Forgot password?
+          </h1>
+          <p className="text-gray-600">
+            No worries, we'll send you reset instructions.
+          </p>
+        </div>
         <div className="w-full max-w-md mx-auto flex flex-col bg-white/50 rounded-lg">
           {/* Fixed Header */}
-          <div className="flex-shrink-0 pt-8 px-6">
+          {/* <div className="flex-shrink-0 pt-8 px-6">
             <div className="flex items-center mb-6">
               <h1 className="text-3xl font-bold text-gray-900">
                 Forgot password?
@@ -204,10 +220,10 @@ const ForgotPasswordScreen = () => {
             <p className="text-gray-600 mb-8">
               No worries, we'll send you reset instructions.
             </p>
-          </div>
+          </div> */}
 
           {/* Form Content */}
-          <div className="flex-1 overflow-y-auto px-6 pb-8">
+          <div className="flex-1 overflow-y-auto px-6 py-8">
             <Formik
               initialValues={initialValues}
               validationSchema={validationSchema}

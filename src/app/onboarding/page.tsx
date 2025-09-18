@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, ChevronDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,8 +30,8 @@ const Onboarding = () => {
     race: "",
     communicationPreference: "whatsapp",
   });
-const [open, setOpen] = React.useState(false);
-const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [open, setOpen] = React.useState(false);
+  const [date, setDate] = React.useState<Date | undefined>(undefined);
   const handleSelectChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -43,6 +43,37 @@ const [date, setDate] = React.useState<Date | undefined>(undefined);
   const handleCommunicationChange = (value) => {
     setFormData((prev) => ({ ...prev, communicationPreference: value }));
   };
+
+  useEffect(() => {
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "token 2980b929194a37f:90f932cf10994d7");
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append(
+      "Cookie",
+      "full_name=Mike%20Bucibo; sid=3cc357e1b6cf8e4e91ba84f17361942d86ceb1c3e536f8d256467eef; system_user=no; user_id=mike%40xyz.com; user_image="
+    );
+
+    const raw = JSON.stringify({
+      email: "mike@xyz.com",
+      password: "Tshw@nelo",
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch(
+      "https://app-staging.janriches.com/api/method/janriches.api.auth.jan_user_login",
+      requestOptions
+    )
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+  }, [])
+  
 
   return (
     <div
@@ -324,7 +355,7 @@ const [date, setDate] = React.useState<Date | undefined>(undefined);
           <p className="text-sm text-gray-600">
             Already have an account?{" "}
             <a
-              href="#"
+              href="/login"
               className="text-[#E31B54] hover:text-[#E31B54] font-medium"
             >
               Log in

@@ -7,22 +7,117 @@ import CircularProgressStep from "@/components/CircularProgressStep";
 
 const PlanSelectionScreen = () => {
   const [selectedPlan, setSelectedPlan] = useState("subscription");
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // PayFast configuration - replace with your actual credentials
+  const PAYFAST_CONFIG = {
+    merchant_id: "12062869",
+    merchant_key: "4dtl43a4c0nhi",
+    return_url: `${window.location.origin}/payment-success`,
+    cancel_url: `${window.location.origin}/payment-cancelled`,
+    notify_url: `${window.location.origin}/api/payfast-notify`,
+    sandbox: true, // Use sandbox for testing
+  };
+
+  // Plan pricing
+  const planPricing = {
+    subscription: {
+      amount: "249.99",
+      item_name: "JanRiches Annual Subscription",
+      item_description:
+        "Join the community, save and start paying yourself first.",
+    },
+    "once-off": {
+      amount: "349.99",
+      item_name: "JanRiches Once-off Payment",
+      item_description: "Be a part of the community on your own terms.",
+    },
+  };
+
+  // Generate signature for PayFast (you'll need to implement this server-side for production)
+  const generateSignature = (data) => {
+    // In production, this should be done server-side for security
+    // This is a simplified version for demonstration
+    const crypto = require("crypto");
+    const queryString = Object.keys(data)
+      .filter((key) => data[key] !== "" && key !== "signature")
+      .sort()
+      .map((key) => `${key}=${encodeURIComponent(data[key])}`)
+      .join("&");
+
+    return crypto.createHash("md5").update(queryString).digest("hex");
+  };
+
+  const handlePayment = async () => {
+    setIsProcessing(true);
+
+    try {
+      const selectedPlanData = planPricing[selectedPlan];
+
+      // PayFast payment data
+      const paymentData = {
+        merchant_id: PAYFAST_CONFIG.merchant_id,
+        merchant_key: PAYFAST_CONFIG.merchant_key,
+        return_url: PAYFAST_CONFIG.return_url,
+        cancel_url: PAYFAST_CONFIG.cancel_url,
+        notify_url: PAYFAST_CONFIG.notify_url,
+
+        // Payment details
+        m_payment_id: `JR_${Date.now()}`, // Unique payment ID
+        amount: selectedPlanData.amount,
+        item_name: selectedPlanData.item_name,
+        item_description: selectedPlanData.item_description,
+
+        // Additional fields
+        email_address: "user@example.com", // Replace with actual user email
+        name_first: "User", // Replace with actual user name
+        name_last: "Name", // Replace with actual user surname
+
+        // Subscription details (if applicable)
+        ...(selectedPlan === "subscription" && {
+          subscription_type: "1", // Monthly
+          billing_date: new Date().toISOString().split("T")[0],
+          recurring_amount: selectedPlanData.amount,
+          frequency: "3", // Annual
+          cycles: "0", // Indefinite
+        }),
+      };
+
+      // In production, you should generate the signature server-side
+      // paymentData.signature = generateSignature(paymentData);
+
+      // Create form and submit to PayFast
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = PAYFAST_CONFIG.sandbox
+        ? "https://sandbox.payfast.co.za/eng/process"
+        : "https://www.payfast.co.za/eng/process";
+
+      console.log("Payment Data:", paymentData);
+      // Add form fields
+      Object.keys(paymentData).forEach((key) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = paymentData[key];
+        form.appendChild(input);
+      });
+      console.log("Submitting form to PayFast:", form);
+      document.body.appendChild(form);
+      form.submit();
+    } catch (error) {
+      console.error("Payment initiation error:", error);
+      setIsProcessing(false);
+      // Handle error - show user-friendly message
+      alert("Payment initiation failed. Please try again.");
+    }
+  };
 
   return (
     <div
       className="min-h-screen flex items-center justify-center px-10 py-8"
       style={{ background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)" }}
     >
-          {/* <img
-            src="/logo-bg.svg"
-            alt="Background"
-            className="absolute top-0 z-0 h-full w-full max-w-md"
-            style={{
-              maskImage: "radial-gradient(circle, black 30%, transparent 70%)",
-              WebkitMaskImage:
-                "radial-gradient(circle, black 60%, transparent 100%)",
-            }}
-          /> */}
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center relative mb-8">
@@ -87,11 +182,8 @@ const PlanSelectionScreen = () => {
                 </p>
               </div>
               <Checkbox
-                id="rememberMe"
+                id="subscription"
                 checked={selectedPlan === "subscription"}
-                // onCheckedChange={(checked) =>
-                //   setFormData((prev) => ({ ...prev, rememberMe: checked }))
-                // }
                 className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
               />
             </div>
@@ -120,11 +212,8 @@ const PlanSelectionScreen = () => {
                 </p>
               </div>
               <Checkbox
-                id="rememberMe"
+                id="once-off"
                 checked={selectedPlan === "once-off"}
-                // onCheckedChange={(checked) =>
-                //   setFormData((prev) => ({ ...prev, rememberMe: checked }))
-                // }
                 className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
               />
             </div>
@@ -151,10 +240,15 @@ const PlanSelectionScreen = () => {
 
           {/* Pay Button */}
           <Button
-            className="w-full bg-[#155EEF] hover:bg-[#155EEF] text-white py-6 text-base font-medium rounded-lg"
-            onClick={() => console.log(`Selected plan: ${selectedPlan}`)}
+            className="w-full bg-[#155EEF] hover:bg-[#155EEF] text-white py-6 text-base font-medium rounded-lg disabled:opacity-50"
+            onClick={handlePayment}
+            disabled={isProcessing}
           >
-            Pay R{selectedPlan === "subscription" ? "249.99" : "349.99"} Now
+            {isProcessing
+              ? "Processing..."
+              : `Pay R${
+                  selectedPlan === "subscription" ? "249.99" : "349.99"
+                } Now`}
           </Button>
         </div>
 
