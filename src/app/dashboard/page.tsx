@@ -12,15 +12,28 @@ import {
   TrendingUp,
   Zap,
   HelpCircle,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ProfileModal from "@/components/ProfileModal";
-import { set } from "date-fns";
+import AuthGuard from "@/components/AuthGuard";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { clearCredentials, clearAuthCookie } from "@/lib/slices/authSlice";
+import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("View all");
   const [isModalOpen, setIsModalOpen] = useState(true);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { user, fullName } = useAppSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    dispatch(clearCredentials());
+    clearAuthCookie();
+    router.push("/login");
+  };
 
   const transactions = [
     {
@@ -47,7 +60,8 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <AuthGuard>
+      <div className="min-h-screen bg-gray-50 flex">
       {/* Left Sidebar */}
       <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
         {/* Logo */}
@@ -115,12 +129,19 @@ const Dashboard = () => {
             <Settings className="w-5 h-5" />
             <span>Settings</span>
           </a>
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg w-full text-left"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Logout</span>
+          </button>
 
           {/* User Profile */}
           <div className="flex items-center space-x-3 px-3 py-2 mt-4">
             <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
             <div className="flex-1">
-              <div className="text-sm font-medium">Olivia</div>
+              <div className="text-sm font-medium">{fullName || user || 'User'}</div>
             </div>
           </div>
         </div>
@@ -132,7 +153,7 @@ const Dashboard = () => {
         <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Welcome back, Olivia
+              Welcome back, {fullName || user || 'User'}
             </h1>
             <div className="flex items-center space-x-4">
               <div className="relative">
@@ -439,7 +460,8 @@ const Dashboard = () => {
           </div>
         </main>
       </div>
-    </div>
+      </div>
+    </AuthGuard>
   );
 };
 

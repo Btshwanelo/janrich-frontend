@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { useLoginMutation } from "@/lib/slices/authSlice";
+import { setCredentials, setError, setLoading, setAuthCookie } from "@/lib/slices/authSlice";
+import { useRouter } from "next/navigation";
+import PublicRouteGuard from "@/components/PublicRouteGuard";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -20,7 +25,14 @@ const validationSchema = Yup.object({
 
 const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  // Redux state
+  const { isAuthenticated, isLoading, error } = useAppSelector(
+    (state) => state.auth
+  );
+  const [login, { isLoading: isLoginLoading }] = useLoginMutation();
 
   // Refs for field highlighting
   const emailRef = useRef<HTMLInputElement>(null);
@@ -32,17 +44,83 @@ const LoginScreen = () => {
     rememberMe: false,
   };
 
-  const handleSubmit = async (values: any, { setSubmitting }: any) => {
-    setIsSubmitting(true);
-    console.log("Login submitted:", values);
+  // Note: Redirect logic is now handled by PublicRouteGuard
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+  // Clear error when component mounts
+  useEffect(() => {
+    dispatch(setError(null));
+  }, [dispatch]);
+
+  const handleSubmit = async (
+    values: { email: string; password: string; rememberMe: boolean },
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
+    try {
+      dispatch(setLoading(true));
+      dispatch(setError(null));
+
+      console.log("Login submitted:", values);
+
+      const result = await login({
+        email: values.email,
+        password: values.password,
+      }).unwrap();
+
+      console.log("Login successful:", result);
+
+      // Dispatch credentials to Redux store
+      dispatch(
+        setCredentials({
+          user: result.message.user,
+          sid: result.message.sid,
+          fullName: result.full_name,
+          homePage: result.home_page,
+        })
+      );
+
+      // Set authentication cookie
+      setAuthCookie(true);
+
+      // Redirect to dashboard
+      router.push("/dashboard");
+    } catch (error: unknown) {
+      console.log("Login failed:", error);
+
+      // Handle different error types
+      let errorMessage = "Login failed. Please try again.";
+
+      if (
+        error &&
+        typeof error === "object" &&
+        "data" in error &&
+        error.data &&
+        typeof error.data === "object" &&
+        "message" in error.data
+      ) {
+        errorMessage = String(error.data.message);
+      } else if (error && typeof error === "object" && "message" in error) {
+        errorMessage = String(error.message);
+      } else if (
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        error.status === 401
+      ) {
+        errorMessage = "Invalid email or password.";
+      } else if (
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        error.status === 500
+      ) {
+        errorMessage = "Server error. Please try again later.";
+      }
+
+      dispatch(setError(errorMessage));
+    } finally {
+      dispatch(setLoading(false));
       setSubmitting(false);
-      // Handle successful login here
-      // window.location.href = "/dashboard";
-    }, 2000);
+    }
   };
 
   const focusNextField = (
@@ -56,10 +134,11 @@ const LoginScreen = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center"
-      style={{ background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)" }}
-    >
+    <PublicRouteGuard>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)" }}
+      >
       {/* Left Panel - Form (Scrollable) */}
       <div className="flex-1 p-6 sm:p-0">
         <div className="text-center relative mb-8">
@@ -105,7 +184,20 @@ const LoginScreen = () => {
                       Email <span className="text-red-500">*</span>
                     </Label>
                     <Field name="email">
-                      {({ field }: any) => (
+                      {({
+                        field,
+                      }: {
+                        field: {
+                          name: string;
+                          value: string;
+                          onChange: (
+                            e: React.ChangeEvent<HTMLInputElement>
+                          ) => void;
+                          onBlur: (
+                            e: React.FocusEvent<HTMLInputElement>
+                          ) => void;
+                        };
+                      }) => (
                         <Input
                           {...field}
                           ref={emailRef}
@@ -117,7 +209,9 @@ const LoginScreen = () => {
                               ? "border-red-500"
                               : ""
                           }`}
-                          onKeyDown={(e: any) => {
+                          onKeyDown={(
+                            e: React.KeyboardEvent<HTMLInputElement>
+                          ) => {
                             if (e.key === "Enter") {
                               e.preventDefault();
                               focusNextField(emailRef);
@@ -143,7 +237,20 @@ const LoginScreen = () => {
                     </Label>
                     <div className="relative mt-1">
                       <Field name="password">
-                        {({ field }: any) => (
+                        {({
+                          field,
+                        }: {
+                          field: {
+                            name: string;
+                            value: string;
+                            onChange: (
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => void;
+                            onBlur: (
+                              e: React.FocusEvent<HTMLInputElement>
+                            ) => void;
+                          };
+                        }) => (
                           <Input
                             {...field}
                             ref={passwordRef}
@@ -155,11 +262,13 @@ const LoginScreen = () => {
                                 ? "border-red-500"
                                 : ""
                             }`}
-                            onKeyDown={(e: any) => {
+                            onKeyDown={(
+                              e: React.KeyboardEvent<HTMLInputElement>
+                            ) => {
                               if (e.key === "Enter") {
                                 e.preventDefault();
                                 // Submit form on Enter in password field
-                                const form = e.target.form;
+                                const form = e.currentTarget.form;
                                 if (
                                   form &&
                                   isValid &&
@@ -196,7 +305,20 @@ const LoginScreen = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Field name="rememberMe">
-                        {({ field }: any) => (
+                        {({
+                          field,
+                        }: {
+                          field: {
+                            name: string;
+                            value: boolean;
+                            onChange: (
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => void;
+                            onBlur: (
+                              e: React.FocusEvent<HTMLInputElement>
+                            ) => void;
+                          };
+                        }) => (
                           <Checkbox
                             id="rememberMe"
                             checked={field.value}
@@ -223,18 +345,26 @@ const LoginScreen = () => {
                     </a>
                   </div>
 
+                  {/* Error Message */}
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                      <p className="text-red-600 text-sm">{error}</p>
+                    </div>
+                  )}
+
                   {/* Submit Button */}
                   <Button
                     type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={
                       !isValid ||
-                      isSubmitting ||
+                      isLoading ||
+                      isLoginLoading ||
                       !values.email ||
                       !values.password
                     }
                   >
-                    {isSubmitting ? "Signing in..." : "Sign in"}
+                    {isLoading || isLoginLoading ? "Signing in..." : "Sign in"}
                   </Button>
 
                   {/* Sign Up Link */}
@@ -310,7 +440,8 @@ const LoginScreen = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </PublicRouteGuard>
   );
 };
 
