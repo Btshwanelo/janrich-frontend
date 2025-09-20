@@ -368,14 +368,14 @@ const Dashboard = () => {
                 <div>
                   <div className="flex items-center space-x-4">
                     <h2 className="text-lg font-semibold text-gray-900">
-                      Vendor movements
+                      Transactions
                     </h2>
                     <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-sm">
                       240 Transaction
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mt-1">
-                    Keep track of vendor and their security ratings.
+                    Keep track of your transactions.
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
