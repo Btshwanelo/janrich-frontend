@@ -50,6 +50,11 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  // Registration data
+  customer: string | null;
+  contact: string | null;
+  address: string | null;
+  registrationMessage: string | null;
 }
 
 const initialState: AuthState = {
@@ -60,6 +65,11 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  // Registration data
+  customer: null,
+  contact: null,
+  address: null,
+  registrationMessage: null,
 };
 
 // Auth API slice
@@ -103,6 +113,8 @@ const authSlice = createSlice({
       state.homePage = action.payload.homePage;
       state.isAuthenticated = true;
       state.error = null;
+      // Set auth cookie for additional security
+      setAuthCookie(true);
     },
     clearCredentials: (state) => {
       state.user = null;
@@ -111,6 +123,13 @@ const authSlice = createSlice({
       state.homePage = null;
       state.isAuthenticated = false;
       state.error = null;
+      // Clear registration data
+      state.customer = null;
+      state.contact = null;
+      state.address = null;
+      state.registrationMessage = null;
+      // Clear persisted data
+      clearAuthCookie();
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
@@ -118,10 +137,24 @@ const authSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    setRegistrationData: (state, action: PayloadAction<{
+      customer: string;
+      user: string;
+      contact: string;
+      address: string | null;
+      message: string;
+    }>) => {
+      state.customer = action.payload.customer;
+      state.user = action.payload.user;
+      state.contact = action.payload.contact;
+      state.address = action.payload.address;
+      state.registrationMessage = action.payload.message;
+      state.error = null;
+    },
   },
 });
 
-export const { setCredentials, clearCredentials, setLoading, setError } = authSlice.actions;
+export const { setCredentials, clearCredentials, setLoading, setError, setRegistrationData } = authSlice.actions;
 
 // Helper functions for cookie management
 export const setAuthCookie = (isAuthenticated: boolean) => {

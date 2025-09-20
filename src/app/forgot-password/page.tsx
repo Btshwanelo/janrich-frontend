@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import PublicRouteGuard from "@/components/PublicRouteGuard";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -187,10 +188,11 @@ const ForgotPasswordScreen = () => {
   }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center"
-      style={{ background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)" }}
-    >
+    <PublicRouteGuard>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)" }}
+      >
       {/* Left Panel - Form */}
       <div className="flex-1 p-6 sm:p-0">
         <div className="text-center relative mb-8">
@@ -354,7 +356,8 @@ const ForgotPasswordScreen = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </PublicRouteGuard>
   );
 };
 

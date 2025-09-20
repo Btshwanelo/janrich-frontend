@@ -12,6 +12,8 @@ interface OTPVerificationModalProps {
 // OTP Verification Modal Component
 const OTPVerificationModal = ({ isOpen, onClose, phoneNumber, onSuccess }: OTPVerificationModalProps) => {
   const [otp, setOTP] = useState(["", "", "", "", "", ""]);
+  const [error, setError] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const handleOTPChange = (index: number, value: string) => {
     if (value.length > 1) return;
@@ -34,14 +36,39 @@ const OTPVerificationModal = ({ isOpen, onClose, phoneNumber, onSuccess }: OTPVe
     }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const otpCode = otp.join("");
     console.log("OTP entered:", otpCode);
-    // Handle verification logic here
-    if (onSuccess) {
-      onSuccess();
-    } else {
-      onClose();
+    
+    // Clear previous error
+    setError("");
+    setIsVerifying(true);
+    
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Hardcoded verification - check if OTP is "213508"
+      if (otpCode === "213508") {
+        console.log("OTP verification successful");
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          onClose();
+        }
+      } else {
+        setError("Invalid OTP code. Please try again.");
+        // Clear the OTP inputs
+        setOTP(["", "", "", "", "", ""]);
+        // Focus on first input
+        const firstInput = document.getElementById("otp-0");
+        firstInput?.focus();
+      }
+    } catch (error) {
+      console.error("OTP verification failed:", error);
+      setError("Verification failed. Please try again.");
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -58,21 +85,21 @@ const OTPVerificationModal = ({ isOpen, onClose, phoneNumber, onSuccess }: OTPVe
           <X className="w-5 h-5" />
         </button>
         <div className="flex gap-2">
-          {/* WhatsApp Icon */}
+          {/* Email Icon */}
           <div className="flex justify-center mb-4">
             <div className="w-12 h-12 flex items-center justify-center">
-              <img src="/whatsapp.svg" alt="WhatsApp" className="w-12 h-12" />
+              <img src="/whatsapp.svg" alt="WhatsApp Icon" className="w-8 h-8" />
             </div>
           </div>
 
           {/* Title and Description */}
           <div className="text-left mb-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Please check your WhatsApp.
+              Please check your whatsapp.
             </h2>
             <p className="text-gray-600 text-sm">
-              We've sent a code to your number ending with{" "}
-              {phoneNumber?.slice(-2) || "**90"}
+              We've sent a verification code to{" "}
+              {phoneNumber || "your email"}
             </p>
           </div>
         </div>
@@ -111,6 +138,13 @@ const OTPVerificationModal = ({ isOpen, onClose, phoneNumber, onSuccess }: OTPVe
           ))}
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
+            <p className="text-red-600 text-sm text-center">{error}</p>
+          </div>
+        )}
+
         {/* Resend Code */}
         <div className="text-center mb-6">
           <p className="text-sm text-gray-600">
@@ -128,9 +162,10 @@ const OTPVerificationModal = ({ isOpen, onClose, phoneNumber, onSuccess }: OTPVe
           </Button>
           <Button
             onClick={handleVerify}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3"
+            disabled={isVerifying || otp.some(digit => digit === "")}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Verify
+            {isVerifying ? "Verifying..." : "Verify"}
           </Button>
         </div>
       </div>

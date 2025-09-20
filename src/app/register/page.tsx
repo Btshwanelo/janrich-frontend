@@ -8,12 +8,16 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useRouter } from "next/navigation";
 
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import CircularProgressStep from "@/components/CircularProgressStep";
 import OTPVerificationModal from "@/components/OTPVerificationModal";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { useRegisterMutation } from "@/lib/slices/authSlice";
+import { setError, setLoading, setRegistrationData } from "@/lib/slices/authSlice";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -23,6 +27,9 @@ const validationSchema = Yup.object({
   surname: Yup.string()
     .min(2, "Surname must be at least 2 characters")
     .required("Surname is required"),
+  email: Yup.string()
+    .email("Please enter a valid email address")
+    .required("Email is required"),
   phoneNumber: Yup.string()
     .required("Phone number is required")
     .min(10, "Please enter a valid phone number"),
@@ -45,10 +52,18 @@ const RegistrationScreen = () => {
   const [showOTPModal, setShowOTPModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPasswordChecks, setShowPasswordChecks] = useState(false);
+  const [registrationData, setLocalRegistrationData] = useState<any>(null);
+
+  // Redux
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { error, isLoading } = useAppSelector((state) => state.auth);
+  const [register, { isLoading: isRegisterLoading }] = useRegisterMutation();
 
   // Refs for field highlighting
   const nameRef = useRef<HTMLInputElement>(null);
   const surnameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
@@ -56,6 +71,7 @@ const RegistrationScreen = () => {
   const initialValues = {
     name: "",
     surname: "",
+    email: "",
     phoneNumber: "",
     whatsappSame: true,
     password: "",
@@ -64,19 +80,77 @@ const RegistrationScreen = () => {
     rememberMe: false,
   };
 
-  const handleSubmit = async (values: any, { setSubmitting }: any) => {
-    setIsSubmitting(true);
-    console.log("Form submitted:", values);
+  const handleSubmit = async (values: any, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
+    try {
+      // dispatch(setLoading(true));
+      dispatch(setError(null));
+      setIsSubmitting(true);
+      
+      console.log("Form submitted:", values);
 
-    // Show OTP modal
-    setShowOTPModal(true);
-    setSubmitting(false);
+      // Prepare registration data
+      const registrationPayload = {
+        customer_name: `${values.name} ${values.surname}`,
+        customer_type: "Individual",
+        title: "Mr", // You might want to make this dynamic
+        first_name: values.name,
+        last_name: values.surname,
+        last_nameemail: values.surname,
+        email: values.email,
+        phone: values.phoneNumber,
+        country_code: "+27", // You might want to make this dynamic
+        new_password: values.password,
+        agree_to_terms: values.agreeTerms ? 1 : 0,
+      };
+
+      // Call register API
+      const result = await register(registrationPayload).unwrap();
+      
+      console.log("Registration successful:", result);
+      
+      // Store registration data in Redux store
+      dispatch(setRegistrationData({
+        customer: result.message.customer,
+        user: result.message.user,
+        contact: result.message.contact,
+        address: result.message.address,
+        message: result.message.message,
+      }));
+      
+      // Store registration data for OTP verification
+      setLocalRegistrationData(result);
+      
+      // Show OTP modal
+      setShowOTPModal(true);
+      
+    } catch (error: unknown) {
+      console.error("Registration failed:", error);
+      
+      // Handle different error types
+      let errorMessage = "Registration failed. Please try again.";
+      
+      if (error && typeof error === "object" && "data" in error && error.data && typeof error.data === "object" && "message" in error.data) {
+        errorMessage = String(error.data.message);
+      } else if (error && typeof error === "object" && "message" in error) {
+        errorMessage = String(error.message);
+      } else if (error && typeof error === "object" && "status" in error && error.status === 400) {
+        errorMessage = "Invalid registration data. Please check your information.";
+      } else if (error && typeof error === "object" && "status" in error && error.status === 500) {
+        errorMessage = "Server error. Please try again later.";
+      }
+      
+      dispatch(setError(errorMessage));
+    } finally {
+      dispatch(setLoading(false));
+      setIsSubmitting(false);
+      setSubmitting(false);
+    }
   };
 
   const handleOTPSuccess = () => {
     setShowOTPModal(false);
     // Redirect to onboarding
-    window.location.href = "/onboarding";
+    router.push("/onboarding");
   };
 
   const focusNextField = (
@@ -85,6 +159,7 @@ const RegistrationScreen = () => {
     const fieldOrder = [
       nameRef,
       surnameRef,
+      emailRef,
       phoneRef,
       passwordRef,
       confirmPasswordRef,
@@ -142,6 +217,14 @@ const RegistrationScreen = () => {
                       phoneNumber={values.phoneNumber}
                       onSuccess={handleOTPSuccess}
                     />
+                    
+                    {/* Error Message */}
+                    {error && (
+                      <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
+                        <p className="text-red-600 text-sm">{error}</p>
+                      </div>
+                    )}
+                    
                     <Form className="space-y-6">
                       {/* Name and Surname */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -215,6 +298,43 @@ const RegistrationScreen = () => {
                             className="text-red-500 text-xs mt-1"
                           />
                         </div>
+                      </div>
+
+                      {/* Email */}
+                      <div>
+                        <Label
+                          htmlFor="email"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          Email <span className="text-red-500">*</span>
+                        </Label>
+                        <Field name="email">
+                          {({ field }: any) => (
+                            <Input
+                              {...field}
+                              ref={emailRef}
+                              id="email"
+                              type="email"
+                              placeholder="Enter your email"
+                              className={`mt-1 focus:ring-blue-500 focus:border-blue-500 bg-white ${
+                                errors.email && touched.email
+                                  ? "border-red-500"
+                                  : ""
+                              }`}
+                              onKeyDown={(e: any) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  focusNextField(emailRef);
+                                }
+                              }}
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage
+                          name="email"
+                          component="div"
+                          className="text-red-500 text-xs mt-1"
+                        />
                       </div>
 
                       {/* Phone Number */}
@@ -515,15 +635,18 @@ const RegistrationScreen = () => {
                         disabled={
                           !isValid ||
                           isSubmitting ||
+                          isLoading ||
+                          isRegisterLoading ||
                           !values.name ||
                           !values.surname ||
+                          !values.email ||
                           !values.phoneNumber ||
                           !values.password ||
                           !values.confirmPassword ||
                           !values.agreeTerms
                         }
                       >
-                        {isSubmitting ? "Processing..." : "Get started"}
+                        {isSubmitting || isLoading || isRegisterLoading ? "Processing..." : "Get started"}
                       </Button>
 
                       {/* Login Link */}

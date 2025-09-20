@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { formatDateDDMMYYYY } from "@/lib/utils";
 
 export function Calendar22() {
   const [open, setOpen] = React.useState(false);
@@ -28,7 +29,7 @@ export function Calendar22() {
             id="date"
             className="w-48 justify-between font-normal"
           >
-            {date ? date.toLocaleDateString() : "Select date"}
+            {date ? formatDateDDMMYYYY(date) : "Select date"}
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>

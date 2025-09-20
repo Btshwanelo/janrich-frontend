@@ -4,26 +4,27 @@ import { Check, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import CircularProgressStep from "@/components/CircularProgressStep";
+import PublicRouteGuard from "@/components/PublicRouteGuard";
 
 const PlanSelectionScreen = () => {
   const [selectedPlan, setSelectedPlan] = useState("subscription");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // PayFast configuration - replace with your actual credentials
+  // PayFast configuration - sandbox credentials for testing
   const PAYFAST_CONFIG = {
-    merchant_id: "12062869",
-    merchant_key: "4dtl43a4c0nhi",
+    merchant_id: "10038198",
+    merchant_key: "8yshtxb2mu1oa",
     return_url: `${window.location.origin}/payment-success`,
     cancel_url: `${window.location.origin}/payment-cancelled`,
     notify_url: `${window.location.origin}/api/payfast-notify`,
-    sandbox: true, // Use sandbox for testing
+    sandbox: true, // Sandbox mode for testing
   };
 
   // Plan pricing
   const planPricing = {
     subscription: {
-      amount: "249.99",
-      item_name: "JanRiches Annual Subscription",
+      amount: "200",
+      item_name: "subscription",
       item_description:
         "Join the community, save and start paying yourself first.",
     },
@@ -34,28 +35,98 @@ const PlanSelectionScreen = () => {
     },
   };
 
-  // Generate signature for PayFast (you'll need to implement this server-side for production)
-  const generateSignature = (data) => {
-    // In production, this should be done server-side for security
-    // This is a simplified version for demonstration
+  // Test signature generation with known values
+  const testSignatureGeneration = () => {
     const crypto = require("crypto");
-    const queryString = Object.keys(data)
-      .filter((key) => data[key] !== "" && key !== "signature")
+    const testData: Record<string, string> = {
+      merchant_id: "10038198",
+      merchant_key: "8yshtxb2mu1oa",
+      amount: "200",
+      item_name: "subscription",
+    };
+
+    const queryString = Object.keys(testData)
       .sort()
-      .map((key) => `${key}=${encodeURIComponent(data[key])}`)
+      .map((key) => `${key}=${encodeURIComponent(testData[key])}`)
       .join("&");
 
-    return crypto.createHash("md5").update(queryString).digest("hex");
+    // Test without passphrase
+    const signatureWithoutPassphrase = crypto
+      .createHash("md5")
+      .update(queryString)
+      .digest("hex");
+    console.log("Test query string (no passphrase):", queryString);
+    console.log("Test signature (no passphrase):", signatureWithoutPassphrase);
+
+    // Test with passphrase
+    const passphrase = "your_passphrase_here"; // Replace with your actual passphrase
+    const queryStringWithPassphrase = `${queryString}&passphrase=${passphrase}`;
+    const signatureWithPassphrase = crypto
+      .createHash("md5")
+      .update(queryStringWithPassphrase)
+      .digest("hex");
+    console.log(
+      "Test query string (with passphrase):",
+      queryStringWithPassphrase
+    );
+    console.log("Test signature (with passphrase):", signatureWithPassphrase);
+
+    console.log("Expected signature:", "35773c2456df895197ee211c354933f2");
+    console.log(
+      "Match (no passphrase):",
+      signatureWithoutPassphrase === "35773c2456df895197ee211c354933f2"
+    );
+    console.log(
+      "Match (with passphrase):",
+      signatureWithPassphrase === "35773c2456df895197ee211c354933f2"
+    );
+  };
+
+  // Generate signature for PayFast
+  const generateSignature = (data: Record<string, any>) => {
+    const crypto = require("crypto");
+
+    // PayFast signature generation requires specific order and format
+    // Remove empty values and signature field
+    const filteredData = Object.keys(data)
+      .filter(
+        (key) =>
+          data[key] !== "" &&
+          data[key] !== null &&
+          data[key] !== undefined &&
+          key !== "signature"
+      )
+      .reduce((obj, key) => {
+        obj[key] = data[key];
+        return obj;
+      }, {} as Record<string, any>);
+
+    // Create query string in alphabetical order
+    const queryString = Object.keys(filteredData)
+      .sort()
+      .map((key) => `${key}=${encodeURIComponent(filteredData[key])}`)
+      .join("&");
+
+    // Add passphrase if you have one (check your PayFast account settings)
+    const passphrase = "your_passphrase_here"; // Replace with your actual PayFast passphrase
+    const finalString = passphrase
+      ? `${queryString}&passphrase=${passphrase}`
+      : queryString;
+
+    console.log("Query string for signature:", finalString);
+
+    return crypto.createHash("md5").update(finalString).digest("hex");
   };
 
   const handlePayment = async () => {
     setIsProcessing(true);
 
     try {
-      const selectedPlanData = planPricing[selectedPlan];
+      const selectedPlanData =
+        planPricing[selectedPlan as keyof typeof planPricing];
 
       // PayFast payment data
-      const paymentData = {
+      const paymentData: Record<string, any> = {
         merchant_id: PAYFAST_CONFIG.merchant_id,
         merchant_key: PAYFAST_CONFIG.merchant_key,
         return_url: PAYFAST_CONFIG.return_url,
@@ -83,17 +154,25 @@ const PlanSelectionScreen = () => {
         }),
       };
 
-      // In production, you should generate the signature server-side
+      // Test signature generation first
+      testSignatureGeneration();
+
+      // Generate signature for PayFast
       // paymentData.signature = generateSignature(paymentData);
 
       // Create form and submit to PayFast
       const form = document.createElement("form");
       form.method = "POST";
-      form.action = PAYFAST_CONFIG.sandbox
-        ? "https://sandbox.payfast.co.za/eng/process"
-        : "https://www.payfast.co.za/eng/process";
+      form.action = "https://sandbox.payfast.co.za/eng/process";
 
       console.log("Payment Data:", paymentData);
+      console.log("PayFast Sandbox URL:", form.action);
+      console.log("Generated Signature:", paymentData.signature);
+      console.log(
+        "Expected Signature from your details:",
+        "35773c2456df895197ee211c354933f2"
+      );
+
       // Add form fields
       Object.keys(paymentData).forEach((key) => {
         const input = document.createElement("input");
@@ -114,158 +193,165 @@ const PlanSelectionScreen = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-10 py-8"
-      style={{ background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)" }}
-    >
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center relative mb-8">
-          <div className="mb-6">
-            <img
-              src="/logo-svg.svg"
-              alt="JanRich Logo"
-              className="mx-auto w-12 h-auto"
-            />
-          </div>
-
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Complete your sign up
-          </h1>
-          <p className="text-gray-600">We're nearly done,</p>
-        </div>
-
-        {/* Plan Selection Card */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
-          {/* Progress Steps */}
-          <div className="mb-8 mx-10">
-            <div className="flex items-center justify-center">
-              <CircularProgressStep status={"isCompleted"} />
-              <div className="flex-1 h-[3px] bg-[#E31B54]" />
-              <CircularProgressStep status={"isCompleted"} />
-              <div className="flex-1 h-[3px] bg-[#E31B54]" />
-              <CircularProgressStep status={"isActive"} />
+    <PublicRouteGuard>
+      <div
+        className="min-h-screen flex items-center justify-center px-10 py-8"
+        style={{
+          background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
+        }}
+      >
+        <div className="w-full max-w-md">
+          {/* Header */}
+          <div className="text-center relative mb-8">
+            <div className="mb-6">
+              <img
+                src="/logo-svg.svg"
+                alt="JanRich Logo"
+                className="mx-auto w-12 h-auto"
+              />
             </div>
+
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Complete your sign up
+            </h1>
+            <p className="text-gray-600">We're nearly done,</p>
           </div>
 
-          <div className="mb-6">
-            <h2 className="text-sm font-semibold text-[#BC1B06] mb-2">
-              Plan Selection
-            </h2>
-            <p className="text-[#535862] text-sm">
-              We've got two payment options for you, Subscriptions and Once-off
+          {/* Plan Selection Card */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
+            {/* Progress Steps */}
+            <div className="mb-8 mx-10">
+              <div className="flex items-center justify-center">
+                <CircularProgressStep status={"isCompleted"} />
+                <div className="flex-1 h-[3px] bg-[#E31B54]" />
+                <CircularProgressStep status={"isCompleted"} />
+                <div className="flex-1 h-[3px] bg-[#E31B54]" />
+                <CircularProgressStep status={"isActive"} />
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h2 className="text-sm font-semibold text-[#BC1B06] mb-2">
+                Plan Selection
+              </h2>
+              <p className="text-[#535862] text-sm">
+                We've got two payment options for you, Subscriptions and
+                Once-off
+              </p>
+            </div>
+
+            {/* Subscription Plan */}
+            <div
+              className={`border-2 rounded-xl p-4 mb-4 cursor-pointer transition-all ${
+                selectedPlan === "subscription"
+                  ? "border-[#155EEF]"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+              onClick={() => setSelectedPlan("subscription")}
+            >
+              <div className="flex items-start">
+                <div className="flex-1">
+                  <div className="flex items-center mb-2">
+                    <CreditCard className="w-5 h-5 text-gray-500 mr-3" />
+                    <div>
+                      <span className="font-medium text-gray-900">
+                        Subscription{" "}
+                      </span>
+                      <span className="text-gray-600">R200.00/year</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 ml-8">
+                    Join the community, save and start paying yourself first.
+                  </p>
+                </div>
+                <Checkbox
+                  id="subscription"
+                  checked={selectedPlan === "subscription"}
+                  className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
+                />
+              </div>
+            </div>
+
+            {/* Once-off Plan */}
+            <div
+              className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
+                selectedPlan === "once-off"
+                  ? "border-[#155EEF]"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+              onClick={() => setSelectedPlan("once-off")}
+            >
+              <div className="flex items-start">
+                <div className="flex-1">
+                  <div className="flex items-center mb-2">
+                    <CreditCard className="w-5 h-5 text-gray-500 mr-3" />
+                    <div>
+                      <span className="font-medium text-gray-900">
+                        Once Off{" "}
+                      </span>
+                      <span className="text-gray-600">R349.99 once-off</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 ml-8">
+                    Be a part of the community on your own terms.
+                  </p>
+                </div>
+                <Checkbox
+                  id="once-off"
+                  checked={selectedPlan === "once-off"}
+                  className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
+                />
+              </div>
+            </div>
+
+            {/* Payment Methods */}
+            <div className="flex items-center justify-center gap-4 my-6">
+              <img
+                src="/visa.svg"
+                alt="Visa"
+                className="h-8 w-auto object-contain"
+              />
+              <img
+                src="/mastercard.svg"
+                alt="MasterCard"
+                className="h-8 w-auto object-contain"
+              />
+              <img
+                src="/blue-mastercard.svg"
+                alt="PayPal"
+                className="h-8 w-auto object-contain"
+              />
+            </div>
+
+            {/* Pay Button */}
+            <Button
+              className="w-full bg-[#155EEF] hover:bg-[#155EEF] text-white py-6 text-base font-medium rounded-lg disabled:opacity-50"
+              onClick={handlePayment}
+              disabled={isProcessing}
+            >
+              {isProcessing
+                ? "Processing..."
+                : `Pay R${
+                    selectedPlan === "subscription" ? "200.00" : "349.99"
+                  } Now`}
+            </Button>
+          </div>
+
+          {/* Login Link */}
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Already have an account?{" "}
+              <a
+                href="#"
+                className="text-[#E31B54] hover:text-[#E31B54] font-medium"
+              >
+                Log in
+              </a>
             </p>
           </div>
-
-          {/* Subscription Plan */}
-          <div
-            className={`border-2 rounded-xl p-4 mb-4 cursor-pointer transition-all ${
-              selectedPlan === "subscription"
-                ? "border-[#155EEF]"
-                : "border-gray-200 hover:border-gray-300"
-            }`}
-            onClick={() => setSelectedPlan("subscription")}
-          >
-            <div className="flex items-start">
-              <div className="flex-1">
-                <div className="flex items-center mb-2">
-                  <CreditCard className="w-5 h-5 text-gray-500 mr-3" />
-                  <div>
-                    <span className="font-medium text-gray-900">
-                      Subscription{" "}
-                    </span>
-                    <span className="text-gray-600">R249.99/year</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 ml-8">
-                  Join the community, save and start paying yourself first.
-                </p>
-              </div>
-              <Checkbox
-                id="subscription"
-                checked={selectedPlan === "subscription"}
-                className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
-              />
-            </div>
-          </div>
-
-          {/* Once-off Plan */}
-          <div
-            className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
-              selectedPlan === "once-off"
-                ? "border-[#155EEF]"
-                : "border-gray-200 hover:border-gray-300"
-            }`}
-            onClick={() => setSelectedPlan("once-off")}
-          >
-            <div className="flex items-start">
-              <div className="flex-1">
-                <div className="flex items-center mb-2">
-                  <CreditCard className="w-5 h-5 text-gray-500 mr-3" />
-                  <div>
-                    <span className="font-medium text-gray-900">Once Off </span>
-                    <span className="text-gray-600">R349.99 once-off</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 ml-8">
-                  Be a part of the community on your own terms.
-                </p>
-              </div>
-              <Checkbox
-                id="once-off"
-                checked={selectedPlan === "once-off"}
-                className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
-              />
-            </div>
-          </div>
-
-          {/* Payment Methods */}
-          <div className="flex items-center justify-center gap-4 my-6">
-            <img
-              src="/visa.svg"
-              alt="Visa"
-              className="h-8 w-auto object-contain"
-            />
-            <img
-              src="/mastercard.svg"
-              alt="MasterCard"
-              className="h-8 w-auto object-contain"
-            />
-            <img
-              src="/blue-mastercard.svg"
-              alt="PayPal"
-              className="h-8 w-auto object-contain"
-            />
-          </div>
-
-          {/* Pay Button */}
-          <Button
-            className="w-full bg-[#155EEF] hover:bg-[#155EEF] text-white py-6 text-base font-medium rounded-lg disabled:opacity-50"
-            onClick={handlePayment}
-            disabled={isProcessing}
-          >
-            {isProcessing
-              ? "Processing..."
-              : `Pay R${
-                  selectedPlan === "subscription" ? "249.99" : "349.99"
-                } Now`}
-          </Button>
-        </div>
-
-        {/* Login Link */}
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            Already have an account?{" "}
-            <a
-              href="#"
-              className="text-[#E31B54] hover:text-[#E31B54] font-medium"
-            >
-              Log in
-            </a>
-          </p>
         </div>
       </div>
-    </div>
+    </PublicRouteGuard>
   );
 };
 
