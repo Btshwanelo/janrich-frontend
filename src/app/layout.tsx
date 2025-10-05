@@ -1,33 +1,41 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { RouteProvider } from "@/providers/route-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 import "./globals.css";
 import ReduxProvider from "@/components/ReduxProvider";
 
 const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  fallback: ["Inter Fallback", "-apple-system", "Segoe UI", "Roboto", "Arial", "sans-serif"],
-  display: "swap",
+    subsets: ["latin"],
+    display: "swap",
+    variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "JanRich Frontend",
-  description: "JanRich Frontend Application",
+    title: "JanRich Frontend",
+    description: "JanRich Frontend Application",
+};
+
+export const viewport: Viewport = {
+    colorScheme: "light",
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
-        <ReduxProvider>
-          {children}
-        </ReduxProvider>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
+            <body className="bg-gray-50 antialiased">
+                <RouteProvider>
+                    <ThemeProvider>
+                        <ReduxProvider>
+                            {children}
+                        </ReduxProvider>
+                    </ThemeProvider>
+                </RouteProvider>
+            </body>
+        </html>
+    );
 }

@@ -1,13 +1,16 @@
 "use client";
 import React from "react";
 import { Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/base/buttons/button";
+import { useRouter } from "next/navigation";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 
 const PaymentErrorPage = () => {
-  const handleAccessAccount = () => {
-    // Handle navigation to account
-    console.log("Accessing account...");
+  const router = useRouter();
+  
+  const handleTryAgain = () => {
+    // Navigate back to payment page
+    router.push("/payment");
   };
 
   return (
@@ -46,18 +49,19 @@ const PaymentErrorPage = () => {
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
               Payment Cancelled
             </h1>
-            <p className="text-gray-700 text-base leading-relaxed">
-              Congratulations your Jan riches account has been successfully
-              created.
+            <p className="text-text text-base leading-relaxed">
+              Your payment was cancelled. You can try again or contact support if you need assistance.
             </p>
           </div>
 
           {/* Action Button */}
           <Button
-            onClick={handleAccessAccount}
-            className=" bg-blue-600 hover:bg-blue-700 text-white py-6 text-base font-medium"
+            color="primary"
+            size="lg"
+            onClick={handleTryAgain}
+            className=""
           >
-            Access your account
+            Try again
           </Button>
         </div>
       </div>

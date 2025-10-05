@@ -1,22 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar as CalendarIcon, ChevronDownIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { parseDate } from "@internationalized/date";
+import { Button } from "@/components/base/buttons/button";
+import { DatePicker } from "@/components/application/date-picker/date-picker";
+import { Select } from "@/components/base/select/select";
 import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn, formatDateDDMMYYYY } from "@/lib/utils";
 import AuthGuard from "@/components/AuthGuard";
 import CircularProgressStep from "@/components/CircularProgressStep";
@@ -50,12 +39,11 @@ const Onboarding = () => {
     useCompleteOnboardingMutation();
 
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
 
   // Initial values for Formik
   const initialValues = {
     whatToCallYou: "",
-    birthdate: null as Date | null,
+    birthdate: null as any,
     gender: "",
     nationality: "",
     countryOfResidence: "",
@@ -147,270 +135,143 @@ const Onboarding = () => {
                 <Form className="space-y-6">
                   {/* What do we call you */}
                   <div>
-                    <Label
-                      htmlFor="whatToCallYou"
-                      className="text-sm font-medium text-gray-700 mb-1 block"
-                    >
-                      What do we call you?{" "}
-                      <span className="text-red-500">*</span>
-                    </Label>
                     <Select
-                      value={values.whatToCallYou}
-                      onValueChange={(value) =>
-                        setFieldValue("whatToCallYou", value)
+                      label="What do we call you?"
+                      placeholder="Select an option"
+                      size="md"
+                      selectedKey={values.whatToCallYou}
+                      onSelectionChange={(key) =>
+                        setFieldValue("whatToCallYou", key)
                       }
+                      isInvalid={!!(errors.whatToCallYou && touched.whatToCallYou)}
                     >
-                      <SelectTrigger
-                        className={cn(
-                          "w-full",
-                          errors.whatToCallYou &&
-                            touched.whatToCallYou &&
-                            "border-red-500"
-                        )}
-                      >
-                        <SelectValue placeholder="Select an option" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="mr">Mr</SelectItem>
-                        <SelectItem value="mrs">Mrs</SelectItem>
-                        <SelectItem value="ms">Ms</SelectItem>
-                        <SelectItem value="dr">Dr</SelectItem>
-                        <SelectItem value="prof">Prof</SelectItem>
-                      </SelectContent>
+                      <Select.Item id="mr">Mr</Select.Item>
+                      <Select.Item id="mrs">Mrs</Select.Item>
+                      <Select.Item id="ms">Ms</Select.Item>
+                      <Select.Item id="dr">Dr</Select.Item>
+                      <Select.Item id="prof">Prof</Select.Item>
                     </Select>
-                    <ErrorMessage
-                      name="whatToCallYou"
-                      component="p"
-                      className="text-red-500 text-sm mt-1"
-                    />
+                    {errors.whatToCallYou && touched.whatToCallYou && (
+                      <p className="text-error-500 text-sm mt-1">{String(errors.whatToCallYou)}</p>
+                    )}
                   </div>
 
                   {/* Birthdate and Gender */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label
-                        htmlFor="birthdate"
-                        className="text-sm font-medium text-gray-700 mb-1 block"
-                      >
-                        Birthdate <span className="text-red-500">*</span>
-                      </Label>
-                      <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            id="date"
-                            className={cn(
-                              "w-full justify-between font-normal",
-                              errors.birthdate &&
-                                touched.birthdate &&
-                                "border-red-500"
-                            )}
-                          >
-                            {values.birthdate
-                              ? formatDateDDMMYYYY(values.birthdate)
-                              : "Select date"}
-                            <ChevronDownIcon />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          className="w-auto overflow-hidden p-0"
-                          align="start"
-                        >
-                          <Calendar
-                            mode="single"
-                            selected={values.birthdate || undefined}
-                            captionLayout="dropdown"
-                            onSelect={(date) => {
-                              setFieldValue("birthdate", date);
-                              setDate(date);
-                              setOpen(false);
-                            }}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <ErrorMessage
-                        name="birthdate"
-                        component="p"
-                        className="text-red-500 text-sm mt-1"
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">
+                        Birthdate <span className="text-error-500">*</span>
+                      </label>
+                      <DatePicker
+                        value={values.birthdate}
+                        onChange={(date) => setFieldValue("birthdate", date)}
+                        onApply={() => setOpen(false)}
+                        onCancel={() => setOpen(false)}
                       />
+                      {errors.birthdate && touched.birthdate && (
+                        <p className="text-error-500 text-sm mt-1">{String(errors.birthdate)}</p>
+                      )}
                     </div>
                     <div>
-                      <Label
-                        htmlFor="gender"
-                        className="text-sm font-medium text-gray-700 mb-1 block"
-                      >
-                        Gender <span className="text-red-500">*</span>
-                      </Label>
                       <Select
-                        value={values.gender}
-                        onValueChange={(value) =>
-                          setFieldValue("gender", value)
-                        }
+                        label="Gender"
+                        placeholder="Select gender"
+                        size="md"
+                        selectedKey={values.gender}
+                        onSelectionChange={(key) => setFieldValue("gender", key)}
+                        isInvalid={!!(errors.gender && touched.gender)}
                       >
-                        <SelectTrigger
-                          className={cn(
-                            "w-full",
-                            errors.gender && touched.gender && "border-red-500"
-                          )}
-                        >
-                          <SelectValue placeholder="Select an option" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="male">Male</SelectItem>
-                          <SelectItem value="female">Female</SelectItem>
-                          <SelectItem value="non-binary">Non-binary</SelectItem>
-                          <SelectItem value="prefer-not-to-say">
-                            Prefer not to say
-                          </SelectItem>
-                        </SelectContent>
+                        <Select.Item id="male">Male</Select.Item>
+                        <Select.Item id="female">Female</Select.Item>
+                        <Select.Item id="non-binary">Non-binary</Select.Item>
+                        <Select.Item id="prefer-not-to-say">Prefer not to say</Select.Item>
                       </Select>
-                      <ErrorMessage
-                        name="gender"
-                        component="p"
-                        className="text-red-500 text-sm mt-1"
-                      />
+                      {errors.gender && touched.gender && (
+                        <p className="text-error-500 text-sm mt-1">{String(errors.gender)}</p>
+                      )}
                     </div>
                   </div>
 
                   {/* Nationality */}
                   <div>
-                    <Label
-                      htmlFor="nationality"
-                      className="text-sm font-medium text-gray-700 mb-1 block"
-                    >
-                      Nationality <span className="text-red-500">*</span>
-                    </Label>
                     <Select
-                      value={values.nationality}
-                      onValueChange={(value) =>
-                        setFieldValue("nationality", value)
-                      }
+                      label="Nationality"
+                      placeholder="Select nationality"
+                      size="md"
+                      selectedKey={values.nationality}
+                      onSelectionChange={(key) => setFieldValue("nationality", key)}
+                      isInvalid={!!(errors.nationality && touched.nationality)}
                     >
-                      <SelectTrigger
-                        className={cn(
-                          "w-full",
-                          errors.nationality &&
-                            touched.nationality &&
-                            "border-red-500"
-                        )}
-                      >
-                        <SelectValue placeholder="Select an option" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="South Africa">
-                          South African
-                        </SelectItem>
-                        <SelectItem value="american">American</SelectItem>
-                        <SelectItem value="british">British</SelectItem>
-                        <SelectItem value="canadian">Canadian</SelectItem>
-                        <SelectItem value="australian">Australian</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
+                      <Select.Item id="South Africa">South African</Select.Item>
+                      <Select.Item id="american">American</Select.Item>
+                      <Select.Item id="british">British</Select.Item>
+                      <Select.Item id="canadian">Canadian</Select.Item>
+                      <Select.Item id="australian">Australian</Select.Item>
+                      <Select.Item id="other">Other</Select.Item>
                     </Select>
-                    <ErrorMessage
-                      name="nationality"
-                      component="p"
-                      className="text-red-500 text-sm mt-1"
-                    />
+                    {errors.nationality && touched.nationality && (
+                      <p className="text-error-500 text-sm mt-1">{String(errors.nationality)}</p>
+                    )}
                   </div>
 
                   {/* Country of Residence */}
                   <div>
-                    <Label
-                      htmlFor="countryOfResidence"
-                      className="text-sm font-medium text-gray-700 mb-1 block"
-                    >
-                      Country of Residence{" "}
-                      <span className="text-red-500">*</span>
-                    </Label>
                     <Select
-                      value={values.countryOfResidence}
-                      onValueChange={(value) =>
-                        setFieldValue("countryOfResidence", value)
-                      }
+                      label="Country of Residence"
+                      placeholder="Select country"
+                      size="md"
+                      selectedKey={values.countryOfResidence}
+                      onSelectionChange={(key) => setFieldValue("countryOfResidence", key)}
+                      isInvalid={!!(errors.countryOfResidence && touched.countryOfResidence)}
                     >
-                      <SelectTrigger
-                        className={cn(
-                          "w-full",
-                          errors.countryOfResidence &&
-                            touched.countryOfResidence &&
-                            "border-red-500"
-                        )}
-                      >
-                        <SelectValue placeholder="Select an option" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="South Africa">
-                          South Africa
-                        </SelectItem>
-                        <SelectItem value="united-states">
-                          United States
-                        </SelectItem>
-                        <SelectItem value="united-kingdom">
-                          United Kingdom
-                        </SelectItem>
-                        <SelectItem value="canada">Canada</SelectItem>
-                        <SelectItem value="australia">Australia</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
+                      <Select.Item id="South Africa">South Africa</Select.Item>
+                      <Select.Item id="united-states">United States</Select.Item>
+                      <Select.Item id="united-kingdom">United Kingdom</Select.Item>
+                      <Select.Item id="canada">Canada</Select.Item>
+                      <Select.Item id="australia">Australia</Select.Item>
+                      <Select.Item id="other">Other</Select.Item>
                     </Select>
-                    <ErrorMessage
-                      name="countryOfResidence"
-                      component="p"
-                      className="text-red-500 text-sm mt-1"
-                    />
+                    {errors.countryOfResidence && touched.countryOfResidence && (
+                      <p className="text-error-500 text-sm mt-1">{String(errors.countryOfResidence)}</p>
+                    )}
                   </div>
 
                   {/* Race */}
                   <div>
-                    <Label
-                      htmlFor="race"
-                      className="text-sm font-medium text-gray-700 mb-1 block"
-                    >
-                      Race <span className="text-red-500">*</span>
-                    </Label>
                     <Select
-                      value={values.race}
-                      onValueChange={(value) => setFieldValue("race", value)}
+                      label="Race"
+                      placeholder="Select race"
+                      size="md"
+                      selectedKey={values.race}
+                      onSelectionChange={(key) => setFieldValue("race", key)}
+                      isInvalid={!!(errors.race && touched.race)}
                     >
-                      <SelectTrigger
-                        className={cn(
-                          "w-full",
-                          errors.race && touched.race && "border-red-500"
-                        )}
-                      >
-                        <SelectValue placeholder="Select an option" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Black African">African</SelectItem>
-                        <SelectItem value="Asian">Asian</SelectItem>
-                        <SelectItem value="Caucasian">Caucasian</SelectItem>
-                        <SelectItem value="Coloured">Coloured</SelectItem>
-                        <SelectItem value="Indian">Indian</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
+                      <Select.Item id="Black African">African</Select.Item>
+                      <Select.Item id="Asian">Asian</Select.Item>
+                      <Select.Item id="Caucasian">Caucasian</Select.Item>
+                      <Select.Item id="Coloured">Coloured</Select.Item>
+                      <Select.Item id="Indian">Indian</Select.Item>
+                      <Select.Item id="Other">Other</Select.Item>
                     </Select>
-                    <ErrorMessage
-                      name="race"
-                      component="p"
-                      className="text-red-500 text-sm mt-1"
-                    />
+                    {errors.race && touched.race && (
+                      <p className="text-error-500 text-sm mt-1">{String(errors.race)}</p>
+                    )}
                   </div>
 
                   {/* Communication Preference */}
                   <div>
                     <Label className="text-sm font-medium text-[#414651] mb-3 block">
                       Communication Preference{" "}
-                      <span className="text-red-500">*</span>
+                      <span className="text-error-500">*</span>
                     </Label>
                     <div className="space-y-3">
                       <div
                         className={`border-2 rounded-lg px-3 py-2 cursor-pointer transition-all ${
                           values.communicationPreference === "Whatsapp"
-                            ? "border-blue-500 "
+                            ? "border-primary-500 "
                             : errors.communicationPreference &&
                               touched.communicationPreference
-                            ? "border-red-500"
+                            ? "border-error-500"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                         onClick={() =>
@@ -421,7 +282,7 @@ const Onboarding = () => {
                           <div
                             className={`w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center ${
                               values.communicationPreference === "Whatsapp"
-                                ? "border-[#E31B54] bg-[#E31B54]"
+                                ? "border-primary-500 bg-primary-500"
                                 : "border-gray-300"
                             }`}
                           >
@@ -440,10 +301,10 @@ const Onboarding = () => {
                       <div
                         className={`border-2 rounded-lg px-3 py-2 cursor-pointer transition-all ${
                           values.communicationPreference === "Email"
-                            ? "border-blue-500"
+                            ? "border-primary-500"
                             : errors.communicationPreference &&
                               touched.communicationPreference
-                            ? "border-red-500"
+                            ? "border-error-500"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                         onClick={() =>
@@ -454,7 +315,7 @@ const Onboarding = () => {
                           <div
                             className={`w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center ${
                               values.communicationPreference === "Email"
-                                ? "border-[#E31B54] bg-[#E31B54]"
+                                ? "border-primary-500 bg-primary-500"
                                 : "border-gray-300"
                             }`}
                           >
@@ -471,15 +332,18 @@ const Onboarding = () => {
                     <ErrorMessage
                       name="communicationPreference"
                       component="p"
-                      className="text-red-500 text-sm mt-1"
+                      className="text-error-500 text-sm mt-1"
                     />
                   </div>
 
                   {/* Get Started Button */}
                   <Button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-base font-medium rounded-lg mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={isSubmitting || isLoading}
+                    color="primary"
+                    size="lg"
+                    className="w-full mt-6"
+                    isDisabled={isSubmitting || isLoading}
+                    isLoading={isSubmitting || isLoading}
                   >
                     {isSubmitting || isLoading
                       ? "Processing..."
@@ -488,8 +352,8 @@ const Onboarding = () => {
 
                   {/* Error Display */}
                   {error && (
-                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-red-600 text-sm">
+                    <div className="mt-4 p-3 bg-error-50 border border-error-200 rounded-lg">
+                      <p className="text-error-600 text-sm">
                         {"data" in error &&
                         error.data &&
                         typeof error.data === "object" &&
@@ -510,7 +374,7 @@ const Onboarding = () => {
               Already have an account?{" "}
               <a
                 href="/login"
-                className="text-[#E31B54] hover:text-[#E31B54] font-medium"
+                className="text-primary-500 hover:text-primary-600 font-medium"
               >
                 Log in
               </a>

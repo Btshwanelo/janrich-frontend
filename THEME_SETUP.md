@@ -17,7 +17,7 @@ This application is configured with a comprehensive theme system that allows for
 The theme uses CSS custom properties for all colors, making it easy to customize:
 
 - **Primary Colors**: Blue-based color palette (50-950 shades)
-- **Secondary Colors**: Slate-based color palette (50-950 shades)  
+- **Secondary Colors**: Slate-based color palette (50-950 shades)
 - **Gray Colors**: Neutral gray palette (50-950 shades)
 - **Semantic Colors**: Background, foreground, border, input, ring, muted, accent, destructive, success, warning
 
@@ -34,26 +34,22 @@ The theme uses CSS custom properties for all colors, making it easy to customize
 export const themes = {
   // ... existing themes
   custom: {
-    '--color-primary-500': '#your-color',
-    '--color-background': '#your-bg',
+    "--color-primary-500": "#155EEF",
+    "--color-background": "#your-bg",
     // ... other color definitions
-  }
-}
+  },
+};
 ```
 
 ### Using the Theme System
 
 ```tsx
-import { useTheme } from '@/components/theme-provider'
+import { useTheme } from "@/components/theme-provider";
 
 function MyComponent() {
-  const { theme, setTheme, toggleTheme } = useTheme()
-  
-  return (
-    <button onClick={toggleTheme}>
-      Current theme: {theme}
-    </button>
-  )
+  const { theme, setTheme, toggleTheme } = useTheme();
+
+  return <button onClick={toggleTheme}>Current theme: {theme}</button>;
 }
 ```
 

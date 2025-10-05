@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Check, CreditCard } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/base/buttons/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import CircularProgressStep from "@/components/CircularProgressStep";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
@@ -223,18 +223,18 @@ const PlanSelectionScreen = () => {
             <div className="mb-8 mx-10">
               <div className="flex items-center justify-center">
                 <CircularProgressStep status={"isCompleted"} />
-                <div className="flex-1 h-[3px] bg-[#E31B54]" />
+                <div className="flex-1 h-[3px] bg-primary-500" />
                 <CircularProgressStep status={"isCompleted"} />
-                <div className="flex-1 h-[3px] bg-[#E31B54]" />
+                <div className="flex-1 h-[3px] bg-primary-500" />
                 <CircularProgressStep status={"isActive"} />
               </div>
             </div>
 
             <div className="mb-6">
-              <h2 className="text-sm font-semibold text-[#BC1B06] mb-2">
+              <h2 className="text-sm font-semibold text-error-600 mb-2">
                 Plan Selection
               </h2>
-              <p className="text-[#535862] text-sm">
+              <p className="text-text text-sm">
                 We've got two payment options for you, Subscriptions and
                 Once-off
               </p>
@@ -244,8 +244,8 @@ const PlanSelectionScreen = () => {
             <div
               className={`border-2 rounded-xl p-4 mb-4 cursor-pointer transition-all ${
                 selectedPlan === "subscription"
-                  ? "border-[#155EEF]"
-                  : "border-gray-200 hover:border-gray-300"
+                  ? "border-primary-500"
+                  : "border-border-inactive hover:border-gray-300"
               }`}
               onClick={() => setSelectedPlan("subscription")}
             >
@@ -267,7 +267,7 @@ const PlanSelectionScreen = () => {
                 <Checkbox
                   id="subscription"
                   checked={selectedPlan === "subscription"}
-                  className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
+                  className="mt-1 data-[state=checked]:bg-primary-500 data-[state=checked]:border-primary-500"
                 />
               </div>
             </div>
@@ -276,8 +276,8 @@ const PlanSelectionScreen = () => {
             <div
               className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
                 selectedPlan === "once-off"
-                  ? "border-[#155EEF]"
-                  : "border-gray-200 hover:border-gray-300"
+                  ? "border-primary-500"
+                  : "border-border-inactive hover:border-gray-300"
               }`}
               onClick={() => setSelectedPlan("once-off")}
             >
@@ -299,7 +299,7 @@ const PlanSelectionScreen = () => {
                 <Checkbox
                   id="once-off"
                   checked={selectedPlan === "once-off"}
-                  className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
+                  className="mt-1 data-[state=checked]:bg-primary-500 data-[state=checked]:border-primary-500"
                 />
               </div>
             </div>
@@ -325,7 +325,9 @@ const PlanSelectionScreen = () => {
 
             {/* Pay Button */}
             <Button
-              className="w-full bg-[#155EEF] hover:bg-[#155EEF] text-white py-6 text-base font-medium rounded-lg disabled:opacity-50"
+              color="primary"
+              size="lg"
+              className="w-full"
               onClick={handlePayment}
               disabled={isProcessing}
             >
@@ -343,7 +345,7 @@ const PlanSelectionScreen = () => {
               Already have an account?{" "}
               <a
                 href="#"
-                className="text-[#E31B54] hover:text-[#E31B54] font-medium"
+                className="text-primary-500 hover:text-primary-600 font-medium"
               >
                 Log in
               </a>
