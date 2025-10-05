@@ -54,7 +54,7 @@ const RegistrationScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPasswordChecks, setShowPasswordChecks] = useState(false);
   const [registrationData, setLocalRegistrationData] = useState<any>(null);
