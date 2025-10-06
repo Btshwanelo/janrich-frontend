@@ -23,6 +23,7 @@ import {
   setLoading,
   setRegistrationData,
 } from "@/lib/slices/authSlice";
+import { Toggle } from "@/components/base/toggle/toggle";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -224,8 +225,11 @@ const RegistrationScreen = () => {
               <OTPVerificationModal
                 isOpen={showOTPModal}
                 onClose={() => setShowOTPModal(false)}
-                phoneNumber={values.phoneNumber}
+                contactInfo={values.phoneNumber}
                 onSuccess={handleOTPSuccess}
+                otpLength={4}
+                validOtp="2135"
+                verificationMethod="email"
               />
 
               {/* Error Message */}
@@ -387,22 +391,22 @@ const RegistrationScreen = () => {
                 <div className="flex items-center space-x-3">
                   <Field name="whatsappSame">
                     {({ field }: any) => (
-                      <Switch
-                        id="whatsappSame"
-                        checked={field.value}
-                        onCheckedChange={(checked) =>
-                          setFieldValue("whatsappSame", checked)
+                      // <Switch
+                      //   id="whatsappSame"
+
+                      //   className="data-[state=checked]:bg-primary-500 border-primary-500"
+                      // />
+                      <Toggle
+                        isSelected={field.value}
+                        onChange={(isSelected) =>
+                          setFieldValue("whatsappSame", isSelected)
                         }
-                        className="data-[state=checked]:bg-primary-500 border-primary-500"
+                        label="Use WhatsApp for notifications"
+                        hint="Receive verification codes via WhatsApp"
+                        size="sm"
                       />
                     )}
                   </Field>
-                  <Label
-                    htmlFor="whatsappSame"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    WhatsApp Number is the same as above.
-                  </Label>
                 </div>
 
                 {/* Password */}

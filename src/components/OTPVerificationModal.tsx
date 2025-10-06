@@ -11,20 +11,59 @@ import { PinInput } from "@/components/base/pin-input/pin-input";
 interface OTPVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  phoneNumber: string;
+  contactInfo: string; // Can be phone number, email, etc.
+  verificationMethod: 'email' | 'sms' | 'whatsapp';
   onSuccess?: () => void;
+  otpLength?: number; // Default to 4, but can be customized
+  validOtp?: string; // For testing purposes
 }
 
 // OTP Verification Modal Component
 const OTPVerificationModal = ({
   isOpen,
   onClose,
-  phoneNumber,
+  contactInfo,
+  verificationMethod,
   onSuccess,
+  otpLength = 4,
+  validOtp = "2135",
 }: OTPVerificationModalProps) => {
   const [otp, setOTP] = useState("");
   const [error, setError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+
+  // Helper functions for different verification methods
+  const getVerificationIcon = () => {
+    switch (verificationMethod) {
+      case 'email':
+        return '/gmail.svg'; // You can add an email icon
+      case 'sms':
+        return "/messages.svg"; // You can add an SMS icon
+      case 'whatsapp':
+        return '/whatsapp.svg';
+      default:
+        return '/whatsapp.svg';
+    }
+  };
+
+  const getVerificationTitle = () => {
+    switch (verificationMethod) {
+      case 'email':
+        return 'Please check your email.';
+      case 'sms':
+        return 'Please check your SMS.';
+      case 'whatsapp':
+        return 'Please check your WhatsApp.';
+      default:
+        return 'Please check your WhatsApp.';
+    }
+  };
+
+  const getVerificationDescription = () => {
+    const methodText = verificationMethod === 'email' ? 'email' : 
+                      verificationMethod === 'sms' ? 'SMS' : 'WhatsApp';
+    return `We've sent a verification code to ${contactInfo || `your ${methodText}`}`;
+  };
 
   const handleOTPChange = (value: string) => {
     setOTP(value);
@@ -45,8 +84,8 @@ const OTPVerificationModal = ({
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Hardcoded verification - check if OTP is "2135"
-      if (otp === "2135") {
+      // Hardcoded verification - check if OTP matches the valid OTP
+      if (otp === validOtp) {
         console.log("OTP verification successful");
         if (onSuccess) {
           onSuccess();
@@ -80,28 +119,28 @@ const OTPVerificationModal = ({
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex gap-2">
-            {/* WhatsApp Icon */}
-            <div className="flex justify-center mb-4">
-              <div className="w-12 h-12 flex items-center justify-center">
-                <img
-                  src="/whatsapp.svg"
-                  alt="WhatsApp Icon"
-                  className="w-8 h-8"
-                />
+            <div className="flex gap-2">
+              {/* Verification Method Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <img
+                    src={getVerificationIcon()}
+                    alt={`${verificationMethod} Icon`}
+                    className="w-8 h-8"
+                  />
+                </div>
+              </div>
+
+              {/* Title and Description */}
+              <div className="text-left mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  {getVerificationTitle()}
+                </h2>
+                <p className="text-text text-sm">
+                  {getVerificationDescription()}
+                </p>
               </div>
             </div>
-
-            {/* Title and Description */}
-            <div className="text-left mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                Please check your whatsapp.
-              </h2>
-              <p className="text-text text-sm">
-                We've sent a verification code to {phoneNumber || "your email"}
-              </p>
-            </div>
-          </div>
 
           {/* OTP Input using Untitled UI PinInput */}
           <div className="flex justify-center mb-6">
@@ -109,29 +148,17 @@ const OTPVerificationModal = ({
               <PinInput.Group
                 value={otp}
                 onChange={handleOTPChange}
-                maxLength={4}
+                maxLength={otpLength}
                 containerClassName="gap-2 justify-center"
               >
-                <PinInput.Slot
-                  index={0}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                  style={{ color: "#155EEF !important" }}
-                />
-                <PinInput.Slot
-                  index={1}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                  style={{ color: "#155EEF !important" }}
-                />
-                <PinInput.Slot
-                  index={2}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                  style={{ color: "#155EEF !important" }}
-                />
-                <PinInput.Slot
-                  index={3}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                  style={{ color: "#155EEF !important" }}
-                />
+                {Array.from({ length: otpLength }, (_, index) => (
+                  <PinInput.Slot
+                    key={index}
+                    index={index}
+                    className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
+                    style={{ color: "#155EEF !important" }}
+                  />
+                ))}
               </PinInput.Group>
             </PinInput>
           </div>
@@ -160,7 +187,7 @@ const OTPVerificationModal = ({
             </Button>
             <Button
               onClick={handleVerify}
-              disabled={isVerifying || otp.length !== 4}
+              disabled={isVerifying || otp.length !== otpLength}
               color="primary"
               isLoading={isVerifying}
               className="flex-1 w-full"
