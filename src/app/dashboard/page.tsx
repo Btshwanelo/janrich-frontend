@@ -22,11 +22,14 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { clearCredentials, clearAuthCookie } from "@/lib/slices/authSlice";
 import { useRouter } from "next/navigation";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
+import SavingsGoalModal from "@/components/SavingsGoalModal";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("View all");
   const [isModalOpen, setIsModalOpen] = useState(true);
   const dispatch = useAppDispatch();
+  const [isOpen, setIsOpen] = React.useState(true);
+
   const router = useRouter();
   const { user, fullName } = useAppSelector((state) => state.auth);
 
@@ -61,7 +64,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <AuthGuard>
+    <PublicRouteGuard>
       <div className="min-h-screen bg-gray-50 flex">
         {/* Left Sidebar */}
         <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
@@ -74,10 +77,16 @@ const Dashboard = () => {
             />
           </div>
 
-          <ProfileModal
+          <SavingsGoalModal
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            onSave={(amount) => console.log("Saved amount:", amount)}
+          />
+
+          {/* <ProfileModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
-          />
+          /> */}
 
           {/* Navigation */}
           <nav className="flex-1 px-4">
@@ -474,7 +483,7 @@ const Dashboard = () => {
           </main>
         </div>
       </div>
-    </AuthGuard>
+    </PublicRouteGuard>
   );
 };
 
