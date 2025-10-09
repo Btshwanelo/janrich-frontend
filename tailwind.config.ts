@@ -95,6 +95,16 @@ const config: Config = {
         border: {
           inactive: "#D5D7DA",
         },
+        // Untitled UI design system colors for components
+        active: "#f2f4f7",
+        secondary: "#344054",
+        primary_hover: "#f9fafb",
+        primary_alt: "#f2f4f7",
+        secondary_alt: "#f9fafb",
+        quaternary: "#667085",
+        "fg-brand-primary_alt": "#155EEF",
+        "brand-secondary": "#155EEF",
+        "border-secondary": "#e4e7ec",
       },
       fontFamily: {
         sans: [
@@ -131,6 +141,10 @@ const config: Config = {
         "xl": "0px 20px 24px -4px rgba(10, 13, 18, 0.08), 0px 8px 8px -4px rgba(10, 13, 18, 0.03), 0px 3px 3px -1.5px rgba(10, 13, 18, 0.04)",
         "2xl": "0px 24px 48px -12px rgba(10, 13, 18, 0.18), 0px 4px 4px -2px rgba(10, 13, 18, 0.04)",
         "3xl": "0px 32px 64px -12px rgba(10, 13, 18, 0.14), 0px 5px 5px -2.5px rgba(10, 13, 18, 0.04)",
+      },
+      // Custom utility classes for Untitled UI components
+      outline: {
+        'focus-ring': '2px solid transparent',
       },
     },
   },

@@ -7,6 +7,8 @@ import { Label } from '@/components/base/input/label';
 import { Select } from '@/components/base/select/select';
 import { Tabs, } from '@/components/application/tabs/tabs';
 import { Badge } from '@/components/base/badges/badges';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/untitled-card';
+import { Avatar } from '@/components/base/avatar/avatar';
 
 export default function ProfileBeneficiaryScreen() {
   const [selectedTab, setSelectedTab] = useState('beneficiary');
@@ -17,7 +19,7 @@ export default function ProfileBeneficiaryScreen() {
     </button>
   );
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-white">
       {/* Sidebar */}
       <div className="w-16 bg-white border-r border-gray-200 flex flex-col items-center py-4 space-y-2">
         <div className="p-3 mb-4">
@@ -36,20 +38,19 @@ export default function ProfileBeneficiaryScreen() {
         <div className="flex-1"></div>
 
         <NavIcon icon={Settings} />
-        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200">
-          <img
-            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
-            alt="User"
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <Avatar
+          size="md"
+          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
+          alt="User"
+          contrastBorder={true}
+        />
       </div>
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         {/* Blue Header */}
         <div className="h-56 relative">
-          <div className="absolute  inset-0 opacity-20">
+          <div className="absolute  inset-0">
             <img
               src="/image 5.png"
               alt="User"
@@ -63,17 +64,15 @@ export default function ProfileBeneficiaryScreen() {
           <div className=" px-8 py-4 mb-6">
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-center gap-6">
-                <div className="relative">
-                  <div className="w-32 h-32 -mt-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                    <img
-                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="absolute bottom-2 right-2 bg-blue-600 rounded-full p-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-white" />
-                  </div>
+                <div className="relative -mt-12">
+                  <Avatar
+                    size="2xl"
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
+                    alt="Profile"
+                    verified={true}
+                    contrastBorder={true}
+                    className="shadow-lg border-4 border-white w-28 h-28"
+                  />
                 </div>
 
                 <div>
@@ -97,136 +96,151 @@ export default function ProfileBeneficiaryScreen() {
             <Tabs
               selectedKey={selectedTab}
               onSelectionChange={(key) => setSelectedTab(key as string)}
-              className="w-fit"
+              className="w-full bg-[#FAFAFA]"
             >
               <Tabs.List
-                type="underline"
+                type="button-brand"
                 size="md"
-                fullWidth
                 items={[
                   { id: "details", label: "My details" },
                   { id: "beneficiary", label: "Beneficiary Details", badge: 2 },
                   { id: "financial", label: "Financial details" },
                 ]}
-                className="w-full justify-start border-b border-gray-200 bg-transparent p-0 h-auto rounded-none"
-              />
+                className="w-full justify-start"
+              >
+                {(tab) => <Tabs.Item {...tab} />}
+              </Tabs.List>
 
               <Tabs.Panel className="mt-6">
-                <div className="grid grid-cols-12 gap-8">
-                  {/* Left column - Description */}
-                  <div className="col-span-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      Beneficiary Details
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      In the event of your passing (touch wood), where would you
-                      like us to direct your funds?
-                    </p>
-                  </div>
-
-                  {/* Right column - Form */}
-                  <div className="col-span-8 space-y-6">
-                    <div>
-                      <Select
-                        label="Beneficiary Type"
-                        placeholder="Select an option"
-                        items={[
-                          { id: "individual", label: "Individual" },
-                          { id: "trust", label: "Trust" },
-                          { id: "estate", label: "Estate" },
-                        ]}
-                        className="w-full"
-                      >
-                        {(item) => (
-                          <Select.Item key={item.id} id={item.id}>
-                            {item.label}
-                          </Select.Item>
-                        )}
-                      </Select>
+                <Card variant="default" className="p-8">
+                  <div className="grid grid-cols-12 gap-8">
+                    {/* Left column - Description */}
+                    <div className="col-span-4">
+                      <CardHeader className="p-0">
+                        <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
+                          Beneficiary Details
+                        </CardTitle>
+                        <CardDescription className="text-sm text-gray-600">
+                          In the event of your passing (touch wood), where would
+                          you like us to direct your funds?
+                        </CardDescription>
+                      </CardHeader>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Right column - Form */}
+                    <CardContent className="col-span-8 space-y-6 p-0">
                       <div>
-                        <Input
-                          label="Beneficiary name"
-                          placeholder="Enter beneficiary name"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <Input
-                          label="Beneficiary Surname"
-                          placeholder="Enter beneficiary surname"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex gap-2">
                         <Select
-                          defaultSelectedKey="za"
-                          items={[{ id: "za", label: "+27" }]}
-                          className="w-24"
+                          label="Beneficiary Type"
+                          placeholder="Select an option"
+                          items={[
+                            { id: "individual", label: "Individual" },
+                            { id: "trust", label: "Trust" },
+                            { id: "estate", label: "Estate" },
+                          ]}
+                          className="w-full"
                         >
                           {(item) => (
                             <Select.Item key={item.id} id={item.id}>
-                              <div className="flex items-center gap-2">
-                                <span>🇿🇦</span>
-                                {item.label}
-                              </div>
+                              {item.label}
                             </Select.Item>
                           )}
                         </Select>
-                        <Input
-                          type="tel"
-                          placeholder="+27 84 000-0000"
-                          className="flex-1"
-                          label="Cell Number"
-                          required
-                        />
                       </div>
-                    </div>
 
-                    <div>
-                      <Select
-                        label="Relation"
-                        placeholder="Select an option"
-                        items={[
-                          { id: "spouse", label: "Spouse" },
-                          { id: "child", label: "Child" },
-                          { id: "parent", label: "Parent" },
-                          { id: "sibling", label: "Sibling" },
-                          { id: "other", label: "Other" },
-                        ]}
-                        className="w-full"
-                        isRequired
-                      >
-                        {(item) => (
-                          <Select.Item key={item.id} id={item.id}>
-                            {item.label}
-                          </Select.Item>
-                        )}
-                      </Select>
-                    </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Input
+                            label="Beneficiary name"
+                            placeholder="Enter beneficiary name"
+                            required
+                          />
+                        </div>
 
-                    <div className="flex justify-end gap-3 pt-4">
-                      <Button variant="secondary">Cancel</Button>
-                      <Button variant="primary">Save changes</Button>
-                    </div>
+                        <div>
+                          <Input
+                            label="Beneficiary Surname"
+                            placeholder="Enter beneficiary surname"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex gap-2">
+                          <Select
+                            defaultSelectedKey="za"
+                            items={[{ id: "za", label: "+27" }]}
+                            className="w-24"
+                          >
+                            {(item) => (
+                              <Select.Item key={item.id} id={item.id}>
+                                <div className="flex items-center gap-2">
+                                  <span>🇿🇦</span>
+                                  {item.label}
+                                </div>
+                              </Select.Item>
+                            )}
+                          </Select>
+                          <Input
+                            type="tel"
+                            placeholder="+27 84 000-0000"
+                            className="flex-1"
+                            label="Cell Number"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Select
+                          label="Relation"
+                          placeholder="Select an option"
+                          items={[
+                            { id: "spouse", label: "Spouse" },
+                            { id: "child", label: "Child" },
+                            { id: "parent", label: "Parent" },
+                            { id: "sibling", label: "Sibling" },
+                            { id: "other", label: "Other" },
+                          ]}
+                          className="w-full"
+                          isRequired
+                        >
+                          {(item) => (
+                            <Select.Item key={item.id} id={item.id}>
+                              {item.label}
+                            </Select.Item>
+                          )}
+                        </Select>
+                      </div>
+
+                      <div className="flex justify-end gap-3 pt-4">
+                        <Button variant="secondary">Cancel</Button>
+                        <Button variant="primary">Save changes</Button>
+                      </div>
+                    </CardContent>
                   </div>
-                </div>
+                </Card>
               </Tabs.Panel>
 
               <Tabs.Panel>
-                <p className="text-gray-600">My details content goes here...</p>
+                <Card variant="default" className="p-8">
+                  <CardContent>
+                    <p className="text-gray-600">
+                      My details content goes here...
+                    </p>
+                  </CardContent>
+                </Card>
               </Tabs.Panel>
 
               <Tabs.Panel>
-                <p className="text-gray-600">
-                  Financial details content goes here...
-                </p>
+                <Card variant="default" className="p-8">
+                  <CardContent>
+                    <p className="text-gray-600">
+                      Financial details content goes here...
+                    </p>
+                  </CardContent>
+                </Card>
               </Tabs.Panel>
             </Tabs>
           </div>
