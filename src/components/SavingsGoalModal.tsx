@@ -31,10 +31,10 @@ export default function SavingsGoalModal({
   onClose,
   onSave,
   title = "How much do you want to save?",
-  minAmount = 5000,
-  maxAmount = 1000000,
-  defaultAmount = 100000,
-  step = 1000,
+  minAmount = 3000,
+  maxAmount = 100000,
+  defaultAmount = 1000,
+  step = 500,
   currency = "R",
   buttonText = "Start Paying yourself first",
   cardTitle = "Great Start! You don't need a million to change your life",
@@ -94,7 +94,7 @@ export default function SavingsGoalModal({
                 maxValue={maxAmount}
                 step={step}
                 labelFormatter={(value) => formatCurrency(value)}
-                className="mb-6"
+                className="mb-6 w-full"
               />
             </div>
 

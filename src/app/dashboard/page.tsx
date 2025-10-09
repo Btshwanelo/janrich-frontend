@@ -19,15 +19,25 @@ import {
 import { Button } from "@/components/ui/untitled-button";
 import { Input } from "@/components/ui/untitled-input";
 import { Checkbox } from "@/components/ui/untitled-checkbox";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/untitled-card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/untitled-card";
 import { Table, TableCard } from "@/components/application/table/table";
 import ProfileModal from "@/components/ProfileModal";
 import AuthGuard from "@/components/AuthGuard";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { clearCredentials, clearAuthCookie, useGetProfileQuery } from "@/lib/slices/authSlice";
+import {
+  clearCredentials,
+  clearAuthCookie,
+  useGetProfileQuery,
+} from "@/lib/slices/authSlice";
 import { useRouter } from "next/navigation";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 import SavingsGoalModal from "@/components/SavingsGoalModal";
+import Sidebar from "@/components/Sidebar";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("View all");
@@ -36,8 +46,8 @@ const Dashboard = () => {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = React.useState(true);
 
-  const {data} = useGetProfileQuery("JR0001");
-console.log("Profile Data:", data);
+  const { data } = useGetProfileQuery("JR0001");
+  console.log("Profile Data:", data);
   const router = useRouter();
   const { user, fullName } = useAppSelector((state) => state.auth);
 
@@ -88,145 +98,10 @@ console.log("Profile Data:", data);
   ];
 
   return (
-    <PublicRouteGuard>
+    <AuthGuard>
       <div className="min-h-screen bg-gray-50 flex">
         {/* Left Sidebar */}
-        <div
-          className={`${
-            isSidebarCollapsed ? "w-16" : "w-64"
-          } bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out fixed left-0 top-0 h-screen z-10`}
-        >
-          {/* Logo and Toggle */}
-          <div className="mb-6 mt-6 px-4 flex items-center justify-between">
-            {!isSidebarCollapsed && (
-              <img
-                src="/logo-svg.svg"
-                alt="JanRich Logo"
-                className="w-12 h-auto"
-              />
-            )}
-            <Button
-              variant="tertiary"
-              size="sm"
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="ml-auto"
-            >
-              {isSidebarCollapsed ? (
-                <Menu className="w-4 h-4" />
-              ) : (
-                <X className="w-4 h-4" />
-              )}
-            </Button>
-          </div>
-
-          <SavingsGoalModal
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            onSave={(amount) => console.log("Saved amount:", amount)}
-          />
-
-          <ProfileModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
-
-          {/* Navigation */}
-          <nav className="flex-1 px-4 overflow-y-auto">
-            <div className="space-y-2">
-              <a
-                href="#"
-                className={`flex items-center ${
-                  isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-                } py-2 text-gray-900 bg-gray-100 rounded-lg`}
-                title={isSidebarCollapsed ? "Dashboard" : ""}
-              >
-                <Home className="w-5 h-5" />
-                {!isSidebarCollapsed && <span>Dashboard</span>}
-              </a>
-              <a
-                href="#"
-                className={`flex items-center ${
-                  isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-                } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
-                title={isSidebarCollapsed ? "Analytics" : ""}
-              >
-                <BarChart3 className="w-5 h-5" />
-                {!isSidebarCollapsed && <span>Analytics</span>}
-              </a>
-              <a
-                href="#"
-                className={`flex items-center ${
-                  isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-                } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
-                title={isSidebarCollapsed ? "Community" : ""}
-              >
-                <Users className="w-5 h-5" />
-                {!isSidebarCollapsed && <span>Community</span>}
-              </a>
-              <a
-                href="#"
-                className={`flex items-center ${
-                  isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-                } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
-                title={isSidebarCollapsed ? "History" : ""}
-              >
-                <Clock className="w-5 h-5" />
-                {!isSidebarCollapsed && <span>History</span>}
-              </a>
-            </div>
-          </nav>
-
-          {/* Bottom Navigation */}
-          <div className="p-4 space-y-2 border-t border-gray-200 bg-white">
-            <a
-              href="#"
-              className={`flex items-center ${
-                isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-              } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
-              title={isSidebarCollapsed ? "Support" : ""}
-            >
-              <HelpCircle className="w-5 h-5" />
-              {!isSidebarCollapsed && <span>Support</span>}
-            </a>
-            <a
-              href="#"
-              onClick={() => setIsModalOpen(true)}
-              className={`flex items-center ${
-                isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-              } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
-              title={isSidebarCollapsed ? "Settings" : ""}
-            >
-              <Settings className="w-5 h-5" />
-              {!isSidebarCollapsed && <span>Settings</span>}
-            </a>
-            <button
-              onClick={handleLogout}
-              className={`flex items-center ${
-                isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-              } py-2 text-gray-600 hover:bg-gray-100 rounded-lg w-full text-left`}
-              title={isSidebarCollapsed ? "Logout" : ""}
-            >
-              <LogOut className="w-5 h-5" />
-              {!isSidebarCollapsed && <span>Logout</span>}
-            </button>
-
-            {/* User Profile */}
-            <div
-              className={`flex items-center ${
-                isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-              } py-2 mt-4`}
-            >
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-              {!isSidebarCollapsed && (
-                <div className="flex-1">
-                  <div className="text-sm font-medium">
-                    {fullName || (typeof user === 'string' ? user : user?.name || user?.email || "User")}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <Sidebar />
 
         {/* Main Content */}
         <div
@@ -238,7 +113,11 @@ console.log("Profile Data:", data);
           <header className="bg-white border-b border-gray-200 px-6 py-4">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-semibold text-gray-900">
-                Welcome back, {fullName || (typeof user === 'string' ? user : user?.name || user?.email || "User")}
+                Welcome back,{" "}
+                {fullName ||
+                  (typeof user === "string"
+                    ? user
+                    : user?.name || user?.email || "User")}
               </h1>
               <div className="flex items-center space-x-4">
                 <Input
@@ -560,7 +439,7 @@ console.log("Profile Data:", data);
           </main>
         </div>
       </div>
-    </PublicRouteGuard>
+    </AuthGuard>
   );
 };
 
