@@ -37,12 +37,16 @@ import {
 } from "@/components/application/file-upload/file-upload-base";
 import AuthGuard from "@/components/AuthGuard";
 import SidebarWrapper from "@/components/SidebarWrapper";
+import { useGetProfileQuery } from "@/lib/slices/authSlice";
 
 export default function ProfileBeneficiaryScreen() {
   const [selectedTab, setSelectedTab] = useState("beneficiary");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [amount, setAmount] = useState([100000]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Fetch profile data
+  const { data: profileData, isLoading: isProfileLoading, error: profileError } = useGetProfileQuery("JR0020");
 
   // Details tab state
   const [firstName, setFirstName] = useState("");
@@ -56,6 +60,34 @@ export default function ProfileBeneficiaryScreen() {
   const [countryOfResidence, setCountryOfResidence] = useState("");
   const [race, setRace] = useState("");
   const [communicationPreference, setCommunicationPreference] = useState("");
+
+  // Populate form fields when profile data is loaded
+  React.useEffect(() => {
+    if (profileData?.message?.data) {
+      const data = profileData.message.data;
+      
+      // Basic info
+      const nameParts = data.basic_info.customer_name.split(' ');
+      setFirstName(nameParts[0] || '');
+      setLastName(nameParts.slice(1).join(' ') || '');
+      setDetailsPhoneNumber(data.basic_info.phone || '');
+      setTitle(data.basic_info.salutation || '');
+      
+      // About you
+      setBirthdate(data.about_you.birth_date || '');
+      setGender(data.about_you.profile_gender || '');
+      setNationality(data.about_you.nationality || '');
+      setCountryOfResidence(data.about_you.country_of_residence || '');
+      setRace(data.about_you.race || '');
+      setCommunicationPreference(data.about_you.communication_preference || '');
+      
+      // Financial details
+      setAmount([data.financials.annual_savings_goal || 100000]);
+      
+      // Beneficiary details
+      setPhoneNumber(data.beneficiary.beneficiary_cell || '');
+    }
+  }, [profileData]);
   const [uploadedFiles, setUploadedFiles] = useState<
     Array<{
       id: string;
@@ -147,6 +179,44 @@ export default function ProfileBeneficiaryScreen() {
   const formatCurrency = (value: number) => {
     return `${"R"} ${value.toLocaleString()}`;
   };
+  // Show loading state while fetching profile data
+  if (isProfileLoading) {
+    return (
+      <AuthGuard>
+        <div className="flex h-screen bg-white">
+          <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
+          <div className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading profile...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </AuthGuard>
+    );
+  }
+
+  // Show error state if profile data failed to load
+  if (profileError) {
+    return (
+      <AuthGuard>
+        <div className="flex h-screen bg-white">
+          <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
+          <div className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="text-red-500 text-lg mb-4">Failed to load profile</div>
+                <p className="text-gray-600">Please try refreshing the page</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </AuthGuard>
+    );
+  }
+
   return (
      <AuthGuard>
        <div className="flex h-screen bg-white">
@@ -182,12 +252,14 @@ export default function ProfileBeneficiaryScreen() {
                     />
                   </div>
 
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                      Katlego Vilane
-                    </h1>
-                    <p className="text-gray-600">katv@gmail.com</p>
-                  </div>
+                   <div>
+                     <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                       {profileData?.message?.data?.basic_info?.customer_name || "Loading..."}
+                     </h1>
+                     <p className="text-gray-600">
+                       {profileData?.message?.data?.basic_info?.email || "Loading..."}
+                     </p>
+                   </div>
                 </div>
 
                 <div className="flex gap-3">
@@ -241,42 +313,47 @@ export default function ProfileBeneficiaryScreen() {
 
                       {/* Right column - Form */}
                       <CardContent className="col-span-9 max-w-[720px] space-y-6 border border-gra-50 shadow p-6 rounded-lg">
-                        <div>
-                          <Select
-                            label="Beneficiary Type"
-                            placeholder="Select an option"
-                            items={[
-                              { id: "individual", label: "Individual" },
-                              { id: "trust", label: "Trust" },
-                              { id: "estate", label: "Estate" },
-                            ]}
-                            className="w-full"
-                          >
-                            {(item) => (
-                              <Select.Item key={item.id} id={item.id}>
-                                {item.label}
-                              </Select.Item>
-                            )}
-                          </Select>
-                        </div>
+                         <div>
+                           <Select
+                             label="Beneficiary Type"
+                             placeholder="Select an option"
+                             items={[
+                               { id: "individual", label: "Individual" },
+                               { id: "trust", label: "Trust" },
+                               { id: "estate", label: "Estate" },
+                             ]}
+                             className="w-full"
+                             defaultSelectedKey={profileData?.message?.data?.beneficiary?.beneficiary_type?.toLowerCase() || ""}
+                           >
+                             {(item) => (
+                               <Select.Item key={item.id} id={item.id}>
+                                 {item.label}
+                               </Select.Item>
+                             )}
+                           </Select>
+                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Input
-                              label="Beneficiary name"
-                              placeholder="Enter beneficiary name"
-                              required
-                            />
-                          </div>
+                         <div className="grid grid-cols-2 gap-4">
+                           <div>
+                             <Input
+                               label="Beneficiary name"
+                               placeholder="Enter beneficiary name"
+                               value={profileData?.message?.data?.beneficiary?.beneficiary_name || ""}
+                               onChange={() => {}} // Placeholder onChange to prevent read-only warning
+                               required
+                             />
+                           </div>
 
-                          <div>
-                            <Input
-                              label="Beneficiary Surname"
-                              placeholder="Enter beneficiary surname"
-                              required
-                            />
-                          </div>
-                        </div>
+                           <div>
+                             <Input
+                               label="Beneficiary Surname"
+                               placeholder="Enter beneficiary surname"
+                               value={profileData?.message?.data?.beneficiary?.beneficiary_surname || ""}
+                               onChange={() => {}} // Placeholder onChange to prevent read-only warning
+                               required
+                             />
+                           </div>
+                         </div>
 
                         <div>
                           <Label
@@ -296,27 +373,28 @@ export default function ProfileBeneficiaryScreen() {
                           </div>
                         </div>
 
-                        <div>
-                          <Select
-                            label="Relation"
-                            placeholder="Select an option"
-                            items={[
-                              { id: "spouse", label: "Spouse" },
-                              { id: "child", label: "Child" },
-                              { id: "parent", label: "Parent" },
-                              { id: "sibling", label: "Sibling" },
-                              { id: "other", label: "Other" },
-                            ]}
-                            className="w-full"
-                            isRequired
-                          >
-                            {(item) => (
-                              <Select.Item key={item.id} id={item.id}>
-                                {item.label}
-                              </Select.Item>
-                            )}
-                          </Select>
-                        </div>
+                         <div>
+                           <Select
+                             label="Relation"
+                             placeholder="Select an option"
+                             items={[
+                               { id: "spouse", label: "Spouse" },
+                               { id: "child", label: "Child" },
+                               { id: "parent", label: "Parent" },
+                               { id: "sibling", label: "Sibling" },
+                               { id: "other", label: "Other" },
+                             ]}
+                             className="w-full"
+                             defaultSelectedKey={profileData?.message?.data?.beneficiary?.beneficiary_relation?.toLowerCase() || ""}
+                             isRequired
+                           >
+                             {(item) => (
+                               <Select.Item key={item.id} id={item.id}>
+                                 {item.label}
+                               </Select.Item>
+                             )}
+                           </Select>
+                         </div>
 
                         <div className="flex justify-end gap-3 pt-4">
                           <Button color="secondary">Cancel</Button>
@@ -685,130 +763,141 @@ export default function ProfileBeneficiaryScreen() {
                           </div>
                         </div>
 
-                        {/* What are you saving for - Full width */}
-                        <div>
-                          <Select
-                            label="What are you saving for"
-                            placeholder="Select an option"
-                            items={[
-                              { id: "house", label: "House" },
-                              { id: "car", label: "Car" },
-                              { id: "education", label: "Education" },
-                              { id: "retirement", label: "Retirement" },
-                              { id: "emergency", label: "Emergency Fund" },
-                              { id: "vacation", label: "Vacation" },
-                              { id: "other", label: "Other" },
-                            ]}
-                            className="w-full"
-                          >
-                            {(item) => (
-                              <Select.Item key={item.id} id={item.id}>
-                                {item.label}
-                              </Select.Item>
-                            )}
-                          </Select>
-                        </div>
+                         {/* What are you saving for - Full width */}
+                         <div>
+                           <Select
+                             label="What are you saving for"
+                             placeholder="Select an option"
+                             items={[
+                               { id: "house", label: "House" },
+                               { id: "car", label: "Car" },
+                               { id: "education", label: "Education" },
+                               { id: "retirement", label: "Retirement" },
+                               { id: "emergency", label: "Emergency Fund" },
+                               { id: "vacation", label: "Vacation" },
+                               { id: "other", label: "Other" },
+                             ]}
+                             className="w-full"
+                             defaultSelectedKey={profileData?.message?.data?.financials?.saving_for?.toLowerCase().replace(/\s+/g, '_') || ""}
+                           >
+                             {(item) => (
+                               <Select.Item key={item.id} id={item.id}>
+                                 {item.label}
+                               </Select.Item>
+                             )}
+                           </Select>
+                         </div>
 
                         {/* Two column grid for remaining fields */}
                         <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Select
-                              label="Employment status"
-                              placeholder="Select an option"
-                              items={[
-                                { id: "employed", label: "Employed" },
-                                { id: "self-employed", label: "Self-employed" },
-                                { id: "unemployed", label: "Unemployed" },
-                                { id: "student", label: "Student" },
-                                { id: "retired", label: "Retired" },
-                              ]}
-                              className="w-full"
-                            >
-                              {(item) => (
-                                <Select.Item key={item.id} id={item.id}>
-                                  {item.label}
-                                </Select.Item>
-                              )}
-                            </Select>
-                          </div>
+                           <div>
+                             <Select
+                               label="Employment status"
+                               placeholder="Select an option"
+                               items={[
+                                 { id: "employed", label: "Employed" },
+                                 { id: "self-employed", label: "Self-employed" },
+                                 { id: "unemployed", label: "Unemployed" },
+                                 { id: "student", label: "Student" },
+                                 { id: "retired", label: "Retired" },
+                                 { id: "other", label: "Other" },
+                               ]}
+                               className="w-full"
+                               defaultSelectedKey={profileData?.message?.data?.financials?.employment_status?.toLowerCase().replace(/\s+/g, '_') || ""}
+                             >
+                               {(item) => (
+                                 <Select.Item key={item.id} id={item.id}>
+                                   {item.label}
+                                 </Select.Item>
+                               )}
+                             </Select>
+                           </div>
 
-                          <div>
-                            <Select
-                              label="Deposit frequency"
-                              placeholder="Select an option"
-                              items={[
-                                { id: "weekly", label: "Weekly" },
-                                { id: "bi-weekly", label: "Bi-weekly" },
-                                { id: "monthly", label: "Monthly" },
-                                { id: "quarterly", label: "Quarterly" },
-                                { id: "annually", label: "Annually" },
-                              ]}
-                              className="w-full"
-                            >
-                              {(item) => (
-                                <Select.Item key={item.id} id={item.id}>
-                                  {item.label}
-                                </Select.Item>
-                              )}
-                            </Select>
-                          </div>
+                           <div>
+                             <Select
+                               label="Deposit frequency"
+                               placeholder="Select an option"
+                               items={[
+                                 { id: "weekly", label: "Weekly" },
+                                 { id: "bi-weekly", label: "Bi-weekly" },
+                                 { id: "monthly", label: "Monthly" },
+                                 { id: "quarterly", label: "Quarterly" },
+                                 { id: "annually", label: "Annually" },
+                               ]}
+                               className="w-full"
+                               defaultSelectedKey={profileData?.message?.data?.financials?.deposit_frequency?.toLowerCase() || ""}
+                             >
+                               {(item) => (
+                                 <Select.Item key={item.id} id={item.id}>
+                                   {item.label}
+                                 </Select.Item>
+                               )}
+                             </Select>
+                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Input
-                              label="Bank name"
-                              placeholder="Enter bank name"
-                              required
-                            />
-                          </div>
+                         <div className="grid grid-cols-2 gap-4">
+                           <div>
+                             <Input
+                               label="Bank name"
+                               placeholder="Enter bank name"
+                               value={profileData?.message?.data?.financials?.customer_bank || ""}
+                               onChange={() => {}} // Placeholder onChange to prevent read-only warning
+                               required
+                             />
+                           </div>
 
-                          <div>
-                            <Input
-                              label="Account number"
-                              placeholder="Enter account number"
-                              required
-                            />
-                          </div>
-                        </div>
+                           <div>
+                             <Input
+                               label="Account number"
+                               placeholder="Enter account number"
+                               value={profileData?.message?.data?.financials?.iban_account || ""}
+                               onChange={() => {}} // Placeholder onChange to prevent read-only warning
+                               required
+                             />
+                           </div>
+                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Select
-                              label="Source of funds"
-                              placeholder="Select an option"
-                              items={[
-                                { id: "salary", label: "Salary" },
-                                { id: "business", label: "Business Income" },
-                                {
-                                  id: "investment",
-                                  label: "Investment Returns",
-                                },
-                                { id: "inheritance", label: "Inheritance" },
-                                { id: "gift", label: "Gift" },
-                                { id: "other", label: "Other" },
-                              ]}
-                              className="w-full"
-                            >
-                              {(item) => (
-                                <Select.Item key={item.id} id={item.id}>
-                                  {item.label}
-                                </Select.Item>
-                              )}
-                            </Select>
-                          </div>
+                         <div className="grid grid-cols-2 gap-4">
+                           <div>
+                             <Select
+                               label="Source of funds"
+                               placeholder="Select an option"
+                               items={[
+                                 { id: "salary", label: "Salary" },
+                                 { id: "business", label: "Business Income" },
+                                 {
+                                   id: "investment",
+                                   label: "Investment Returns",
+                                 },
+                                 { id: "inheritance", label: "Inheritance" },
+                                 { id: "gift", label: "Gift" },
+                                 { id: "other", label: "Other" },
+                               ]}
+                               className="w-full"
+                               defaultSelectedKey={profileData?.message?.data?.financials?.fund_source?.toLowerCase().replace(/\s+/g, '_') || ""}
+                             >
+                               {(item) => (
+                                 <Select.Item key={item.id} id={item.id}>
+                                   {item.label}
+                                 </Select.Item>
+                               )}
+                             </Select>
+                           </div>
 
-                          <div>
-                            <Input
-                              label="Pay day"
-                              type="number"
-                              placeholder="Enter day of month (1-31)"
-                              min="1"
-                              max="31"
-                              required
-                            />
-                          </div>
-                        </div>
+                           <div>
+                             <Input
+                               label="Pay day"
+                               type="number"
+                               placeholder="Enter day of month (1-31)"
+                               min="1"
+                               max="31"
+                               value={profileData?.message?.data?.financials?.pay_day || ""}
+                               onChange={() => {}} // Placeholder onChange to prevent read-only warning
+                               required
+                             />
+                           </div>
+                         </div>
 
                         <div className="flex justify-end gap-3 pt-4">
                           <Button color="secondary">Cancel</Button>

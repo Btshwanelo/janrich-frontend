@@ -42,6 +42,67 @@ export interface RegisterResponse {
   };
 }
 
+export interface ProfileResponse {
+  message: {
+    result: string;
+    message: string;
+    data: {
+      basic_info: {
+        customer_id: string;
+        customer_name: string;
+        customer_type: string;
+        customer_group: string;
+        territory: string;
+        email: string;
+        phone: string;
+        whatsapp_number: string;
+        country_code: string;
+        salutation: string;
+        gender: string;
+        agree_to_terms: number;
+        constitution_version: string | null;
+        agree_datetime: string | null;
+      };
+      about_you: {
+        birth_date: string;
+        age: string;
+        profile_gender: string;
+        nationality: string;
+        country_of_residence: string;
+        race: string;
+        race_other: string;
+        communication_preference: string;
+      };
+      financials: {
+        employment_status: string;
+        employee_status_other: string;
+        deposit_frequency: string;
+        deposit_frequency_other: string;
+        customer_bank: string;
+        bank_other: string;
+        fund_source: string;
+        fund_source_other: string;
+        saving_for: string;
+        saving_for_other: string;
+        account_holder: string;
+        branch_code: string;
+        iban_account: string;
+        annual_savings_goal: number;
+        household_size: number;
+        pay_day: number;
+      };
+      beneficiary: {
+        beneficiary_type: string;
+        beneficiary_name: string;
+        beneficiary_surname: string;
+        beneficiary_cell: string;
+        beneficiary_relation: string;
+      };
+      addresses: any[];
+    };
+  };
+}
+
 export interface AuthState {
   user: string | null;
   sid: string | null;
@@ -91,10 +152,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
-    getProfile: builder.query({
+    getProfile: builder.query<ProfileResponse, string>({
       query: (customerId) => ({
         url: `jan.customer?customer_id=${customerId}`,
-        method: "POST",
+        method: "GET",
       }),
       providesTags: ["Auth"],
     }),
