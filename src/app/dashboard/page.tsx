@@ -37,7 +37,7 @@ import {
 import { useRouter } from "next/navigation";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 import SavingsGoalModal from "@/components/SavingsGoalModal";
-import Sidebar from "@/components/Sidebar";
+import SidebarWrapper from "@/components/SidebarWrapper";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("View all");
@@ -101,7 +101,7 @@ const Dashboard = () => {
     <AuthGuard>
       <div className="min-h-screen bg-gray-50 flex">
         {/* Left Sidebar */}
-        <Sidebar />
+        <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
 
         {/* Main Content */}
         <div
@@ -117,7 +117,7 @@ const Dashboard = () => {
                 {fullName ||
                   (typeof user === "string"
                     ? user
-                    : user?.name || user?.email || "User")}
+                    : (user as any)?.name || (user as any)?.email || "User")}
               </h1>
               <div className="flex items-center space-x-4">
                 <Input
