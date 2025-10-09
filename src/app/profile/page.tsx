@@ -37,7 +37,11 @@ import {
 } from "@/components/application/file-upload/file-upload-base";
 import AuthGuard from "@/components/AuthGuard";
 import SidebarWrapper from "@/components/SidebarWrapper";
-import { useGetProfileQuery } from "@/lib/slices/authSlice";
+import {
+  useGetProfileQuery,
+  useUpdateFinancialDetailsMutation,
+  useUpdateBeneficiaryMutation,
+} from "@/lib/slices/authSlice";
 
 export default function ProfileBeneficiaryScreen() {
   const [selectedTab, setSelectedTab] = useState("beneficiary");
@@ -46,7 +50,19 @@ export default function ProfileBeneficiaryScreen() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Fetch profile data
-  const { data: profileData, isLoading: isProfileLoading, error: profileError } = useGetProfileQuery("JR0020");
+  const {
+    data: profileData,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useGetProfileQuery("JR0020");
+
+  // Financial details update mutation
+  const [updateFinancialDetails, { isLoading: isUpdatingFinancials }] =
+    useUpdateFinancialDetailsMutation();
+
+  // Beneficiary update mutation
+  const [updateBeneficiary, { isLoading: isUpdatingBeneficiary }] =
+    useUpdateBeneficiaryMutation();
 
   // Details tab state
   const [firstName, setFirstName] = useState("");
@@ -61,31 +77,80 @@ export default function ProfileBeneficiaryScreen() {
   const [race, setRace] = useState("");
   const [communicationPreference, setCommunicationPreference] = useState("");
 
+  // Financial details state
+  const [employmentStatus, setEmploymentStatus] = useState("");
+  const [employmentStatusOther, setEmploymentStatusOther] = useState("");
+  const [depositFrequency, setDepositFrequency] = useState("");
+  const [depositFrequencyOther, setDepositFrequencyOther] = useState("");
+  const [customerBank, setCustomerBank] = useState("");
+  const [bankOther, setBankOther] = useState("");
+  const [fundSource, setFundSource] = useState("");
+  const [fundSourceOther, setFundSourceOther] = useState("");
+  const [savingFor, setSavingFor] = useState("");
+  const [savingForOther, setSavingForOther] = useState("");
+  const [accountHolder, setAccountHolder] = useState("");
+  const [branchCode, setBranchCode] = useState("");
+  const [ibanAccount, setIbanAccount] = useState("");
+  const [householdSize, setHouseholdSize] = useState(1);
+  const [payDay, setPayDay] = useState(1);
+
+  // Beneficiary state
+  const [beneficiaryType, setBeneficiaryType] = useState("");
+  const [beneficiaryName, setBeneficiaryName] = useState("");
+  const [beneficiarySurname, setBeneficiarySurname] = useState("");
+  const [beneficiaryTitle, setBeneficiaryTitle] = useState("");
+  const [beneficiaryCell, setBeneficiaryCell] = useState("");
+  const [beneficiaryRelation, setBeneficiaryRelation] = useState("");
+console.log("beneficiaryType", beneficiaryType);
+console.log("beneficiaryCell", beneficiaryCell);
+console.log("beneficiaryTitle", beneficiaryTitle);
+console.log("beneficiaryRelation", beneficiaryRelation);
   // Populate form fields when profile data is loaded
   React.useEffect(() => {
     if (profileData?.message?.data) {
       const data = profileData.message.data;
-      
+
       // Basic info
-      const nameParts = data.basic_info.customer_name.split(' ');
-      setFirstName(nameParts[0] || '');
-      setLastName(nameParts.slice(1).join(' ') || '');
-      setDetailsPhoneNumber(data.basic_info.phone || '');
-      setTitle(data.basic_info.salutation || '');
-      
+      const nameParts = data.basic_info.customer_name.split(" ");
+      setFirstName(nameParts[0] || "");
+      setLastName(nameParts.slice(1).join(" ") || "");
+      setDetailsPhoneNumber(data.basic_info.phone || "");
+      setTitle(data.basic_info.salutation || "");
+
       // About you
-      setBirthdate(data.about_you.birth_date || '');
-      setGender(data.about_you.profile_gender || '');
-      setNationality(data.about_you.nationality || '');
-      setCountryOfResidence(data.about_you.country_of_residence || '');
-      setRace(data.about_you.race || '');
-      setCommunicationPreference(data.about_you.communication_preference || '');
-      
+      setBirthdate(data.about_you.birth_date || "");
+      setGender(data.about_you.profile_gender || "");
+      setNationality(data.about_you.nationality || "");
+      setCountryOfResidence(data.about_you.country_of_residence || "");
+      setRace(data.about_you.race || "");
+      setCommunicationPreference(data.about_you.communication_preference || "");
+
       // Financial details
       setAmount([data.financials.annual_savings_goal || 100000]);
-      
+      setEmploymentStatus(data.financials.employment_status || "");
+      setEmploymentStatusOther(data.financials.employee_status_other || "");
+      setDepositFrequency(data.financials.deposit_frequency || "");
+      setDepositFrequencyOther(data.financials.deposit_frequency_other || "");
+      setCustomerBank(data.financials.customer_bank || "");
+      setBankOther(data.financials.bank_other || "");
+      setFundSource(data.financials.fund_source || "");
+      setFundSourceOther(data.financials.fund_source_other || "");
+      setSavingFor(data.financials.saving_for || "");
+      setSavingForOther(data.financials.saving_for_other || "");
+      setAccountHolder(data.financials.account_holder || "");
+      setBranchCode(data.financials.branch_code || "");
+      setIbanAccount(data.financials.iban_account || "");
+      setHouseholdSize(data.financials.household_size || 1);
+      setPayDay(data.financials.pay_day || 1);
+
       // Beneficiary details
-      setPhoneNumber(data.beneficiary.beneficiary_cell || '');
+      setPhoneNumber(data.beneficiary.beneficiary_cell || "");
+      setBeneficiaryType(data.beneficiary.beneficiary_type || "");
+      setBeneficiaryName(data.beneficiary.beneficiary_name || "");
+      setBeneficiarySurname(data.beneficiary.beneficiary_surname || "");
+      setBeneficiaryTitle(data.beneficiary.beneficiary_surname || ""); // Using surname as title for now
+      setBeneficiaryCell(data.beneficiary.beneficiary_cell || "");
+      setBeneficiaryRelation(data.beneficiary.beneficiary_relation || "");
     }
   }, [profileData]);
   const [uploadedFiles, setUploadedFiles] = useState<
@@ -179,13 +244,74 @@ export default function ProfileBeneficiaryScreen() {
   const formatCurrency = (value: number) => {
     return `${"R"} ${value.toLocaleString()}`;
   };
+
+  // Handle financial details form submission
+  const handleFinancialDetailsSubmit = async () => {
+    try {
+      const financialData = {
+        customer_id: "JR0020",
+        custom_employment_status: employmentStatus,
+        custom_employee_status_other: employmentStatusOther,
+        custom_deposit_frequency: depositFrequency,
+        custom_deposit_frequency_other: depositFrequencyOther,
+        custom_customer_bank: customerBank,
+        custom_bank_other: bankOther,
+        custom_fund_source: fundSource,
+        custom_fund_source_other: fundSourceOther,
+        custom_saving_for: savingFor,
+        custom_saving_for_other: savingForOther,
+        custom_account_holder: accountHolder,
+        custom_branch_code: branchCode,
+        custom_iban_account: ibanAccount,
+        custom_annual_savings_goal: amount[0],
+        custom_household_size: householdSize,
+        custom_pay_day: payDay,
+      };
+
+      const result = await updateFinancialDetails(financialData).unwrap();
+      console.log("Financial details updated successfully:", result);
+
+      // You can add a success notification here
+      alert("Financial details updated successfully!");
+    } catch (error) {
+      console.error("Failed to update financial details:", error);
+      alert("Failed to update financial details. Please try again.");
+    }
+  };
+
+  // Handle beneficiary form submission
+  const handleBeneficiarySubmit = async () => {
+    try {
+      const beneficiaryData = {
+        customer_id: "JR0020",
+        beneficiary_type: beneficiaryType,
+        beneficiary_name: beneficiaryName,
+        beneficiary_title: beneficiaryTitle,
+        beneficiary_cell: beneficiaryCell,
+        beneficiary_relation: beneficiaryRelation,
+      };
+
+      const result = await updateBeneficiary(beneficiaryData).unwrap();
+      console.log("Beneficiary updated successfully:", result);
+
+      // You can add a success notification here
+      alert("Beneficiary information updated successfully!");
+    } catch (error) {
+      console.error("Failed to update beneficiary:", error);
+      alert("Failed to update beneficiary information. Please try again.");
+    }
+  };
   // Show loading state while fetching profile data
   if (isProfileLoading) {
     return (
       <AuthGuard>
         <div className="flex h-screen bg-white">
           <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
-          <div className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+          <div
+            className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${
+              isSidebarCollapsed ? "ml-16" : "ml-64"
+            }`}
+          >
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -204,10 +330,16 @@ export default function ProfileBeneficiaryScreen() {
       <AuthGuard>
         <div className="flex h-screen bg-white">
           <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
-          <div className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+          <div
+            className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${
+              isSidebarCollapsed ? "ml-16" : "ml-64"
+            }`}
+          >
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <div className="text-red-500 text-lg mb-4">Failed to load profile</div>
+                <div className="text-red-500 text-lg mb-4">
+                  Failed to load profile
+                </div>
                 <p className="text-gray-600">Please try refreshing the page</p>
               </div>
             </div>
@@ -218,13 +350,17 @@ export default function ProfileBeneficiaryScreen() {
   }
 
   return (
-     <AuthGuard>
-       <div className="flex h-screen bg-white">
-         {/* Left Sidebar */}
-         <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
+    <AuthGuard>
+      <div className="flex h-screen bg-white">
+        {/* Left Sidebar */}
+        <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
 
-         {/* Main Content */}
-         <div className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+        {/* Main Content */}
+        <div
+          className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${
+            isSidebarCollapsed ? "ml-16" : "ml-64"
+          }`}
+        >
           {/* Blue Header */}
           <div className="h-56 relative">
             <div className="absolute  inset-0">
@@ -252,14 +388,16 @@ export default function ProfileBeneficiaryScreen() {
                     />
                   </div>
 
-                   <div>
-                     <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                       {profileData?.message?.data?.basic_info?.customer_name || "Loading..."}
-                     </h1>
-                     <p className="text-gray-600">
-                       {profileData?.message?.data?.basic_info?.email || "Loading..."}
-                     </p>
-                   </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                      {profileData?.message?.data?.basic_info?.customer_name ||
+                        "Loading..."}
+                    </h1>
+                    <p className="text-gray-600">
+                      {profileData?.message?.data?.basic_info?.email ||
+                        "Loading..."}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="flex gap-3">
@@ -313,47 +451,55 @@ export default function ProfileBeneficiaryScreen() {
 
                       {/* Right column - Form */}
                       <CardContent className="col-span-9 max-w-[720px] space-y-6 border border-gra-50 shadow p-6 rounded-lg">
-                         <div>
-                           <Select
-                             label="Beneficiary Type"
-                             placeholder="Select an option"
-                             items={[
-                               { id: "individual", label: "Individual" },
-                               { id: "trust", label: "Trust" },
-                               { id: "estate", label: "Estate" },
-                             ]}
-                             className="w-full"
-                             defaultSelectedKey={profileData?.message?.data?.beneficiary?.beneficiary_type?.toLowerCase() || ""}
-                           >
-                             {(item) => (
-                               <Select.Item key={item.id} id={item.id}>
-                                 {item.label}
-                               </Select.Item>
-                             )}
-                           </Select>
-                         </div>
+                        <div>
+                          <Select
+                            label="Beneficiary Type"
+                            placeholder="Select an option"
+                            items={[
+                              { id: "My Estate", label: "My Estate" },
+                              { id: "My Beneficiary", label: "My Beneficiary" },
+                            ]}
+                            className="w-full"
+                            defaultSelectedKey={
+                              beneficiaryType.toLowerCase() || ""
+                            }
+                            onSelectionChange={(key) =>
+                              setBeneficiaryType(key as string)
+                            }
+                          >
+                            {(item) => (
+                              <Select.Item key={item.id} id={item.id}>
+                                {item.label}
+                              </Select.Item>
+                            )}
+                          </Select>
+                        </div>
 
-                         <div className="grid grid-cols-2 gap-4">
-                           <div>
-                             <Input
-                               label="Beneficiary name"
-                               placeholder="Enter beneficiary name"
-                               value={profileData?.message?.data?.beneficiary?.beneficiary_name || ""}
-                               onChange={() => {}} // Placeholder onChange to prevent read-only warning
-                               required
-                             />
-                           </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Input
+                              label="Beneficiary name"
+                              placeholder="Enter beneficiary name"
+                              value={beneficiaryName}
+                              onChange={(e) =>
+                                setBeneficiaryName(e.target.value)
+                              }
+                              required
+                            />
+                          </div>
 
-                           <div>
-                             <Input
-                               label="Beneficiary Surname"
-                               placeholder="Enter beneficiary surname"
-                               value={profileData?.message?.data?.beneficiary?.beneficiary_surname || ""}
-                               onChange={() => {}} // Placeholder onChange to prevent read-only warning
-                               required
-                             />
-                           </div>
-                         </div>
+                          <div>
+                            <Input
+                              label="Beneficiary Surname"
+                              placeholder="Enter beneficiary surname"
+                              value={beneficiarySurname}
+                              onChange={(e) =>
+                                setBeneficiarySurname(e.target.value)
+                              }
+                              required
+                            />
+                          </div>
+                        </div>
 
                         <div>
                           <Label
@@ -367,38 +513,53 @@ export default function ProfileBeneficiaryScreen() {
                               placeholder="Enter phone number"
                               defaultCountry="ZA"
                               className="phone-input"
-                              value={phoneNumber}
-                              onChange={(value) => setPhoneNumber(value || "")}
+                              value={beneficiaryCell}
+                              onChange={(value) =>
+                                setBeneficiaryCell(value || "")
+                              }
                             />
                           </div>
                         </div>
 
-                         <div>
-                           <Select
-                             label="Relation"
-                             placeholder="Select an option"
-                             items={[
-                               { id: "spouse", label: "Spouse" },
-                               { id: "child", label: "Child" },
-                               { id: "parent", label: "Parent" },
-                               { id: "sibling", label: "Sibling" },
-                               { id: "other", label: "Other" },
-                             ]}
-                             className="w-full"
-                             defaultSelectedKey={profileData?.message?.data?.beneficiary?.beneficiary_relation?.toLowerCase() || ""}
-                             isRequired
-                           >
-                             {(item) => (
-                               <Select.Item key={item.id} id={item.id}>
-                                 {item.label}
-                               </Select.Item>
-                             )}
-                           </Select>
-                         </div>
+                        <div>
+                          <Select
+                            label="Relation"
+                            placeholder="Select an option"
+                            items={[
+                              { id: "spouse", label: "Spouse" },
+                              { id: "child", label: "Child" },
+                              { id: "parent", label: "Parent" },
+                              { id: "sibling", label: "Sibling" },
+                              { id: "other", label: "Other" },
+                            ]}
+                            className="w-full"
+                            defaultSelectedKey={
+                              beneficiaryRelation.toLowerCase() || ""
+                            }
+                            onSelectionChange={(key) =>
+                              setBeneficiaryRelation(key as string)
+                            }
+                            isRequired
+                          >
+                            {(item) => (
+                              <Select.Item key={item.id} id={item.id}>
+                                {item.label}
+                              </Select.Item>
+                            )}
+                          </Select>
+                        </div>
 
                         <div className="flex justify-end gap-3 pt-4">
                           <Button color="secondary">Cancel</Button>
-                          <Button color="primary">Save changes</Button>
+                          <Button
+                            color="primary"
+                            onClick={handleBeneficiarySubmit}
+                            disabled={isUpdatingBeneficiary}
+                          >
+                            {isUpdatingBeneficiary
+                              ? "Saving..."
+                              : "Save changes"}
+                          </Button>
                         </div>
                       </CardContent>
                     </div>
@@ -763,145 +924,178 @@ export default function ProfileBeneficiaryScreen() {
                           </div>
                         </div>
 
-                         {/* What are you saving for - Full width */}
-                         <div>
-                           <Select
-                             label="What are you saving for"
-                             placeholder="Select an option"
-                             items={[
-                               { id: "house", label: "House" },
-                               { id: "car", label: "Car" },
-                               { id: "education", label: "Education" },
-                               { id: "retirement", label: "Retirement" },
-                               { id: "emergency", label: "Emergency Fund" },
-                               { id: "vacation", label: "Vacation" },
-                               { id: "other", label: "Other" },
-                             ]}
-                             className="w-full"
-                             defaultSelectedKey={profileData?.message?.data?.financials?.saving_for?.toLowerCase().replace(/\s+/g, '_') || ""}
-                           >
-                             {(item) => (
-                               <Select.Item key={item.id} id={item.id}>
-                                 {item.label}
-                               </Select.Item>
-                             )}
-                           </Select>
-                         </div>
+                        {/* What are you saving for - Full width */}
+                        <div>
+                          <Select
+                            label="What are you saving for"
+                            placeholder="Select an option"
+                            items={[
+                              { id: "house", label: "House" },
+                              { id: "car", label: "Car" },
+                              { id: "education", label: "Education" },
+                              { id: "retirement", label: "Retirement" },
+                              { id: "emergency", label: "Emergency Fund" },
+                              { id: "vacation", label: "Vacation" },
+                              { id: "other", label: "Other" },
+                            ]}
+                            className="w-full"
+                            defaultSelectedKey={
+                              savingFor.toLowerCase().replace(/\s+/g, "_") || ""
+                            }
+                            onSelectionChange={(key) =>
+                              setSavingFor(key as string)
+                            }
+                          >
+                            {(item) => (
+                              <Select.Item key={item.id} id={item.id}>
+                                {item.label}
+                              </Select.Item>
+                            )}
+                          </Select>
+                        </div>
 
                         {/* Two column grid for remaining fields */}
                         <div className="grid grid-cols-2 gap-4">
-                           <div>
-                             <Select
-                               label="Employment status"
-                               placeholder="Select an option"
-                               items={[
-                                 { id: "employed", label: "Employed" },
-                                 { id: "self-employed", label: "Self-employed" },
-                                 { id: "unemployed", label: "Unemployed" },
-                                 { id: "student", label: "Student" },
-                                 { id: "retired", label: "Retired" },
-                                 { id: "other", label: "Other" },
-                               ]}
-                               className="w-full"
-                               defaultSelectedKey={profileData?.message?.data?.financials?.employment_status?.toLowerCase().replace(/\s+/g, '_') || ""}
-                             >
-                               {(item) => (
-                                 <Select.Item key={item.id} id={item.id}>
-                                   {item.label}
-                                 </Select.Item>
-                               )}
-                             </Select>
-                           </div>
+                          <div>
+                            <Select
+                              label="Employment status"
+                              placeholder="Select an option"
+                              items={[
+                                { id: "employed", label: "Employed" },
+                                { id: "self-employed", label: "Self-employed" },
+                                { id: "unemployed", label: "Unemployed" },
+                                { id: "student", label: "Student" },
+                                { id: "retired", label: "Retired" },
+                                { id: "other", label: "Other" },
+                              ]}
+                              className="w-full"
+                              defaultSelectedKey={
+                                employmentStatus
+                                  .toLowerCase()
+                                  .replace(/\s+/g, "_") || ""
+                              }
+                              onSelectionChange={(key) =>
+                                setEmploymentStatus(key as string)
+                              }
+                            >
+                              {(item) => (
+                                <Select.Item key={item.id} id={item.id}>
+                                  {item.label}
+                                </Select.Item>
+                              )}
+                            </Select>
+                          </div>
 
-                           <div>
-                             <Select
-                               label="Deposit frequency"
-                               placeholder="Select an option"
-                               items={[
-                                 { id: "weekly", label: "Weekly" },
-                                 { id: "bi-weekly", label: "Bi-weekly" },
-                                 { id: "monthly", label: "Monthly" },
-                                 { id: "quarterly", label: "Quarterly" },
-                                 { id: "annually", label: "Annually" },
-                               ]}
-                               className="w-full"
-                               defaultSelectedKey={profileData?.message?.data?.financials?.deposit_frequency?.toLowerCase() || ""}
-                             >
-                               {(item) => (
-                                 <Select.Item key={item.id} id={item.id}>
-                                   {item.label}
-                                 </Select.Item>
-                               )}
-                             </Select>
-                           </div>
+                          <div>
+                            <Select
+                              label="Deposit frequency"
+                              placeholder="Select an option"
+                              items={[
+                                { id: "weekly", label: "Weekly" },
+                                { id: "bi-weekly", label: "Bi-weekly" },
+                                { id: "monthly", label: "Monthly" },
+                                { id: "quarterly", label: "Quarterly" },
+                                { id: "annually", label: "Annually" },
+                              ]}
+                              className="w-full"
+                              defaultSelectedKey={
+                                depositFrequency.toLowerCase() || ""
+                              }
+                              onSelectionChange={(key) =>
+                                setDepositFrequency(key as string)
+                              }
+                            >
+                              {(item) => (
+                                <Select.Item key={item.id} id={item.id}>
+                                  {item.label}
+                                </Select.Item>
+                              )}
+                            </Select>
+                          </div>
                         </div>
 
-                         <div className="grid grid-cols-2 gap-4">
-                           <div>
-                             <Input
-                               label="Bank name"
-                               placeholder="Enter bank name"
-                               value={profileData?.message?.data?.financials?.customer_bank || ""}
-                               onChange={() => {}} // Placeholder onChange to prevent read-only warning
-                               required
-                             />
-                           </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Input
+                              label="Bank name"
+                              placeholder="Enter bank name"
+                              value={customerBank}
+                              onChange={(e) => setCustomerBank(e.target.value)}
+                              required
+                            />
+                          </div>
 
-                           <div>
-                             <Input
-                               label="Account number"
-                               placeholder="Enter account number"
-                               value={profileData?.message?.data?.financials?.iban_account || ""}
-                               onChange={() => {}} // Placeholder onChange to prevent read-only warning
-                               required
-                             />
-                           </div>
-                         </div>
+                          <div>
+                            <Input
+                              label="Account number"
+                              placeholder="Enter account number"
+                              value={ibanAccount}
+                              onChange={(e) => setIbanAccount(e.target.value)}
+                              required
+                            />
+                          </div>
+                        </div>
 
-                         <div className="grid grid-cols-2 gap-4">
-                           <div>
-                             <Select
-                               label="Source of funds"
-                               placeholder="Select an option"
-                               items={[
-                                 { id: "salary", label: "Salary" },
-                                 { id: "business", label: "Business Income" },
-                                 {
-                                   id: "investment",
-                                   label: "Investment Returns",
-                                 },
-                                 { id: "inheritance", label: "Inheritance" },
-                                 { id: "gift", label: "Gift" },
-                                 { id: "other", label: "Other" },
-                               ]}
-                               className="w-full"
-                               defaultSelectedKey={profileData?.message?.data?.financials?.fund_source?.toLowerCase().replace(/\s+/g, '_') || ""}
-                             >
-                               {(item) => (
-                                 <Select.Item key={item.id} id={item.id}>
-                                   {item.label}
-                                 </Select.Item>
-                               )}
-                             </Select>
-                           </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Select
+                              label="Source of funds"
+                              placeholder="Select an option"
+                              items={[
+                                { id: "salary", label: "Salary" },
+                                { id: "business", label: "Business Income" },
+                                {
+                                  id: "investment",
+                                  label: "Investment Returns",
+                                },
+                                { id: "inheritance", label: "Inheritance" },
+                                { id: "gift", label: "Gift" },
+                                { id: "other", label: "Other" },
+                              ]}
+                              className="w-full"
+                              defaultSelectedKey={
+                                fundSource.toLowerCase().replace(/\s+/g, "_") ||
+                                ""
+                              }
+                              onSelectionChange={(key) =>
+                                setFundSource(key as string)
+                              }
+                            >
+                              {(item) => (
+                                <Select.Item key={item.id} id={item.id}>
+                                  {item.label}
+                                </Select.Item>
+                              )}
+                            </Select>
+                          </div>
 
-                           <div>
-                             <Input
-                               label="Pay day"
-                               type="number"
-                               placeholder="Enter day of month (1-31)"
-                               min="1"
-                               max="31"
-                               value={profileData?.message?.data?.financials?.pay_day || ""}
-                               onChange={() => {}} // Placeholder onChange to prevent read-only warning
-                               required
-                             />
-                           </div>
-                         </div>
+                          <div>
+                            <Input
+                              label="Pay day"
+                              type="number"
+                              placeholder="Enter day of month (1-31)"
+                              min="1"
+                              max="31"
+                              value={payDay}
+                              onChange={(e) =>
+                                setPayDay(parseInt(e.target.value) || 1)
+                              }
+                              required
+                            />
+                          </div>
+                        </div>
 
                         <div className="flex justify-end gap-3 pt-4">
                           <Button color="secondary">Cancel</Button>
-                          <Button color="primary">Save changes</Button>
+                          <Button
+                            color="primary"
+                            onClick={handleFinancialDetailsSubmit}
+                            disabled={isUpdatingFinancials}
+                          >
+                            {isUpdatingFinancials
+                              ? "Saving..."
+                              : "Save changes"}
+                          </Button>
                         </div>
                       </CardContent>
                     </div>

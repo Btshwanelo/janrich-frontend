@@ -103,6 +103,59 @@ export interface ProfileResponse {
   };
 }
 
+export interface FinancialDetailsRequest {
+  customer_id: string;
+  custom_employment_status: string;
+  custom_employee_status_other?: string;
+  custom_deposit_frequency: string;
+  custom_deposit_frequency_other?: string;
+  custom_customer_bank: string;
+  custom_bank_other?: string;
+  custom_fund_source: string;
+  custom_fund_source_other?: string;
+  custom_saving_for: string;
+  custom_saving_for_other?: string;
+  custom_account_holder: string;
+  custom_branch_code: string;
+  custom_iban_account: string;
+  custom_annual_savings_goal: number;
+  custom_household_size: number;
+  custom_pay_day: number;
+}
+
+export interface FinancialDetailsResponse {
+  message: {
+    ok: boolean;
+    customer_id: string;
+    updated_fields: string[];
+    message: string;
+  };
+}
+
+export interface BeneficiaryRequest {
+  customer_id: string;
+  beneficiary_type: string;
+  beneficiary_name: string;
+  beneficiary_title: string;
+  beneficiary_cell: string;
+  beneficiary_relation: string;
+}
+
+export interface BeneficiaryResponse {
+  message: {
+    result: string;
+    customer_id: string;
+    message: string;
+    beneficiary: {
+      type: string;
+      name: string;
+      surname: string;
+      cell: string;
+      relation: string;
+    };
+  };
+}
+
 export interface AuthState {
   user: string | null;
   sid: string | null;
@@ -159,10 +212,26 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ["Auth"],
     }),
+    updateFinancialDetails: builder.mutation<FinancialDetailsResponse, FinancialDetailsRequest>({
+      query: (financialData) => ({
+        url: "jan.payment",
+        method: "POST",
+        body: financialData,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
+    updateBeneficiary: builder.mutation<BeneficiaryResponse, BeneficiaryRequest>({
+      query: (beneficiaryData) => ({
+        url: "jan.beneficiary",
+        method: "POST",
+        body: beneficiaryData,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation ,useGetProfileQuery} = authApiSlice;
+export const { useLoginMutation, useRegisterMutation, useGetProfileQuery, useUpdateFinancialDetailsMutation, useUpdateBeneficiaryMutation } = authApiSlice;
 
 // Auth slice
 const authSlice = createSlice({
