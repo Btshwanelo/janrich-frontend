@@ -5,7 +5,7 @@ import { parseDate } from "@internationalized/date";
 import { Button } from "@/components/base/buttons/button";
 import { DatePicker } from "@/components/application/date-picker/date-picker";
 import { Select } from "@/components/base/select/select";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/base/input/label";
 import { cn, formatDateDDMMYYYY } from "@/lib/utils";
 import AuthGuard from "@/components/AuthGuard";
 import CircularProgressStep from "@/components/CircularProgressStep";

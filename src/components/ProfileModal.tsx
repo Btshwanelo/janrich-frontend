@@ -1,17 +1,11 @@
 import React, { useState } from "react";
 import { X, Edit, Check, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Button } from "@/components/ui/untitled-button";
+import { Input } from "@/components/ui/untitled-input";
+import { Label } from "@/components/base/input/label";
+import { Select } from "@/components/base/select/select";
 
-const ProfileModal = ({ isOpen, onClose }) => {
+const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [formData, setFormData] = useState({
     firstName: "Sienna",
     lastName: "Hewitt",
@@ -22,7 +16,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -202,39 +196,22 @@ const ProfileModal = ({ isOpen, onClose }) => {
                 Country
               </Label>
               <Select
-                value={formData.country}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, country: value }))
+                selectedKey={formData.country}
+                onSelectionChange={(key) =>
+                  setFormData((prev) => ({ ...prev, country: key as string }))
                 }
+                items={[
+                  { id: "australia", label: "Australia UTC/GMT +10" },
+                  { id: "usa", label: "United States UTC/GMT -5" },
+                  { id: "uk", label: "United Kingdom UTC/GMT +0" }
+                ]}
+                className="w-full"
               >
-                <SelectTrigger className="bg-gray-50">
-                  <SelectValue>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">🇦🇺</span>
-                      <span>Australia UTC/GMT +10</span>
-                    </div>
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="australia">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">🇦🇺</span>
-                      <span>Australia UTC/GMT +10</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="usa">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">🇺🇸</span>
-                      <span>United States UTC/GMT -5</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="uk">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">🇬🇧</span>
-                      <span>United Kingdom UTC/GMT +0</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
+                {(item) => (
+                  <Select.Item key={item.id} id={item.id}>
+                    {item.label}
+                  </Select.Item>
+                )}
               </Select>
               <p className="text-xs text-gray-500 mt-1">
                 Estimates based on recent IP address.
@@ -246,7 +223,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
           <div className="flex gap-3 mt-8">
             <Button
               onClick={handleSaveDraft}
-              variant="outline"
+              variant="secondary"
               className="flex-1 flex items-center justify-center gap-2"
             >
               <svg

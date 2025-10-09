@@ -3,9 +3,9 @@ import React, { useState, useRef } from "react";
 import { Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/ui/untitled-input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/base/input/label";
+import { Toggle } from "@/components/base/toggle/toggle";
+import { Checkbox } from "@/components/ui/untitled-checkbox";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
@@ -23,7 +23,6 @@ import {
   setLoading,
   setRegistrationData,
 } from "@/lib/slices/authSlice";
-import { Toggle } from "@/components/base/toggle/toggle";
 
 // Validation schema
 const validationSchema = Yup.object({

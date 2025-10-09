@@ -42,9 +42,9 @@ export function middleware(request: NextRequest) {
   }
 
   // Redirect to dashboard if trying to access public route while authenticated
-  if (isPublicRoute && isAuthenticated) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
+  // if (isPublicRoute && isAuthenticated) {
+  //   return NextResponse.redirect(new URL("/dashboard", request.url));
+  // }
 
   return NextResponse.next();
 }

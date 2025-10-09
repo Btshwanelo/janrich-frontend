@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/base/input/label";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import PublicRouteGuard from "@/components/PublicRouteGuard";

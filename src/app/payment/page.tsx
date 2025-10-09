@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Check, CreditCard } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/ui/untitled-checkbox";
 import CircularProgressStep from "@/components/CircularProgressStep";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 

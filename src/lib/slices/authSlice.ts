@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { apiSlice } from '../api/apiSlice';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { apiSlice } from "../api/apiSlice";
 
 // Types
 export interface LoginRequest {
@@ -77,36 +77,46 @@ export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
-        url: 'janriches.api.auth.jan_user_login',
-        method: 'POST',
+        url: "janriches.api.auth.jan_user_login",
+        method: "POST",
         body: credentials,
       }),
-      invalidatesTags: ['Auth'],
+      invalidatesTags: ["Auth"],
     }),
     register: builder.mutation<RegisterResponse, RegisterRequest>({
       query: (userData) => ({
-        url: 'janriches.api.portal_customer.customer_step1_create',
-        method: 'POST',
+        url: "janriches.api.portal_customer.customer_step1_create",
+        method: "POST",
         body: userData,
       }),
-      invalidatesTags: ['Auth'],
+      invalidatesTags: ["Auth"],
+    }),
+    getProfile: builder.query({
+      query: (customerId) => ({
+        url: `jan.customer?customer_id=${customerId}`,
+        method: "POST",
+      }),
+      providesTags: ["Auth"],
     }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation } = authApiSlice;
+export const { useLoginMutation, useRegisterMutation ,useGetProfileQuery} = authApiSlice;
 
 // Auth slice
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
-    setCredentials: (state, action: PayloadAction<{
-      user: string;
-      sid: string;
-      fullName: string;
-      homePage: string;
-    }>) => {
+    setCredentials: (
+      state,
+      action: PayloadAction<{
+        user: string;
+        sid: string;
+        fullName: string;
+        homePage: string;
+      }>
+    ) => {
       state.user = action.payload.user;
       state.sid = action.payload.sid;
       state.fullName = action.payload.fullName;
@@ -137,13 +147,16 @@ const authSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    setRegistrationData: (state, action: PayloadAction<{
-      customer: string;
-      user: string;
-      contact: string;
-      address: string | null;
-      message: string;
-    }>) => {
+    setRegistrationData: (
+      state,
+      action: PayloadAction<{
+        customer: string;
+        user: string;
+        contact: string;
+        address: string | null;
+        message: string;
+      }>
+    ) => {
       state.customer = action.payload.customer;
       state.user = action.payload.user;
       state.contact = action.payload.contact;
@@ -154,18 +167,26 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, clearCredentials, setLoading, setError, setRegistrationData } = authSlice.actions;
+export const {
+  setCredentials,
+  clearCredentials,
+  setLoading,
+  setError,
+  setRegistrationData,
+} = authSlice.actions;
 
 // Helper functions for cookie management
 export const setAuthCookie = (isAuthenticated: boolean) => {
-  if (typeof window !== 'undefined') {
-    document.cookie = `auth-token=${isAuthenticated}; path=/; max-age=${isAuthenticated ? 86400 : 0}`;
+  if (typeof window !== "undefined") {
+    document.cookie = `auth-token=${isAuthenticated}; path=/; max-age=${
+      isAuthenticated ? 86400 : 0
+    }`;
   }
 };
 
 export const clearAuthCookie = () => {
-  if (typeof window !== 'undefined') {
-    document.cookie = 'auth-token=false; path=/; max-age=0';
+  if (typeof window !== "undefined") {
+    document.cookie = "auth-token=false; path=/; max-age=0";
   }
 };
 export default authSlice.reducer;

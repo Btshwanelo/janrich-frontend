@@ -18,11 +18,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/untitled-button";
 import { Input } from "@/components/ui/untitled-input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/untitled-checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/untitled-card";
+import { Table, TableCard } from "@/components/application/table/table";
 import ProfileModal from "@/components/ProfileModal";
 import AuthGuard from "@/components/AuthGuard";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { clearCredentials, clearAuthCookie } from "@/lib/slices/authSlice";
+import { clearCredentials, clearAuthCookie, useGetProfileQuery } from "@/lib/slices/authSlice";
 import { useRouter } from "next/navigation";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 import SavingsGoalModal from "@/components/SavingsGoalModal";
@@ -32,8 +34,10 @@ const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const dispatch = useAppDispatch();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(true);
 
+  const {data} = useGetProfileQuery("JR0001");
+console.log("Profile Data:", data);
   const router = useRouter();
   const { user, fullName } = useAppSelector((state) => state.auth);
 
@@ -43,7 +47,15 @@ const Dashboard = () => {
     router.push("/login");
   };
 
-  const transactions = [
+  interface Transaction {
+    id: string;
+    date: string;
+    status: string;
+    amount: string;
+    type: string;
+  }
+
+  const transactions: Transaction[] = [
     {
       id: "JR0001",
       date: "Jan 6, 2025",
@@ -52,26 +64,38 @@ const Dashboard = () => {
       type: "Savings Deposit",
     },
     {
-      id: "JR0001",
-      date: "Jan 6, 2025",
-      status: "Paid",
-      amount: "R 3500.90",
-      type: "Savings Deposit",
+      id: "JR0002",
+      date: "Jan 5, 2025",
+      status: "Pending",
+      amount: "R 2500.00",
+      type: "Investment",
     },
     {
-      id: "JR0001",
-      date: "Jan 6, 2025",
+      id: "JR0003",
+      date: "Jan 4, 2025",
       status: "Paid",
-      amount: "R 3500.90",
+      amount: "R 1800.50",
       type: "Savings Deposit",
     },
+  ];
+
+  const columns = [
+    { key: "reference", label: "Reference" },
+    { key: "date", label: "Date" },
+    { key: "status", label: "Status" },
+    { key: "amount", label: "Amount" },
+    { key: "purchase", label: "Purchase" },
   ];
 
   return (
     <PublicRouteGuard>
       <div className="min-h-screen bg-gray-50 flex">
         {/* Left Sidebar */}
-        <div className={`${isSidebarCollapsed ? 'w-16' : 'w-64'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out`}>
+        <div
+          className={`${
+            isSidebarCollapsed ? "w-16" : "w-64"
+          } bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out fixed left-0 top-0 h-screen z-10`}
+        >
           {/* Logo and Toggle */}
           <div className="mb-6 mt-6 px-4 flex items-center justify-between">
             {!isSidebarCollapsed && (
@@ -87,7 +111,11 @@ const Dashboard = () => {
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
               className="ml-auto"
             >
-              {isSidebarCollapsed ? <Menu className="w-4 h-4" /> : <X className="w-4 h-4" />}
+              {isSidebarCollapsed ? (
+                <Menu className="w-4 h-4" />
+              ) : (
+                <X className="w-4 h-4" />
+              )}
             </Button>
           </div>
 
@@ -103,11 +131,13 @@ const Dashboard = () => {
           />
 
           {/* Navigation */}
-          <nav className="flex-1 px-4">
+          <nav className="flex-1 px-4 overflow-y-auto">
             <div className="space-y-2">
               <a
                 href="#"
-                className={`flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 text-gray-900 bg-gray-100 rounded-lg`}
+                className={`flex items-center ${
+                  isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+                } py-2 text-gray-900 bg-gray-100 rounded-lg`}
                 title={isSidebarCollapsed ? "Dashboard" : ""}
               >
                 <Home className="w-5 h-5" />
@@ -115,7 +145,9 @@ const Dashboard = () => {
               </a>
               <a
                 href="#"
-                className={`flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+                className={`flex items-center ${
+                  isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+                } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
                 title={isSidebarCollapsed ? "Analytics" : ""}
               >
                 <BarChart3 className="w-5 h-5" />
@@ -123,7 +155,9 @@ const Dashboard = () => {
               </a>
               <a
                 href="#"
-                className={`flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+                className={`flex items-center ${
+                  isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+                } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
                 title={isSidebarCollapsed ? "Community" : ""}
               >
                 <Users className="w-5 h-5" />
@@ -131,7 +165,9 @@ const Dashboard = () => {
               </a>
               <a
                 href="#"
-                className={`flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+                className={`flex items-center ${
+                  isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+                } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
                 title={isSidebarCollapsed ? "History" : ""}
               >
                 <Clock className="w-5 h-5" />
@@ -141,10 +177,12 @@ const Dashboard = () => {
           </nav>
 
           {/* Bottom Navigation */}
-          <div className="p-4 space-y-2">
+          <div className="p-4 space-y-2 border-t border-gray-200 bg-white">
             <a
               href="#"
-              className={`flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+              className={`flex items-center ${
+                isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+              } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
               title={isSidebarCollapsed ? "Support" : ""}
             >
               <HelpCircle className="w-5 h-5" />
@@ -153,7 +191,9 @@ const Dashboard = () => {
             <a
               href="#"
               onClick={() => setIsModalOpen(true)}
-              className={`flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+              className={`flex items-center ${
+                isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+              } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
               title={isSidebarCollapsed ? "Settings" : ""}
             >
               <Settings className="w-5 h-5" />
@@ -161,7 +201,9 @@ const Dashboard = () => {
             </a>
             <button
               onClick={handleLogout}
-              className={`flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 text-gray-600 hover:bg-gray-100 rounded-lg w-full text-left`}
+              className={`flex items-center ${
+                isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+              } py-2 text-gray-600 hover:bg-gray-100 rounded-lg w-full text-left`}
               title={isSidebarCollapsed ? "Logout" : ""}
             >
               <LogOut className="w-5 h-5" />
@@ -169,12 +211,16 @@ const Dashboard = () => {
             </button>
 
             {/* User Profile */}
-            <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 mt-4`}>
+            <div
+              className={`flex items-center ${
+                isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+              } py-2 mt-4`}
+            >
               <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
               {!isSidebarCollapsed && (
                 <div className="flex-1">
                   <div className="text-sm font-medium">
-                    {fullName || user || "User"}
+                    {fullName || (typeof user === 'string' ? user : user?.name || user?.email || "User")}
                   </div>
                 </div>
               )}
@@ -183,15 +229,19 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col">
+        <div
+          className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+            isSidebarCollapsed ? "ml-16" : "ml-64"
+          }`}
+        >
           {/* Header */}
           <header className="bg-white border-b border-gray-200 px-6 py-4">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-semibold text-gray-900">
-                Welcome back, {fullName || user || "User"}
+                Welcome back, {fullName || (typeof user === 'string' ? user : user?.name || user?.email || "User")}
               </h1>
               <div className="flex items-center space-x-4">
-                <Input 
+                <Input
                   leftIcon={<Search className="w-4 h-4" />}
                   placeholder="Search"
                   className="w-64"
@@ -233,7 +283,6 @@ const Dashboard = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-
                   {/* Chart Area */}
                   <div className="h-64 flex items-end justify-between space-x-2 mb-4">
                     <div className="flex flex-col items-center">
@@ -398,8 +447,8 @@ const Dashboard = () => {
                     </p>
                   </div>
 
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     className="w-full flex items-center justify-center space-x-2"
                   >
                     <Zap className="w-4 h-4" />
@@ -410,119 +459,104 @@ const Dashboard = () => {
             </div>
 
             {/* Transactions */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center space-x-4">
-                      <CardTitle className="text-lg font-semibold text-gray-900">
-                        Transactions
-                      </CardTitle>
-                      <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-sm">
-                        240 Transaction
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Keep track of your transactions.
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <Input 
-                      leftIcon={<Search className="w-4 h-4" />}
-                      placeholder="Search"
-                      className="w-64"
-                      rightIcon={<span className="text-xs text-gray-400">⌘K</span>}
+            <TableCard.Root className="">
+              <TableCard.Header
+                title="Transactions"
+                badge="240 Transaction"
+                description="Keep track of your transactions."
+                // contentTrailing={
+                //   <div className="flex items-center space-x-4">
+                //     <Input
+                //       leftIcon={<Search className="w-4 h-4" />}
+                //       placeholder="Search"
+                //       className="w-64"
+                //       rightIcon={
+                //         <span className="text-xs text-gray-400">⌘K</span>
+                //       }
+                //     />
+                //     <Button
+                //       variant="secondary"
+                //       size="sm"
+                //       className="flex items-center space-x-2"
+                //     >
+                //       <Filter className="w-4 h-4" />
+                //       <span>Filters</span>
+                //     </Button>
+                //   </div>
+                // }
+              />
+
+              {/* Tabs */}
+              <div className="flex space-x-1 p-4 bg-gray-100 border-b border-gray-200">
+                <div className="flex items-center justify-end space-x-4">
+                  <Input
+                    leftIcon={<Search className="w-4 h-4" />}
+                    placeholder="Search"
+                    className="w-64"
+                    rightIcon={
+                      <span className="text-xs text-gray-400">⌘K</span>
+                    }
+                  />
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="flex items-center space-x-2"
+                  >
+                    <Filter className="w-4 h-4" />
+                    <span>Filters</span>
+                  </Button>
+                </div>
+              </div>
+
+              <Table
+                selectionMode="multiple"
+                selectionBehavior="toggle"
+                size="md"
+              >
+                <Table.Header columns={columns}>
+                  {(column) => (
+                    <Table.Head
+                      id={column.key}
+                      isRowHeader={column.key === "reference"}
+                      label={column.label}
                     />
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="flex items-center space-x-2"
-                    >
-                      <Filter className="w-4 h-4" />
-                      <span>Filters</span>
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-
-                {/* Tabs */}
-                <div className="flex space-x-1 mb-6 bg-gray-100 rounded-lg p-1">
-                  {["View all", "Monitored", "Unmonitored"].map((tab) => (
-                    <Button
-                      key={tab}
-                      variant={activeTab === tab ? "primary" : "tertiary"}
-                      size="sm"
-                      onClick={() => setActiveTab(tab)}
-                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        activeTab === tab
-                          ? "bg-white text-gray-900 shadow-sm"
-                          : "text-gray-600 hover:text-gray-900"
-                      }`}
-                    >
-                      {tab}
-                    </Button>
-                  ))}
-                </div>
-
-                {/* Table */}
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-medium text-gray-600 text-sm">
-                          <input type="checkbox" className="rounded" />
-                        </th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600 text-sm">
-                          Reference
-                        </th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600 text-sm">
-                          Date
-                        </th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600 text-sm">
-                          Status
-                        </th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600 text-sm">
-                          Amount
-                        </th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600 text-sm">
-                          Purchase
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transactions.map((transaction, index) => (
-                        <tr
-                          key={index}
-                          className="border-b border-gray-100 hover:bg-gray-50"
+                  )}
+                </Table.Header>
+                <Table.Body>
+                  {transactions.map((item) => (
+                    <Table.Row key={item.id} columns={columns}>
+                      <Table.Cell>
+                        <span className="font-medium text-gray-900">
+                          {item.id}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span className="text-gray-600">{item.date}</span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            item.status === "Paid"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
                         >
-                          <td className="py-4 px-4">
-                            <input type="checkbox" className="rounded" />
-                          </td>
-                          <td className="py-4 px-4 text-sm text-gray-900">
-                            {transaction.id}
-                          </td>
-                          <td className="py-4 px-4 text-sm text-gray-600">
-                            {transaction.date}
-                          </td>
-                          <td className="py-4 px-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              ✓ {transaction.status}
-                            </span>
-                          </td>
-                          <td className="py-4 px-4 text-sm font-medium text-gray-900">
-                            {transaction.amount}
-                          </td>
-                          <td className="py-4 px-4 text-sm text-gray-600">
-                            {transaction.type}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
+                          {item.status === "Paid" ? "✓" : "⏳"} {item.status}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span className="font-medium text-gray-900">
+                          {item.amount}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span className="text-gray-600">{item.type}</span>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
+            </TableCard.Root>
           </main>
         </div>
       </div>

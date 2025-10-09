@@ -3,8 +3,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/ui/untitled-input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/base/input/label";
+import { Checkbox } from "@/components/ui/untitled-checkbox";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
@@ -286,11 +286,11 @@ const LoginScreen = () => {
                     }) => (
                       <Checkbox
                         id="rememberMe"
-                        checked={field.value}
-                        onCheckedChange={(checked) =>
-                          setFieldValue("rememberMe", checked)
+                        isSelected={field.value}
+                        onChange={(isSelected) =>
+                          setFieldValue("rememberMe", isSelected)
                         }
-                        className="data-[state=checked]:bg-primary-500 data-[state=checked]:border-primary-500"
+                        className="data-[selected]:bg-primary-500 data-[selected]:border-primary-500"
                       />
                     )}
                   </Field>

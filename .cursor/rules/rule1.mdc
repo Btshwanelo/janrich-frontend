@@ -1,0 +1,63 @@
+---
+alwaysApply: true
+---
+{
+  "project": "Next.js + Tailwind + TypeScript (Untitled UI)",
+  "rules": [
+    {
+      "goal": "Use only official Untitled UI components for all design elements.",
+      "details": [
+        "Do not create custom UI components or write your own versions of official components.",
+        "Always use and reference official components and patterns from https://www.untitledui.com/.",
+        "If a component is not yet installed in the project, install it automatically using the correct npm or yarn package before importing.",
+        "Ensure all components follow Untitled UI design principles: soft shadows, balanced white space, rounded corners, and consistent typography."
+      ]
+    },
+    {
+      "goal": "Styling rules",
+      "details": [
+        "Use TailwindCSS exclusively for styling and layout — no inline styles or CSS modules.",
+        "Apply responsive classes (sm:, md:, lg:) for adaptive layouts.",
+        "Use Untitled UI color and spacing system (e.g., text-gray-900, bg-neutral-50, p-4, gap-4).",
+        "Structure layouts with flex or grid; avoid absolute positioning unless required."
+      ]
+    },
+    {
+      "goal": "Code standards",
+      "details": [
+        "Write all components and pages in TypeScript with proper interfaces and types.",
+        "Use functional React components only — no class components.",
+        "Follow Next.js App Router conventions using the `app/` directory.",
+        "Use async/await for all data fetching and server actions.",
+        "Name React components in PascalCase and files in kebab-case."
+      ]
+    },
+    {
+      "goal": "UI/UX patterns",
+      "details": [
+        "All screens must be fully responsive and mobile-first.",
+        "Include consistent hover, focus, and active states that match Untitled UI behavior.",
+        "Use consistent spacing (8px grid system: p-2, p-4, gap-2, gap-4, etc.).",
+        "Use Framer Motion for transitions and subtle animations when applicable."
+      ]
+    },
+    {
+      "goal": "Page and layout creation",
+      "details": [
+        "Wrap pages in `<main className='min-h-screen bg-white'>` or theme-appropriate containers.",
+        "Use official Untitled UI layout patterns for sections, cards, tables, and grids.",
+        "Use official Untitled UI components such as Button, Input, Dropdown, Modal, Tabs, and Card for all interactions.",
+        "Do not re-implement existing Untitled UI elements — import them once installed."
+      ]
+    },
+    {
+      "goal": "Code cleanliness and structure",
+      "details": [
+        "Keep files concise (under 200 lines where possible).",
+        "Group imports logically: React/Next.js first, UI components second, utilities last.",
+        "Use absolute imports via '@/‘ alias (configured in tsconfig.json).",
+        "Follow Prettier and ESLint conventions for consistent formatting."
+      ]
+    }
+  ]
+}
