@@ -403,7 +403,7 @@ const Dashboard = () => {
               <Table
                 selectionMode="multiple"
                 selectionBehavior="toggle"
-                size="md"
+                size="sm"
                 className={"border border-gray-50"}
               >
                 <Table.Header
