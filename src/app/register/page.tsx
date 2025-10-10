@@ -638,11 +638,11 @@ const RegistrationScreen = () => {
                     {({ field }: any) => (
                       <Checkbox
                         id="agreeTerms"
-                        checked={field.value}
-                        onCheckedChange={(checked) =>
-                          setFieldValue("agreeTerms", checked)
+                        isSelected={field.value}
+                        onChange={(isSelected) =>
+                          setFieldValue("agreeTerms", isSelected)
                         }
-                        className="mt-1 data-[state=checked]:bg-primary-500 data-[state=checked]:border-primary-500"
+                        className="mt-1"
                       />
                     )}
                   </Field>
