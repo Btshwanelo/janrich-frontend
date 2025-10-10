@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/untitled-input";
 import { Label } from "@/components/base/input/label";
 import { Select } from "@/components/base/select/select";
 import { Tabs } from "@/components/application/tabs/tabs";
+import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 import { Badge } from "@/components/base/badges/badges";
 import {
   Card,
@@ -69,6 +70,10 @@ export default function ProfileBeneficiaryScreen() {
   // Customer and Profile update mutations
   const [updateCustomer, { isLoading: isUpdatingCustomer }] = useUpdateCustomerMutation();
   const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
+
+  // Toast hooks
+  const showSuccessToast = useSuccessToast();
+  const showErrorToast = useErrorToast();
 
   // Details tab state
   const [firstName, setFirstName] = useState("");
@@ -341,11 +346,29 @@ console.log("beneficiaryRelation", beneficiaryRelation);
       const result = await updateFinancialDetails(financialData).unwrap();
       console.log("Financial details updated successfully:", result);
 
-      // You can add a success notification here
-      alert("Financial details updated successfully!");
+      // Show success toast
+      showSuccessToast(
+        "Financial Details Updated!",
+        "Your financial information has been saved successfully.",
+        {
+          duration: 4000,
+        }
+      );
     } catch (error) {
       console.error("Failed to update financial details:", error);
-      alert("Failed to update financial details. Please try again.");
+      
+      // Show error toast
+      showErrorToast(
+        "Update Failed",
+        "Unable to save your financial details. Please try again.",
+        {
+          duration: 0, // Don't auto-dismiss
+          action: {
+            label: "Retry",
+            onClick: () => handleFinancialDetailsSubmit(),
+          },
+        }
+      );
     }
   };
 
@@ -377,11 +400,29 @@ console.log("beneficiaryRelation", beneficiaryRelation);
       const result = await updateBeneficiary(beneficiaryData).unwrap();
       console.log("Beneficiary updated successfully:", result);
 
-      // You can add a success notification here
-      alert("Beneficiary information updated successfully!");
+      // Show success toast
+      showSuccessToast(
+        "Beneficiary Updated!",
+        "Your beneficiary information has been saved successfully.",
+        {
+          duration: 4000,
+        }
+      );
     } catch (error) {
       console.error("Failed to update beneficiary:", error);
-      alert("Failed to update beneficiary information. Please try again.");
+      
+      // Show error toast
+      showErrorToast(
+        "Update Failed",
+        "Unable to save your beneficiary information. Please try again.",
+        {
+          duration: 0, // Don't auto-dismiss
+          action: {
+            label: "Retry",
+            onClick: () => handleBeneficiarySubmit(),
+          },
+        }
+      );
     }
   };
 
@@ -409,7 +450,7 @@ console.log("beneficiaryRelation", beneficiaryRelation);
         first_name: firstName,
         last_name: lastName,
         territory: "All Territories",
-        // email: email,
+        email: email,
         phone: detailsPhoneNumber,
         whatsapp_number: whatsappNumber,
         country_code: countryCode,
@@ -422,13 +463,40 @@ console.log("beneficiaryRelation", beneficiaryRelation);
       console.log("Customer updated successfully:", result);
       
       if (result.message.result === "failed") {
-        alert(`Customer update failed: ${result.message.message}`);
+        showErrorToast(
+          "Update Failed",
+          result.message.message || "Unable to update customer information.",
+          {
+            duration: 0, // Don't auto-dismiss
+            action: {
+              label: "Retry",
+              onClick: () => handleCustomerUpdate(),
+            },
+          }
+        );
       } else {
-        alert("Customer information updated successfully!");
+        showSuccessToast(
+          "Customer Updated!",
+          "Your basic information has been saved successfully.",
+          {
+            duration: 4000,
+          }
+        );
       }
     } catch (error) {
       console.error("Failed to update customer:", error);
-      alert("Failed to update customer information. Please try again.");
+      
+      showErrorToast(
+        "Update Failed",
+        "Unable to save your customer information. Please try again.",
+        {
+          duration: 0, // Don't auto-dismiss
+          action: {
+            label: "Retry",
+            onClick: () => handleCustomerUpdate(),
+          },
+        }
+      );
     }
   };
 
@@ -476,13 +544,40 @@ console.log("beneficiaryRelation", beneficiaryRelation);
       console.log("Profile updated successfully:", result);
       
       if (result.message.ok) {
-        alert("Profile information updated successfully!");
+        showSuccessToast(
+          "Profile Updated!",
+          "Your profile information has been saved successfully.",
+          {
+            duration: 4000,
+          }
+        );
       } else {
-        alert("Profile update failed. Please try again.");
+        showErrorToast(
+          "Update Failed",
+          "Unable to update your profile information. Please try again.",
+          {
+            duration: 0, // Don't auto-dismiss
+            action: {
+              label: "Retry",
+              onClick: () => handleProfileUpdate(),
+            },
+          }
+        );
       }
     } catch (error) {
       console.error("Failed to update profile:", error);
-      alert("Failed to update profile information. Please try again.");
+      
+      showErrorToast(
+        "Update Failed",
+        "Unable to save your profile information. Please try again.",
+        {
+          duration: 0, // Don't auto-dismiss
+          action: {
+            label: "Retry",
+            onClick: () => handleProfileUpdate(),
+          },
+        }
+      );
     }
   };
 

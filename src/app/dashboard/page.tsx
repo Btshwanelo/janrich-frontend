@@ -16,9 +16,9 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { Button } from "@/components/ui/untitled-button";
-import { Input } from "@/components/ui/untitled-input";
-import { Checkbox } from "@/components/ui/untitled-checkbox";
+import { Button } from "@/components/base/buttons/button";
+import { Input } from "@/components/base/input/input";
+import { Checkbox } from "@/components/base/checkbox/checkbox";
 import {
   Card,
   CardContent,
@@ -123,19 +123,15 @@ const Dashboard = () => {
                     : (user as any)?.name || (user as any)?.email || "User")}
               </h1>
               <div className="flex items-center space-x-4">
-                <Input
-                  leftIcon={<Search className="w-4 h-4" />}
-                  placeholder="Search"
-                  className="w-64"
-                />
+                <Input icon={Search} placeholder="Search" className="w-64" />
                 <Button
-                  variant="secondary"
+                  color="secondary"
                   className="flex items-center space-x-2"
                 >
                   <span>Customize</span>
                 </Button>
                 <Button
-                  variant="secondary"
+                  color="secondary"
                   className="flex items-center space-x-2"
                 >
                   <span>Export</span>
@@ -159,7 +155,7 @@ const Dashboard = () => {
                         Keep track of your savings and interest earned.
                       </p>
                     </div>
-                    <Button variant="tertiary" size="sm">
+                    <Button color="tertiary" size="sm">
                       <MoreHorizontal className="w-4 h-4" />
                     </Button>
                   </div>
@@ -254,7 +250,7 @@ const Dashboard = () => {
                   </div>
 
                   <div className="flex justify-end">
-                    <Button variant="secondary" size="sm">
+                    <Button color="secondary" size="sm">
                       View full report
                     </Button>
                   </div>
@@ -268,7 +264,7 @@ const Dashboard = () => {
                     <CardTitle className="text-lg font-semibold text-gray-900">
                       Keep it up
                     </CardTitle>
-                    <Button variant="tertiary" size="sm">
+                    <Button color="tertiary" size="sm">
                       <MoreHorizontal className="w-4 h-4" />
                     </Button>
                   </div>
@@ -330,7 +326,7 @@ const Dashboard = () => {
                   </div>
 
                   <Button
-                    variant="primary"
+                    color="primary"
                     className="w-full flex items-center justify-center space-x-2"
                   >
                     <Zap className="w-4 h-4" />
@@ -357,7 +353,7 @@ const Dashboard = () => {
                 //       }
                 //     />
                 //     <Button
-                //       variant="secondary"
+                //       color="secondary"
                 //       size="sm"
                 //       className="flex items-center space-x-2"
                 //     >
@@ -372,15 +368,13 @@ const Dashboard = () => {
               <div className="flex space-x-1 p-4 bg-gray-100 border-b border-gray-200">
                 <div className="flex items-center justify-end space-x-4">
                   <Input
-                    leftIcon={<Search className="w-4 h-4" />}
+                    icon={Search}
                     placeholder="Search"
                     className="w-64"
-                    rightIcon={
-                      <span className="text-xs text-gray-400">⌘K</span>
-                    }
+                    shortcut="⌘K"
                   />
                   <Button
-                    variant="secondary"
+                    color="secondary"
                     size="sm"
                     className="flex items-center space-x-2"
                   >
@@ -394,13 +388,18 @@ const Dashboard = () => {
                 selectionMode="multiple"
                 selectionBehavior="toggle"
                 size="md"
+                className={"border border-gray-50"}
               >
-                <Table.Header columns={columns}>
+                <Table.Header
+                  columns={columns}
+                  className={"bg-gray-50 border border-gray-50"}
+                >
                   {(column) => (
                     <Table.Head
                       id={column.key}
                       isRowHeader={column.key === "reference"}
                       label={column.label}
+                      className={"bg-gray-50"}
                     />
                   )}
                 </Table.Header>

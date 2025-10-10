@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { RouteProvider } from "@/providers/route-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { ToastProvider } from "@/components/base/toast";
 import "./globals.css";
 import ReduxProvider from "@/components/ReduxProvider";
 
@@ -31,7 +32,9 @@ export default function RootLayout({
                 <RouteProvider>
                     <ThemeProvider>
                         <ReduxProvider>
-                            {children}
+                            <ToastProvider>
+                                {children}
+                            </ToastProvider>
                         </ReduxProvider>
                     </ThemeProvider>
                 </RouteProvider>
