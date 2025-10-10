@@ -233,6 +233,7 @@ const Onboarding = () => {
                         onChange={(date) => setFieldValue("birthdate", date)}
                         onApply={() => setOpen(false)}
                         onCancel={() => setOpen(false)}
+                        className={'py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 ' + (errors.birthdate && touched.birthdate ? 'border-error-500' : 'border-gray-300')    }
                       />
                       {errors.birthdate && touched.birthdate && (
                         <p className="text-error-500 text-sm mt-1">{String(errors.birthdate)}</p>
