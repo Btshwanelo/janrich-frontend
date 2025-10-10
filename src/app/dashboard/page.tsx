@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Home,
   BarChart3,
@@ -43,14 +43,31 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("View all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [hasUserDismissedModal, setHasUserDismissedModal] = useState(false);
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = React.useState(true);
 
-  const { data } = useGetProfileQuery("JR0001");
-  console.log("Profile Data:", data);
   const router = useRouter();
-  const { user, fullName } = useAppSelector((state) => state.auth);
+  const { user, fullName, customer } = useAppSelector((state) => state.auth);
+  const { data, refetch } = useGetProfileQuery(customer);
 
+  useEffect(() => {
+    // Check if savings goal hasn't been set (0, null, undefined, or missing)
+    const savingsGoal = data?.message?.data?.financials?.annual_savings_goal;
+    if (savingsGoal === 0 && !hasUserDismissedModal) {
+      console.log(
+        "Savings goal not set, opening modal. Current value:",
+        savingsGoal
+      );
+      setIsModalOpen(true);
+    } else if (savingsGoal && savingsGoal > 0) {
+      console.log("Savings goal already set:", savingsGoal);
+      setIsModalOpen(false);
+      setHasUserDismissedModal(false); // Reset dismissal flag when goal is set
+    }
+  }, [data, hasUserDismissedModal]);
+
+  console.log("profile data", data);
   const handleLogout = () => {
     dispatch(clearCredentials());
     clearAuthCookie();
@@ -102,9 +119,20 @@ const Dashboard = () => {
       <div className="min-h-screen bg-gray-50 flex">
         {/* Left Sidebar */}
         <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
-        {/* <SavingsGoalModal isOpen={true} onClose={function (): void {
-          throw new Error("Function not implemented.");
-        } } /> */}
+        <SavingsGoalModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setHasUserDismissedModal(true);
+          }}
+          customerId={customer || "JR0001"}
+          onSave={async (amount) => {
+            console.log("Savings goal saved:", amount);
+            // Refetch profile data to get updated savings goal
+            await refetch();
+            setIsModalOpen(false);
+          }}
+        />
 
         {/* Main Content */}
         <div
@@ -258,7 +286,7 @@ const Dashboard = () => {
               </Card>
 
               {/* Keep it up Card */}
-              <Card className="border-primary-200">
+              <Card className="border-2 border-[#155EEF]">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg font-semibold text-gray-900">
@@ -272,31 +300,13 @@ const Dashboard = () => {
                 <CardContent>
                   {/* Circular Progress */}
                   <div className="flex items-center justify-center mb-6">
-                    <div className="relative w-32 h-32">
-                      <svg
-                        className="w-32 h-32 transform -rotate-90"
-                        viewBox="0 0 36 36"
-                      >
-                        <path
-                          d="M18 2.0845
-                          a 15.9155 15.9155 0 0 1 0 31.831
-                          a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="#e5e7eb"
-                          strokeWidth="2"
-                        />
-                        <path
-                          d="M18 2.0845
-                          a 15.9155 15.9155 0 0 1 0 31.831
-                          a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="#ef4444"
-                          strokeWidth="2"
-                          strokeDasharray="40, 100"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative w-full h-32">
+                      <img
+                        src="/Progress circle.svg"
+                        alt="Savings Goal Chart"
+                        className="w-full max-h-60"
+                      />
+                      {/* <div className="absolute inset-0 flex items-center justify-center">
                         <div className="text-center">
                           <div className="text-2xl font-bold text-gray-900">
                             40%
@@ -305,7 +315,7 @@ const Dashboard = () => {
                             Savings goal
                           </div>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
 
@@ -316,7 +326,7 @@ const Dashboard = () => {
                     </span>
                   </div>
 
-                  <div className="mb-6">
+                  <div className="mb-6 border-b border-gray-100 pb-4">
                     <h3 className="font-semibold text-gray-900 mb-2">
                       You've almost reached your goal
                     </h3>
@@ -325,13 +335,19 @@ const Dashboard = () => {
                     </p>
                   </div>
 
-                  <Button
-                    color="primary"
-                    className="w-full flex items-center justify-center space-x-2"
-                  >
-                    <Zap className="w-4 h-4" />
-                    <span>Upgrade plan</span>
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button
+                      color="secondary"
+                      className=""
+                      onClick={() => {
+                        setIsModalOpen(true);
+                        setHasUserDismissedModal(false);
+                      }}
+                      iconLeading={<Zap data-icon />}
+                    >
+                      <span>Set Savings Goal</span>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -375,10 +391,10 @@ const Dashboard = () => {
                   />
                   <Button
                     color="secondary"
-                    size="sm"
+                    size="md"
                     className="flex items-center space-x-2"
+                    iconTrailing={<Filter className="w-4 h-4" />}
                   >
-                    <Filter className="w-4 h-4" />
                     <span>Filters</span>
                   </Button>
                 </div>

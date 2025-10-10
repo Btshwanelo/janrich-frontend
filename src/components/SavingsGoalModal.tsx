@@ -4,55 +4,98 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Slider } from "@/components/base/slider/slider";
-import {
-  ModalOverlay,
-  Modal,
-  Dialog,
-} from "@/components/application/modals/modal";
+import { ModalOverlay, Modal, Dialog } from "@/components/application/modals/modal";
+import { useUpdateSavingsGoalMutation } from "@/lib/slices/authSlice";
+import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 
 interface SavingsGoalModalProps {
   isOpen: boolean;
   onClose: () => void;
+  customerId?: string;
   onSave?: (amount: number) => void;
-  title?: string;
-  minAmount?: number;
-  maxAmount?: number;
-  defaultAmount?: number;
-  step?: number;
-  currency?: string;
-  buttonText?: string;
-  cardTitle?: string;
-  cardImage?: string;
-  cardImageAlt?: string;
 }
 
 export default function SavingsGoalModal({
   isOpen,
   onClose,
+  customerId,
   onSave,
-  title = "How much do you want to save?",
-  minAmount = 3000,
-  maxAmount = 100000,
-  defaultAmount = 1000,
-  step = 500,
-  currency = "R",
-  buttonText = "Start Paying yourself first",
-  cardTitle = "Great Start! You don't need a million to change your life",
-  cardImage = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=300&fit=crop",
-  cardImageAlt = "Professional woman",
 }: SavingsGoalModalProps) {
-  const [amount, setAmount] = useState([defaultAmount]);
+  const [amount, setAmount] = useState([15000]);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const minAmount = 5000;
+  const maxAmount = 100000;
+  const step = 1000;
 
-  const formatCurrency = (value: number) => {
+  const [updateSavingsGoal, { isLoading: isUpdatingGoal }] = useUpdateSavingsGoalMutation();
+  const showSuccessToast = useSuccessToast();
+  const showErrorToast = useErrorToast();
+
+  const formatCurrency = (value: number): string => {
+    const currency = "R";
     return `${currency} ${value.toLocaleString()}`;
   };
 
-  const handleSubmit = () => {
-    console.log("Selected amount:", amount[0]);
-    if (onSave) {
-      onSave(amount[0]);
+  const cardTitle = "Great Start! You don't need a million to change your life";
+  const cardImage = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=300&fit=crop";
+  const cardImageAlt = "Professional woman";
+  const buttonText = "Start Paying yourself first";
+
+  const handleSubmit = async () => {
+    if (!customerId) {
+      showErrorToast(
+        "Error",
+        "Customer ID is required to save your savings goal.",
+        { duration: 4000 }
+      );
+      return;
     }
-    onClose();
+
+    setIsSaving(true);
+
+    try {
+      const response = await updateSavingsGoal({
+        customer_id: customerId,
+        annual_savings_goal: amount[0],
+      }).unwrap();
+
+      console.log("Savings goal updated successfully:", response);
+
+      // Show success toast
+      showSuccessToast(
+        "Savings Goal Set!",
+        `Your annual savings goal of ${formatCurrency(amount[0])} has been saved successfully.`,
+        {
+          duration: 4000,
+        }
+      );
+
+      // Call the onSave callback if provided
+      if (onSave) {
+        onSave(amount[0]);
+      }
+
+      // Close the modal
+      onClose();
+    } catch (error: any) {
+      console.error("Failed to update savings goal:", error);
+      
+      // Show error toast
+      showErrorToast(
+        "Save Failed",
+        error?.data?.message || "Unable to save your savings goal. Please try again.",
+        {
+          duration: 0, // Don't auto-dismiss
+          action: {
+            label: "Retry",
+            onClick: () => handleSubmit(),
+          },
+        }
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -60,7 +103,7 @@ export default function SavingsGoalModal({
   return (
     <ModalOverlay isOpen={isOpen} onOpenChange={onClose}>
       <Modal>
-        <Dialog className="bg-white rounded-2xl p-6 w-full mx-auto max-w-[400px] flex flex-col relative">
+        <Dialog className="bg-white rounded-2xl p-6 w-full mx-auto max-w-[400px] flex flex-col relative overflow-hidden">
           {/* Close Button */}
           <button
             onClick={onClose}
@@ -71,10 +114,10 @@ export default function SavingsGoalModal({
 
           {/* Header */}
           <div className="text-center mb-6">
-            <h2 className="text-md font-semibold text-gray-900">{title}</h2>
+            <h2 className="text-md font-semibold text-gray-900">How much do you want to save?</h2>
           </div>
 
-          <div className="space-y-6 mx-6">
+          <div className="space-y-6 mx-4">
             <div className="text-center">
               <div className="text-4xl font-bold text-primary-500 mb-6">
                 {formatCurrency(amount[0])}
@@ -85,17 +128,22 @@ export default function SavingsGoalModal({
                 <span>{formatCurrency(maxAmount)}</span>
               </div>
 
-              <Slider
-                value={amount}
-                onChange={(value) =>
-                  setAmount(Array.isArray(value) ? value : [value])
-                }
-                minValue={minAmount}
-                maxValue={maxAmount}
-                step={step}
-                labelFormatter={(value) => formatCurrency(value)}
-                className="mb-6 w-full"
-              />
+              <div className="w-full px-1 mb-6 overflow-hidden max-w-full">
+                <div className="slider-container">
+                  <Slider
+                    value={amount}
+                    onChange={(value) =>
+                      setAmount(Array.isArray(value) ? value : [value])
+                    }
+                    minValue={minAmount}
+                    maxValue={maxAmount}
+                    step={step}
+                    labelFormatter={(value) => formatCurrency(value)}
+                    labelPosition="bottom"
+                    className="w-full max-w-full"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className=" border border-border-inactive rounded-lg p-4">
@@ -117,8 +165,10 @@ export default function SavingsGoalModal({
               color="primary"
               size="lg"
               className="w-full"
+              disabled={isSaving || isUpdatingGoal}
+              isLoading={isSaving || isUpdatingGoal}
             >
-              {buttonText}
+              {(isSaving || isUpdatingGoal) ? "Saving..." : buttonText}
             </Button>
           </div>
         </Dialog>

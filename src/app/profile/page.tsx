@@ -45,6 +45,7 @@ import {
   useUpdateCustomerMutation,
   useUpdateProfileMutation,
 } from "@/lib/slices/authSlice";
+import { useAppSelector } from "@/lib/hooks";
 
 export default function ProfileBeneficiaryScreen() {
   const [selectedTab, setSelectedTab] = useState("beneficiary");
@@ -52,12 +53,15 @@ export default function ProfileBeneficiaryScreen() {
   const [amount, setAmount] = useState([100000]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
+  const { user, customer } = useAppSelector((state) => state.auth);
   // Fetch profile data
+  console.log("user", user);
+  console.log("customer", customer);
   const {
     data: profileData,
     isLoading: isProfileLoading,
     error: profileError,
-  } = useGetProfileQuery("JR0020");
+  } = useGetProfileQuery(customer);
 
   // Financial details update mutation
   const [updateFinancialDetails, { isLoading: isUpdatingFinancials }] =
@@ -118,10 +122,6 @@ export default function ProfileBeneficiaryScreen() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [countryCode, setCountryCode] = useState("");
   const [raceOther, setRaceOther] = useState("");
-console.log("beneficiaryType", beneficiaryType);
-console.log("beneficiaryCell", beneficiaryCell);
-console.log("beneficiaryTitle", beneficiaryTitle);
-console.log("beneficiaryRelation", beneficiaryRelation);
   // Populate form fields when profile data is loaded
   React.useEffect(() => {
     if (profileData?.message?.data) {
@@ -389,16 +389,21 @@ console.log("beneficiaryRelation", beneficiaryRelation);
       ];
 
       const beneficiaryData = {
-        customer_id: "JR0020",
-        beneficiary_type: mapSelectKeyToApiValue(beneficiaryType, beneficiaryTypeOptions),
+        customer_id: customer,
+        beneficiary_type: mapSelectKeyToApiValue(
+          beneficiaryType,
+          beneficiaryTypeOptions
+        ),
         beneficiary_name: beneficiaryName,
         beneficiary_title: beneficiaryTitle,
         beneficiary_cell: beneficiaryCell,
-        beneficiary_relation: mapSelectKeyToApiValue(beneficiaryRelation, beneficiaryRelationOptions),
+        beneficiary_relation: mapSelectKeyToApiValue(
+          beneficiaryRelation,
+          beneficiaryRelationOptions
+        ),
       };
 
       const result = await updateBeneficiary(beneficiaryData).unwrap();
-      console.log("Beneficiary updated successfully:", result);
 
       // Show success toast
       showSuccessToast(

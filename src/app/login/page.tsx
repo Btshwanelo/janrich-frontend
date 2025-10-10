@@ -72,7 +72,7 @@ const LoginScreen = () => {
         password: values.password,
       }).unwrap();
 
-      console.log("Login successful:", result);
+      console.log("Login successful:", result.message.customer.name);
 
       // Dispatch credentials to Redux store
       dispatch(
@@ -81,6 +81,7 @@ const LoginScreen = () => {
           sid: result.message.sid,
           fullName: result.full_name,
           homePage: result.home_page,
+          customer: result.message.customer.name,
         })
       );
 

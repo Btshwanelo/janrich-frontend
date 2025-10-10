@@ -26,6 +26,7 @@ export interface LoginResponse {
     success: boolean;
     user: string;
     sid: string;
+    customer: { name: string; customer_name: string };
   };
   home_page: string;
   full_name: string;
@@ -223,6 +224,21 @@ export interface VerifyOTPResponse {
   };
 }
 
+// Savings goal interfaces
+export interface SavingsGoalRequest {
+  customer_id: string;
+  annual_savings_goal: number;
+}
+
+export interface SavingsGoalResponse {
+  message: {
+    ok: boolean;
+    customer_id: string;
+    message: string;
+    annual_savings_goal: number;
+  };
+}
+
 export interface AuthState {
   user: string | null;
   sid: string | null;
@@ -279,7 +295,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ["Auth"],
     }),
-    updateFinancialDetails: builder.mutation<FinancialDetailsResponse, FinancialDetailsRequest>({
+    updateFinancialDetails: builder.mutation<
+      FinancialDetailsResponse,
+      FinancialDetailsRequest
+    >({
       query: (financialData) => ({
         url: "jan.payment",
         method: "POST",
@@ -287,7 +306,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
-    updateBeneficiary: builder.mutation<BeneficiaryResponse, BeneficiaryRequest>({
+    updateBeneficiary: builder.mutation<
+      BeneficiaryResponse,
+      BeneficiaryRequest
+    >({
       query: (beneficiaryData) => ({
         url: "jan.beneficiary",
         method: "POST",
@@ -295,7 +317,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
-    updateCustomer: builder.mutation<CustomerUpdateResponse, CustomerUpdateRequest>({
+    updateCustomer: builder.mutation<
+      CustomerUpdateResponse,
+      CustomerUpdateRequest
+    >({
       query: (customerData) => ({
         url: "jan.update.customer",
         method: "POST",
@@ -303,7 +328,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
-    updateProfile: builder.mutation<ProfileUpdateResponse, ProfileUpdateRequest>({
+    updateProfile: builder.mutation<
+      ProfileUpdateResponse,
+      ProfileUpdateRequest
+    >({
       query: (profileData) => ({
         url: "jan.profile",
         method: "POST",
@@ -318,26 +346,41 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: otpData,
       }),
     }),
-    verifyRegistrationOTP: builder.mutation<VerifyOTPResponse, VerifyOTPRequest>({
+    verifyRegistrationOTP: builder.mutation<
+      VerifyOTPResponse,
+      VerifyOTPRequest
+    >({
       query: (verifyData) => ({
         url: "janriches.api.otp.verify_and_register",
         method: "POST",
         body: verifyData,
       }),
     }),
+    updateSavingsGoal: builder.mutation<
+      SavingsGoalResponse,
+      SavingsGoalRequest
+    >({
+      query: (savingsData) => ({
+        url: "jan.goal",
+        method: "POST",
+        body: savingsData,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
   }),
 });
 
-export const { 
-  useLoginMutation, 
-  useRegisterMutation, 
-  useGetProfileQuery, 
-  useUpdateFinancialDetailsMutation, 
-  useUpdateBeneficiaryMutation, 
-  useUpdateCustomerMutation, 
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useGetProfileQuery,
+  useUpdateFinancialDetailsMutation,
+  useUpdateBeneficiaryMutation,
+  useUpdateCustomerMutation,
   useUpdateProfileMutation,
   useSendRegistrationOTPMutation,
-  useVerifyRegistrationOTPMutation
+  useVerifyRegistrationOTPMutation,
+  useUpdateSavingsGoalMutation,
 } = authApiSlice;
 
 // Auth slice
@@ -352,12 +395,14 @@ const authSlice = createSlice({
         sid: string;
         fullName: string;
         homePage: string;
+        customer: string;
       }>
     ) => {
       state.user = action.payload.user;
       state.sid = action.payload.sid;
       state.fullName = action.payload.fullName;
       state.homePage = action.payload.homePage;
+      state.customer = action.payload.customer;
       state.isAuthenticated = true;
       state.error = null;
       // Set auth cookie for additional security
