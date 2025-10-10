@@ -7,6 +7,8 @@ import {
   Dialog,
 } from "@/components/application/modals/modal";
 import { PinInput } from "@/components/base/pin-input/pin-input";
+import { useVerifyRegistrationOTPMutation } from "@/lib/slices/authSlice";
+import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 
 interface OTPVerificationModalProps {
   isOpen: boolean;
@@ -14,8 +16,9 @@ interface OTPVerificationModalProps {
   contactInfo: string; // Can be phone number, email, etc.
   verificationMethod: 'email' | 'sms' | 'whatsapp';
   onSuccess?: () => void;
-  otpLength?: number; // Default to 4, but can be customized
+  otpLength?: number; // Default to 6, but can be customized
   validOtp?: string; // For testing purposes
+  email?: string; // Required for email verification
 }
 
 // OTP Verification Modal Component
@@ -25,12 +28,18 @@ const OTPVerificationModal = ({
   contactInfo,
   verificationMethod,
   onSuccess,
-  otpLength = 4,
+  otpLength = 6,
   validOtp = "2135",
+  email,
 }: OTPVerificationModalProps) => {
   const [otp, setOTP] = useState("");
   const [error, setError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  
+  // API hooks
+  const [verifyOTP, { isLoading: isVerifyingOTP }] = useVerifyRegistrationOTPMutation();
+  const showSuccessToast = useSuccessToast();
+  const showErrorToast = useErrorToast();
 
   // Helper functions for different verification methods
   const getVerificationIcon = () => {
@@ -81,25 +90,65 @@ const OTPVerificationModal = ({
     setIsVerifying(true);
 
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (verificationMethod === 'email' && email) {
+        // Use real API for email verification
+        const result = await verifyOTP({
+          email: email,
+          otp_input: otp,
+        }).unwrap();
 
-      // Hardcoded verification - check if OTP matches the valid OTP
-      if (otp === validOtp) {
-        console.log("OTP verification successful");
-        if (onSuccess) {
-          onSuccess();
+        console.log("OTP verification successful:", result);
+        
+        if (result.message.status === "registered") {
+          showSuccessToast(
+            "Email Verified!",
+            "Your email has been successfully verified and you are now registered.",
+            {
+              duration: 5000,
+            }
+          );
+          
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            onClose();
+          }
         } else {
-          onClose();
+          setError("Verification failed. Please try again.");
+          setOTP("");
         }
       } else {
-        setError("Invalid OTP code. Please try again.");
-        // Clear the OTP input
-        setOTP("");
+        // Fallback to hardcoded verification for other methods
+        if (otp === validOtp) {
+          console.log("OTP verification successful");
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            onClose();
+          }
+        } else {
+          setError("Invalid OTP code. Please try again.");
+          setOTP("");
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("OTP verification failed:", error);
+      
+      // Show error toast
+      showErrorToast(
+        "Verification Failed",
+        error?.data?.message || "Unable to verify OTP. Please try again.",
+        {
+          duration: 0, // Don't auto-dismiss
+          action: {
+            label: "Retry",
+            onClick: () => handleVerify(),
+          },
+        }
+      );
+      
       setError("Verification failed. Please try again.");
+      setOTP("");
     } finally {
       setIsVerifying(false);
     }
@@ -144,7 +193,7 @@ const OTPVerificationModal = ({
 
           {/* OTP Input using Untitled UI PinInput */}
           <div className="flex justify-center mb-6">
-            <PinInput size="md">
+            <PinInput size="sm">
               <PinInput.Group
                 value={otp}
                 onChange={handleOTPChange}
@@ -187,12 +236,12 @@ const OTPVerificationModal = ({
             </Button>
             <Button
               onClick={handleVerify}
-              disabled={isVerifying || otp.length !== otpLength}
+              disabled={isVerifying || isVerifyingOTP || otp.length !== otpLength}
               color="primary"
-              isLoading={isVerifying}
+              isLoading={isVerifying || isVerifyingOTP}
               className="flex-1 w-full"
             >
-              {isVerifying ? "Verifying..." : "Verify"}
+              {(isVerifying || isVerifyingOTP) ? "Verifying..." : "Verify"}
             </Button>
           </div>
         </Dialog>

@@ -12,9 +12,12 @@ import CircularProgressStep from "@/components/CircularProgressStep";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 import { useDispatch, useSelector } from "react-redux";
 import { useCompleteOnboardingMutation } from "@/lib/slices/onboardingSlice";
+import { useSendRegistrationOTPMutation } from "@/lib/slices/authSlice";
 import { RootState } from "@/lib/store";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import OTPVerificationModal from "@/components/OTPVerificationModal";
+import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -37,8 +40,15 @@ const Onboarding = () => {
   const { user, customer } = useSelector((state: RootState) => state.auth);
   const [completeOnboarding, { isLoading, error }] =
     useCompleteOnboardingMutation();
+  const [sendOTP, { isLoading: isSendingOTP }] = useSendRegistrationOTPMutation();
 
   const [open, setOpen] = React.useState(false);
+  const [showOTPModal, setShowOTPModal] = React.useState(false);
+  const [userEmail, setUserEmail] = React.useState("");
+  
+  // Toast hooks
+  const showSuccessToast = useSuccessToast();
+  const showErrorToast = useErrorToast();
 
   // Initial values for Formik
   const initialValues = {
@@ -76,16 +86,72 @@ const Onboarding = () => {
       const response = await completeOnboarding(onboardingData).unwrap();
 
       if (response.message.ok) {
-        // Redirect to payment page on success
-        router.push("/payment");
+        // Show success toast
+        showSuccessToast(
+          "Profile Updated!",
+          "Your profile has been saved successfully. Now let's verify your email.",
+          {
+            duration: 4000,
+          }
+        );
+        
+        // Get user email from the response or user data
+        const email = user || "user@example.com"; // You might need to get this from the response
+        setUserEmail(email);
+        
+        // Send OTP for email verification
+        try {
+          await sendOTP({ email }).unwrap();
+          setShowOTPModal(true);
+        } catch (otpError) {
+          console.error("Failed to send OTP:", otpError);
+          showErrorToast(
+            "OTP Send Failed",
+            "Unable to send verification email. Please try again.",
+            {
+              duration: 0,
+              action: {
+                label: "Retry",
+                onClick: () => {
+                  sendOTP({ email }).unwrap().then(() => setShowOTPModal(true));
+                },
+              },
+            }
+          );
+        }
       } else {
         console.error("Onboarding failed:", response.message.message);
+        showErrorToast(
+          "Update Failed",
+          response.message.message || "Unable to save your profile. Please try again.",
+          {
+            duration: 0,
+            action: {
+              label: "Retry",
+              onClick: () => handleSubmit(values, { setSubmitting }),
+            },
+          }
+        );
       }
     } catch (err) {
       console.error("Error completing onboarding:", err);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Handle OTP verification success
+  const handleOTPSuccess = () => {
+    setShowOTPModal(false);
+    showSuccessToast(
+      "Email Verified!",
+      "Your email has been verified successfully. You can now proceed to payment.",
+      {
+        duration: 5000,
+      }
+    );
+    // Redirect to payment page
+    router.push("/payment");
   };
 
   return (
@@ -382,6 +448,17 @@ const Onboarding = () => {
           </div>
         </div>
       </div>
+
+      {/* OTP Verification Modal */}
+      <OTPVerificationModal
+        isOpen={showOTPModal}
+        onClose={() => setShowOTPModal(false)}
+        contactInfo={userEmail}
+        verificationMethod="email"
+        email={userEmail}
+        onSuccess={handleOTPSuccess}
+        otpLength={6}
+      />
     </PublicRouteGuard>
   );
 };

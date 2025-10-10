@@ -643,6 +643,7 @@ const RegistrationScreen = () => {
                           setFieldValue("agreeTerms", isSelected)
                         }
                         className="mt-1"
+                        size="sm"
                       />
                     )}
                   </Field>

@@ -199,6 +199,30 @@ export interface ProfileUpdateResponse {
   };
 }
 
+// Email verification interfaces
+export interface SendOTPRequest {
+  email: string;
+}
+
+export interface SendOTPResponse {
+  message: {
+    status: string;
+    otp_id: string;
+  };
+}
+
+export interface VerifyOTPRequest {
+  email: string;
+  otp_input: string;
+}
+
+export interface VerifyOTPResponse {
+  message: {
+    status: string;
+    user: string;
+  };
+}
+
 export interface AuthState {
   user: string | null;
   sid: string | null;
@@ -287,10 +311,34 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
+    sendRegistrationOTP: builder.mutation<SendOTPResponse, SendOTPRequest>({
+      query: (otpData) => ({
+        url: "janriches.api.otp.send_registration_otp",
+        method: "POST",
+        body: otpData,
+      }),
+    }),
+    verifyRegistrationOTP: builder.mutation<VerifyOTPResponse, VerifyOTPRequest>({
+      query: (verifyData) => ({
+        url: "janriches.api.otp.verify_and_register",
+        method: "POST",
+        body: verifyData,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetProfileQuery, useUpdateFinancialDetailsMutation, useUpdateBeneficiaryMutation, useUpdateCustomerMutation, useUpdateProfileMutation } = authApiSlice;
+export const { 
+  useLoginMutation, 
+  useRegisterMutation, 
+  useGetProfileQuery, 
+  useUpdateFinancialDetailsMutation, 
+  useUpdateBeneficiaryMutation, 
+  useUpdateCustomerMutation, 
+  useUpdateProfileMutation,
+  useSendRegistrationOTPMutation,
+  useVerifyRegistrationOTPMutation
+} = authApiSlice;
 
 // Auth slice
 const authSlice = createSlice({
