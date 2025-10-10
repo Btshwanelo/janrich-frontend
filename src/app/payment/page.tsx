@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Check, CreditCard } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
-import { Checkbox } from "@/components/ui/untitled-checkbox";
+import { Checkbox } from "@/components/base/checkbox/checkbox";
 import CircularProgressStep from "@/components/CircularProgressStep";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 
@@ -266,8 +266,13 @@ const PlanSelectionScreen = () => {
                 </div>
                 <Checkbox
                   id="subscription"
-                  checked={selectedPlan === "subscription"}
-                  className="mt-1 data-[state=checked]:bg-primary-500 data-[state=checked]:border-primary-500"
+                  isSelected={selectedPlan === "subscription"}
+                  onChange={(isSelected) => {
+                    if (isSelected) {
+                      setSelectedPlan("subscription");
+                    }
+                  }}
+                  className="mt-1"
                 />
               </div>
             </div>
@@ -298,8 +303,13 @@ const PlanSelectionScreen = () => {
                 </div>
                 <Checkbox
                   id="once-off"
-                  checked={selectedPlan === "once-off"}
-                  className="mt-1 data-[state=checked]:bg-primary-500 data-[state=checked]:border-primary-500"
+                  isSelected={selectedPlan === "once-off"}
+                  onChange={(isSelected) => {
+                    if (isSelected) {
+                      setSelectedPlan("once-off");
+                    }
+                  }}
+                  className="mt-1"
                 />
               </div>
             </div>

@@ -102,6 +102,9 @@ const Dashboard = () => {
       <div className="min-h-screen bg-gray-50 flex">
         {/* Left Sidebar */}
         <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
+        {/* <SavingsGoalModal isOpen={true} onClose={function (): void {
+          throw new Error("Function not implemented.");
+        } } /> */}
 
         {/* Main Content */}
         <div
