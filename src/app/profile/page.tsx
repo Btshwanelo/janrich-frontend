@@ -41,6 +41,8 @@ import {
   useGetProfileQuery,
   useUpdateFinancialDetailsMutation,
   useUpdateBeneficiaryMutation,
+  useUpdateCustomerMutation,
+  useUpdateProfileMutation,
 } from "@/lib/slices/authSlice";
 
 export default function ProfileBeneficiaryScreen() {
@@ -63,6 +65,10 @@ export default function ProfileBeneficiaryScreen() {
   // Beneficiary update mutation
   const [updateBeneficiary, { isLoading: isUpdatingBeneficiary }] =
     useUpdateBeneficiaryMutation();
+  
+  // Customer and Profile update mutations
+  const [updateCustomer, { isLoading: isUpdatingCustomer }] = useUpdateCustomerMutation();
+  const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
 
   // Details tab state
   const [firstName, setFirstName] = useState("");
@@ -101,6 +107,12 @@ export default function ProfileBeneficiaryScreen() {
   const [beneficiaryTitle, setBeneficiaryTitle] = useState("");
   const [beneficiaryCell, setBeneficiaryCell] = useState("");
   const [beneficiaryRelation, setBeneficiaryRelation] = useState("");
+
+  // Additional state for My Details form
+  const [email, setEmail] = useState("");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [countryCode, setCountryCode] = useState("");
+  const [raceOther, setRaceOther] = useState("");
 console.log("beneficiaryType", beneficiaryType);
 console.log("beneficiaryCell", beneficiaryCell);
 console.log("beneficiaryTitle", beneficiaryTitle);
@@ -110,12 +122,15 @@ console.log("beneficiaryRelation", beneficiaryRelation);
     if (profileData?.message?.data) {
       const data = profileData.message.data;
 
-      // Basic info
-      const nameParts = data.basic_info.customer_name.split(" ");
-      setFirstName(nameParts[0] || "");
-      setLastName(nameParts.slice(1).join(" ") || "");
-      setDetailsPhoneNumber(data.basic_info.phone || "");
-      setTitle(data.basic_info.salutation || "");
+        // Basic info
+        const nameParts = data.basic_info.customer_name.split(" ");
+        setFirstName(nameParts[0] || "");
+        setLastName(nameParts.slice(1).join(" ") || "");
+        setDetailsPhoneNumber(data.basic_info.phone || "");
+        setTitle(data.basic_info.salutation || "");
+        setEmail(data.basic_info.email || "");
+        setWhatsappNumber(data.basic_info.whatsapp_number || "");
+        setCountryCode(data.basic_info.country_code || "");
 
       // About you
       setBirthdate(data.about_you.birth_date || "");
@@ -123,6 +138,7 @@ console.log("beneficiaryRelation", beneficiaryRelation);
       setNationality(data.about_you.nationality || "");
       setCountryOfResidence(data.about_you.country_of_residence || "");
       setRace(data.about_you.race || "");
+      setRaceOther(data.about_you.race_other || "");
       setCommunicationPreference(data.about_you.communication_preference || "");
 
       // Financial details
@@ -245,20 +261,74 @@ console.log("beneficiaryRelation", beneficiaryRelation);
     return `${"R"} ${value.toLocaleString()}`;
   };
 
+  // Helper functions to map API values to select options
+  const mapApiValueToSelectKey = (apiValue: string, options: { id: string; label: string }[]) => {
+    if (!apiValue) return "";
+    
+    // Find the option that matches the API value (case-insensitive)
+    const matchingOption = options.find(option => 
+      option.label.toLowerCase() === apiValue.toLowerCase() ||
+      option.id.toLowerCase() === apiValue.toLowerCase()
+    );
+    
+    return matchingOption ? matchingOption.id : "";
+  };
+
+  const mapSelectKeyToApiValue = (selectKey: string, options: { id: string; label: string }[]) => {
+    const option = options.find(opt => opt.id === selectKey);
+    return option ? option.label : selectKey;
+  };
+
   // Handle financial details form submission
   const handleFinancialDetailsSubmit = async () => {
     try {
+      const employmentStatusOptions = [
+        { id: "employed", label: "Employed" },
+        { id: "self-employed", label: "Self-employed" },
+        { id: "unemployed", label: "Unemployed" },
+        { id: "student", label: "Student" },
+        { id: "retired", label: "Retired" },
+        { id: "other", label: "Other" },
+      ];
+      
+      const depositFrequencyOptions = [
+        { id: "weekly", label: "Weekly" },
+        { id: "bi-weekly", label: "Bi-weekly" },
+        { id: "monthly", label: "Monthly" },
+        { id: "quarterly", label: "Quarterly" },
+        { id: "annually", label: "Annually" },
+      ];
+      
+      const fundSourceOptions = [
+        { id: "salary", label: "Salary" },
+        { id: "business", label: "Business Income" },
+        { id: "investment", label: "Investment Returns" },
+        { id: "inheritance", label: "Inheritance" },
+        { id: "gift", label: "Gift" },
+        { id: "other", label: "Other" },
+      ];
+      
+      const savingForOptions = [
+        { id: "house", label: "House" },
+        { id: "car", label: "Car" },
+        { id: "education", label: "Education" },
+        { id: "retirement", label: "Retirement" },
+        { id: "emergency", label: "Emergency Fund" },
+        { id: "vacation", label: "Vacation" },
+        { id: "other", label: "Other" },
+      ];
+
       const financialData = {
         customer_id: "JR0020",
-        custom_employment_status: employmentStatus,
+        custom_employment_status: mapSelectKeyToApiValue(employmentStatus, employmentStatusOptions),
         custom_employee_status_other: employmentStatusOther,
-        custom_deposit_frequency: depositFrequency,
+        custom_deposit_frequency: mapSelectKeyToApiValue(depositFrequency, depositFrequencyOptions),
         custom_deposit_frequency_other: depositFrequencyOther,
         custom_customer_bank: customerBank,
         custom_bank_other: bankOther,
-        custom_fund_source: fundSource,
+        custom_fund_source: mapSelectKeyToApiValue(fundSource, fundSourceOptions),
         custom_fund_source_other: fundSourceOther,
-        custom_saving_for: savingFor,
+        custom_saving_for: mapSelectKeyToApiValue(savingFor, savingForOptions),
         custom_saving_for_other: savingForOther,
         custom_account_holder: accountHolder,
         custom_branch_code: branchCode,
@@ -282,13 +352,26 @@ console.log("beneficiaryRelation", beneficiaryRelation);
   // Handle beneficiary form submission
   const handleBeneficiarySubmit = async () => {
     try {
+      const beneficiaryTypeOptions = [
+        { id: "My Estate", label: "My Estate" },
+        { id: "My Beneficiary", label: "My Beneficiary" },
+      ];
+      
+      const beneficiaryRelationOptions = [
+        { id: "spouse", label: "Spouse" },
+        { id: "child", label: "Child" },
+        { id: "parent", label: "Parent" },
+        { id: "sibling", label: "Sibling" },
+        { id: "other", label: "Other" },
+      ];
+
       const beneficiaryData = {
         customer_id: "JR0020",
-        beneficiary_type: beneficiaryType,
+        beneficiary_type: mapSelectKeyToApiValue(beneficiaryType, beneficiaryTypeOptions),
         beneficiary_name: beneficiaryName,
         beneficiary_title: beneficiaryTitle,
         beneficiary_cell: beneficiaryCell,
-        beneficiary_relation: beneficiaryRelation,
+        beneficiary_relation: mapSelectKeyToApiValue(beneficiaryRelation, beneficiaryRelationOptions),
       };
 
       const result = await updateBeneficiary(beneficiaryData).unwrap();
@@ -299,6 +382,120 @@ console.log("beneficiaryRelation", beneficiaryRelation);
     } catch (error) {
       console.error("Failed to update beneficiary:", error);
       alert("Failed to update beneficiary information. Please try again.");
+    }
+  };
+
+  // Handle My Details form submission (Customer Update)
+  const handleCustomerUpdate = async () => {
+    try {
+      const titleOptions = [
+        { id: "mr", label: "Mr" },
+        { id: "mrs", label: "Mrs" },
+        { id: "ms", label: "Ms" },
+        { id: "dr", label: "Dr" },
+        { id: "prof", label: "Prof" },
+      ];
+
+      const genderOptions = [
+        { id: "male", label: "Male" },
+        { id: "female", label: "Female" },
+        { id: "other", label: "Other" },
+        { id: "prefer-not-to-say", label: "Prefer not to say" },
+      ];
+
+      const customerData = {
+        customer_id: "JR0020",
+        customer_name: `${firstName} ${lastName}`,
+        first_name: firstName,
+        last_name: lastName,
+        territory: "All Territories",
+        // email: email,
+        phone: detailsPhoneNumber,
+        whatsapp_number: whatsappNumber,
+        country_code: countryCode,
+        title: mapSelectKeyToApiValue(title, titleOptions),
+        gender: mapSelectKeyToApiValue(gender, genderOptions),
+        agree_to_terms: 1,
+      };
+
+      const result = await updateCustomer(customerData).unwrap();
+      console.log("Customer updated successfully:", result);
+      
+      if (result.message.result === "failed") {
+        alert(`Customer update failed: ${result.message.message}`);
+      } else {
+        alert("Customer information updated successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to update customer:", error);
+      alert("Failed to update customer information. Please try again.");
+    }
+  };
+
+  // Handle My Details form submission (Profile Update)
+  const handleProfileUpdate = async () => {
+    try {
+      // Format birth date from YYYY-MM-DD to DD/MM/YYYY
+      const formatBirthDate = (dateString: string) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+
+      const genderOptions = [
+        { id: "male", label: "Male" },
+        { id: "female", label: "Female" },
+        { id: "other", label: "Other" },
+        { id: "prefer-not-to-say", label: "Prefer not to say" },
+      ];
+
+      const raceOptions = [
+        { id: "african", label: "African" },
+        { id: "coloured", label: "Coloured" },
+        { id: "indian", label: "Indian/Asian" },
+        { id: "white", label: "White" },
+        { id: "other", label: "Other" },
+        { id: "prefer-not-to-say", label: "Prefer not to say" },
+      ];
+
+      const profileData = {
+        customer_id: "JR0020",
+        birth_date: formatBirthDate(birthdate),
+        gender: mapSelectKeyToApiValue(gender, genderOptions),
+        nationality: nationality,
+        country_of_residence: countryOfResidence,
+        race: mapSelectKeyToApiValue(race, raceOptions),
+        race_other: raceOther,
+        communication_preference: communicationPreference,
+      };
+
+      const result = await updateProfile(profileData).unwrap();
+      console.log("Profile updated successfully:", result);
+      
+      if (result.message.ok) {
+        alert("Profile information updated successfully!");
+      } else {
+        alert("Profile update failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      alert("Failed to update profile information. Please try again.");
+    }
+  };
+
+  // Combined handler for My Details form
+  const handleMyDetailsSubmit = async () => {
+    try {
+      // Update customer information first
+      // await handleCustomerUpdate();
+      
+      // Then update profile information
+      await handleProfileUpdate();
+    } catch (error) {
+      console.error("Failed to update My Details:", error);
     }
   };
   // Show loading state while fetching profile data
@@ -452,21 +649,22 @@ console.log("beneficiaryRelation", beneficiaryRelation);
                       {/* Right column - Form */}
                       <CardContent className="col-span-9 max-w-[720px] space-y-6 border border-gra-50 shadow p-6 rounded-lg">
                         <div>
-                          <Select
-                            label="Beneficiary Type"
-                            placeholder="Select an option"
-                            items={[
-                              { id: "My Estate", label: "My Estate" },
-                              { id: "My Beneficiary", label: "My Beneficiary" },
-                            ]}
-                            className="w-full"
-                            defaultSelectedKey={
-                              beneficiaryType.toLowerCase() || ""
-                            }
-                            onSelectionChange={(key) =>
-                              setBeneficiaryType(key as string)
-                            }
-                          >
+                           <Select
+                             label="Beneficiary Type"
+                             placeholder="Select an option"
+                             items={[
+                               { id: "My Estate", label: "My Estate" },
+                               { id: "My Beneficiary", label: "My Beneficiary" },
+                             ]}
+                             className="w-full"
+                             defaultSelectedKey={mapApiValueToSelectKey(beneficiaryType, [
+                               { id: "My Estate", label: "My Estate" },
+                               { id: "My Beneficiary", label: "My Beneficiary" },
+                             ])}
+                             onSelectionChange={(key) =>
+                               setBeneficiaryType(key as string)
+                             }
+                           >
                             {(item) => (
                               <Select.Item key={item.id} id={item.id}>
                                 {item.label}
@@ -522,25 +720,29 @@ console.log("beneficiaryRelation", beneficiaryRelation);
                         </div>
 
                         <div>
-                          <Select
-                            label="Relation"
-                            placeholder="Select an option"
-                            items={[
-                              { id: "spouse", label: "Spouse" },
-                              { id: "child", label: "Child" },
-                              { id: "parent", label: "Parent" },
-                              { id: "sibling", label: "Sibling" },
-                              { id: "other", label: "Other" },
-                            ]}
-                            className="w-full"
-                            defaultSelectedKey={
-                              beneficiaryRelation.toLowerCase() || ""
-                            }
-                            onSelectionChange={(key) =>
-                              setBeneficiaryRelation(key as string)
-                            }
-                            isRequired
-                          >
+                           <Select
+                             label="Relation"
+                             placeholder="Select an option"
+                             items={[
+                               { id: "spouse", label: "Spouse" },
+                               { id: "child", label: "Child" },
+                               { id: "parent", label: "Parent" },
+                               { id: "sibling", label: "Sibling" },
+                               { id: "other", label: "Other" },
+                             ]}
+                             className="w-full"
+                             defaultSelectedKey={mapApiValueToSelectKey(beneficiaryRelation, [
+                               { id: "spouse", label: "Spouse" },
+                               { id: "child", label: "Child" },
+                               { id: "parent", label: "Parent" },
+                               { id: "sibling", label: "Sibling" },
+                               { id: "other", label: "Other" },
+                             ])}
+                             onSelectionChange={(key) =>
+                               setBeneficiaryRelation(key as string)
+                             }
+                             isRequired
+                           >
                             {(item) => (
                               <Select.Item key={item.id} id={item.id}>
                                 {item.label}
@@ -689,7 +891,13 @@ console.log("beneficiaryRelation", beneficiaryRelation);
                                 { id: "prof", label: "Prof" },
                               ]}
                               className="w-full"
-                              defaultSelectedKey={title}
+                              defaultSelectedKey={mapApiValueToSelectKey(title, [
+                                { id: "mr", label: "Mr" },
+                                { id: "mrs", label: "Mrs" },
+                                { id: "ms", label: "Ms" },
+                                { id: "dr", label: "Dr" },
+                                { id: "prof", label: "Prof" },
+                              ])}
                               onSelectionChange={(key) =>
                                 setTitle(key as string)
                               }
@@ -726,7 +934,12 @@ console.log("beneficiaryRelation", beneficiaryRelation);
                                   },
                                 ]}
                                 className="w-full"
-                                defaultSelectedKey={gender}
+                                defaultSelectedKey={mapApiValueToSelectKey(gender, [
+                                  { id: "male", label: "Male" },
+                                  { id: "female", label: "Female" },
+                                  { id: "other", label: "Other" },
+                                  { id: "prefer-not-to-say", label: "Prefer not to say" },
+                                ])}
                                 onSelectionChange={(key) =>
                                   setGender(key as string)
                                 }
@@ -779,7 +992,14 @@ console.log("beneficiaryRelation", beneficiaryRelation);
                                 },
                               ]}
                               className="w-full"
-                              defaultSelectedKey={race}
+                              defaultSelectedKey={mapApiValueToSelectKey(race, [
+                                { id: "african", label: "African" },
+                                { id: "coloured", label: "Coloured" },
+                                { id: "indian", label: "Indian/Asian" },
+                                { id: "white", label: "White" },
+                                { id: "other", label: "Other" },
+                                { id: "prefer-not-to-say", label: "Prefer not to say" },
+                              ])}
                               onSelectionChange={(key) =>
                                 setRace(key as string)
                               }
@@ -861,7 +1081,13 @@ console.log("beneficiaryRelation", beneficiaryRelation);
 
                           <div className="flex justify-end gap-3 pt-4">
                             <Button color="secondary">Cancel</Button>
-                            <Button color="primary">Save changes</Button>
+                            <Button 
+                              color="primary" 
+                              onClick={handleMyDetailsSubmit}
+                              disabled={isUpdatingCustomer || isUpdatingProfile}
+                            >
+                              {(isUpdatingCustomer || isUpdatingProfile) ? "Saving..." : "Save changes"}
+                            </Button>
                           </div>
                         </CardContent>
                       </div>
@@ -926,26 +1152,32 @@ console.log("beneficiaryRelation", beneficiaryRelation);
 
                         {/* What are you saving for - Full width */}
                         <div>
-                          <Select
-                            label="What are you saving for"
-                            placeholder="Select an option"
-                            items={[
-                              { id: "house", label: "House" },
-                              { id: "car", label: "Car" },
-                              { id: "education", label: "Education" },
-                              { id: "retirement", label: "Retirement" },
-                              { id: "emergency", label: "Emergency Fund" },
-                              { id: "vacation", label: "Vacation" },
-                              { id: "other", label: "Other" },
-                            ]}
-                            className="w-full"
-                            defaultSelectedKey={
-                              savingFor.toLowerCase().replace(/\s+/g, "_") || ""
-                            }
-                            onSelectionChange={(key) =>
-                              setSavingFor(key as string)
-                            }
-                          >
+                           <Select
+                             label="What are you saving for"
+                             placeholder="Select an option"
+                             items={[
+                               { id: "house", label: "House" },
+                               { id: "car", label: "Car" },
+                               { id: "education", label: "Education" },
+                               { id: "retirement", label: "Retirement" },
+                               { id: "emergency", label: "Emergency Fund" },
+                               { id: "vacation", label: "Vacation" },
+                               { id: "other", label: "Other" },
+                             ]}
+                             className="w-full"
+                             defaultSelectedKey={mapApiValueToSelectKey(savingFor, [
+                               { id: "house", label: "House" },
+                               { id: "car", label: "Car" },
+                               { id: "education", label: "Education" },
+                               { id: "retirement", label: "Retirement" },
+                               { id: "emergency", label: "Emergency Fund" },
+                               { id: "vacation", label: "Vacation" },
+                               { id: "other", label: "Other" },
+                             ])}
+                             onSelectionChange={(key) =>
+                               setSavingFor(key as string)
+                             }
+                           >
                             {(item) => (
                               <Select.Item key={item.id} id={item.id}>
                                 {item.label}
@@ -957,27 +1189,30 @@ console.log("beneficiaryRelation", beneficiaryRelation);
                         {/* Two column grid for remaining fields */}
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <Select
-                              label="Employment status"
-                              placeholder="Select an option"
-                              items={[
-                                { id: "employed", label: "Employed" },
-                                { id: "self-employed", label: "Self-employed" },
-                                { id: "unemployed", label: "Unemployed" },
-                                { id: "student", label: "Student" },
-                                { id: "retired", label: "Retired" },
-                                { id: "other", label: "Other" },
-                              ]}
-                              className="w-full"
-                              defaultSelectedKey={
-                                employmentStatus
-                                  .toLowerCase()
-                                  .replace(/\s+/g, "_") || ""
-                              }
-                              onSelectionChange={(key) =>
-                                setEmploymentStatus(key as string)
-                              }
-                            >
+                             <Select
+                               label="Employment status"
+                               placeholder="Select an option"
+                               items={[
+                                 { id: "employed", label: "Employed" },
+                                 { id: "self-employed", label: "Self-employed" },
+                                 { id: "unemployed", label: "Unemployed" },
+                                 { id: "student", label: "Student" },
+                                 { id: "retired", label: "Retired" },
+                                 { id: "other", label: "Other" },
+                               ]}
+                               className="w-full"
+                               defaultSelectedKey={mapApiValueToSelectKey(employmentStatus, [
+                                 { id: "employed", label: "Employed" },
+                                 { id: "self-employed", label: "Self-employed" },
+                                 { id: "unemployed", label: "Unemployed" },
+                                 { id: "student", label: "Student" },
+                                 { id: "retired", label: "Retired" },
+                                 { id: "other", label: "Other" },
+                               ])}
+                               onSelectionChange={(key) =>
+                                 setEmploymentStatus(key as string)
+                               }
+                             >
                               {(item) => (
                                 <Select.Item key={item.id} id={item.id}>
                                   {item.label}
@@ -987,24 +1222,28 @@ console.log("beneficiaryRelation", beneficiaryRelation);
                           </div>
 
                           <div>
-                            <Select
-                              label="Deposit frequency"
-                              placeholder="Select an option"
-                              items={[
-                                { id: "weekly", label: "Weekly" },
-                                { id: "bi-weekly", label: "Bi-weekly" },
-                                { id: "monthly", label: "Monthly" },
-                                { id: "quarterly", label: "Quarterly" },
-                                { id: "annually", label: "Annually" },
-                              ]}
-                              className="w-full"
-                              defaultSelectedKey={
-                                depositFrequency.toLowerCase() || ""
-                              }
-                              onSelectionChange={(key) =>
-                                setDepositFrequency(key as string)
-                              }
-                            >
+                             <Select
+                               label="Deposit frequency"
+                               placeholder="Select an option"
+                               items={[
+                                 { id: "weekly", label: "Weekly" },
+                                 { id: "bi-weekly", label: "Bi-weekly" },
+                                 { id: "monthly", label: "Monthly" },
+                                 { id: "quarterly", label: "Quarterly" },
+                                 { id: "annually", label: "Annually" },
+                               ]}
+                               className="w-full"
+                               defaultSelectedKey={mapApiValueToSelectKey(depositFrequency, [
+                                 { id: "weekly", label: "Weekly" },
+                                 { id: "bi-weekly", label: "Bi-weekly" },
+                                 { id: "monthly", label: "Monthly" },
+                                 { id: "quarterly", label: "Quarterly" },
+                                 { id: "annually", label: "Annually" },
+                               ])}
+                               onSelectionChange={(key) =>
+                                 setDepositFrequency(key as string)
+                               }
+                             >
                               {(item) => (
                                 <Select.Item key={item.id} id={item.id}>
                                   {item.label}
@@ -1038,29 +1277,33 @@ console.log("beneficiaryRelation", beneficiaryRelation);
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <Select
-                              label="Source of funds"
-                              placeholder="Select an option"
-                              items={[
-                                { id: "salary", label: "Salary" },
-                                { id: "business", label: "Business Income" },
-                                {
-                                  id: "investment",
-                                  label: "Investment Returns",
-                                },
-                                { id: "inheritance", label: "Inheritance" },
-                                { id: "gift", label: "Gift" },
-                                { id: "other", label: "Other" },
-                              ]}
-                              className="w-full"
-                              defaultSelectedKey={
-                                fundSource.toLowerCase().replace(/\s+/g, "_") ||
-                                ""
-                              }
-                              onSelectionChange={(key) =>
-                                setFundSource(key as string)
-                              }
-                            >
+                             <Select
+                               label="Source of funds"
+                               placeholder="Select an option"
+                               items={[
+                                 { id: "salary", label: "Salary" },
+                                 { id: "business", label: "Business Income" },
+                                 {
+                                   id: "investment",
+                                   label: "Investment Returns",
+                                 },
+                                 { id: "inheritance", label: "Inheritance" },
+                                 { id: "gift", label: "Gift" },
+                                 { id: "other", label: "Other" },
+                               ]}
+                               className="w-full"
+                               defaultSelectedKey={mapApiValueToSelectKey(fundSource, [
+                                 { id: "salary", label: "Salary" },
+                                 { id: "business", label: "Business Income" },
+                                 { id: "investment", label: "Investment Returns" },
+                                 { id: "inheritance", label: "Inheritance" },
+                                 { id: "gift", label: "Gift" },
+                                 { id: "other", label: "Other" },
+                               ])}
+                               onSelectionChange={(key) =>
+                                 setFundSource(key as string)
+                               }
+                             >
                               {(item) => (
                                 <Select.Item key={item.id} id={item.id}>
                                   {item.label}

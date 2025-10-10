@@ -62,7 +62,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
       <nav className="flex-1 px-4 overflow-y-auto">
         <div className="space-y-2">
           <a
-            href="#"
+            href="/dashboard"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
             } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
@@ -106,6 +106,16 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
 
       {/* Bottom Navigation */}
       <div className="p-4 space-y-2 border-t border-gray-200 bg-white">
+        <a
+          href="/profile"
+          className={`flex items-center ${
+            isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+          } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+          title={isSidebarCollapsed ? "Support" : ""}
+        >
+          <HelpCircle className="w-5 h-5" />
+          {!isSidebarCollapsed && <span>Profile</span>}
+        </a>
         <a
           href="#"
           className={`flex items-center ${

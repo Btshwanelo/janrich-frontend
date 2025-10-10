@@ -156,6 +156,49 @@ export interface BeneficiaryResponse {
   };
 }
 
+export interface CustomerUpdateRequest {
+  customer_id: string;
+  customer_name: string;
+  first_name: string;
+  last_name: string;
+  territory: string;
+  email: string;
+  phone: string;
+  whatsapp_number: string;
+  country_code: string;
+  title: string;
+  gender: string;
+  agree_to_terms: number;
+}
+
+export interface CustomerUpdateResponse {
+  message: {
+    result: string;
+    message: string;
+  };
+}
+
+export interface ProfileUpdateRequest {
+  customer_id: string;
+  birth_date: string;
+  gender: string;
+  nationality: string;
+  country_of_residence: string;
+  race: string;
+  race_other: string;
+  communication_preference: string;
+}
+
+export interface ProfileUpdateResponse {
+  message: {
+    ok: boolean;
+    customer_id: string;
+    customer: string;
+    message: string;
+    age: number;
+  };
+}
+
 export interface AuthState {
   user: string | null;
   sid: string | null;
@@ -191,7 +234,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
-        url: "janriches.api.auth.jan_user_login",
+        url: "jan.login",
         method: "POST",
         body: credentials,
       }),
@@ -228,10 +271,26 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
+    updateCustomer: builder.mutation<CustomerUpdateResponse, CustomerUpdateRequest>({
+      query: (customerData) => ({
+        url: "jan.update.customer",
+        method: "POST",
+        body: customerData,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
+    updateProfile: builder.mutation<ProfileUpdateResponse, ProfileUpdateRequest>({
+      query: (profileData) => ({
+        url: "jan.profile",
+        method: "POST",
+        body: profileData,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetProfileQuery, useUpdateFinancialDetailsMutation, useUpdateBeneficiaryMutation } = authApiSlice;
+export const { useLoginMutation, useRegisterMutation, useGetProfileQuery, useUpdateFinancialDetailsMutation, useUpdateBeneficiaryMutation, useUpdateCustomerMutation, useUpdateProfileMutation } = authApiSlice;
 
 // Auth slice
 const authSlice = createSlice({

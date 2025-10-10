@@ -38,6 +38,13 @@ const validationSchema = Yup.object({
   phoneNumber: Yup.string()
     .required("Phone number is required")
     .min(10, "Please enter a valid phone number"),
+  whatsappNumber: Yup.string().when("whatsappSame", {
+    is: false,
+    then: (schema) => schema
+      .required("WhatsApp number is required when not using same as phone")
+      .min(10, "Please enter a valid WhatsApp number"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .required("Password is required"),
@@ -54,7 +61,7 @@ const RegistrationScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [showOTPModal, setShowOTPModal] = useState(true);
+  const [showOTPModal, setShowOTPModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPasswordChecks, setShowPasswordChecks] = useState(false);
   const [registrationData, setLocalRegistrationData] = useState<any>(null);
@@ -70,6 +77,7 @@ const RegistrationScreen = () => {
   const surnameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
+  const whatsappRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
@@ -79,6 +87,7 @@ const RegistrationScreen = () => {
     email: "",
     phoneNumber: "",
     whatsappSame: true,
+    whatsappNumber: "",
     password: "",
     confirmPassword: "",
     agreeTerms: false,
@@ -106,6 +115,7 @@ const RegistrationScreen = () => {
         last_nameemail: values.surname,
         email: values.email,
         phone: values.phoneNumber,
+        whatsapp_number: values.whatsappSame ? values.phoneNumber : values.whatsappNumber,
         country_code: "+27", // You might want to make this dynamic
         new_password: values.password,
         agree_to_terms: values.agreeTerms ? 1 : 0,
@@ -221,6 +231,7 @@ const RegistrationScreen = () => {
         >
           {({ values, errors, touched, setFieldValue, isValid }) => (
             <>
+            {console.log({ values, errors, touched, isValid })}
               <OTPVerificationModal
                 isOpen={showOTPModal}
                 onClose={() => setShowOTPModal(false)}
@@ -228,7 +239,7 @@ const RegistrationScreen = () => {
                 onSuccess={handleOTPSuccess}
                 otpLength={4}
                 validOtp="2135"
-                verificationMethod="email"
+                verificationMethod="whatsapp"
               />
 
               {/* Error Message */}
@@ -407,6 +418,42 @@ const RegistrationScreen = () => {
                     )}
                   </Field>
                 </div>
+
+                {/* WhatsApp Number Field - Show when toggle is false */}
+                <Field name="whatsappSame">
+                  {({ field }: any) => (
+                    !field.value && (
+                      <div>
+                        <Label
+                          htmlFor="whatsappNumber"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          WhatsApp Number
+                          <span className="text-error-500">*</span>
+                        </Label>
+                        <div className="mt-1">
+                          <Field name="whatsappNumber">
+                            {({ field }: any) => (
+                              <PhoneInput
+                                {...field}
+                                ref={whatsappRef}
+                                placeholder="Enter WhatsApp number"
+                                defaultCountry="ZA"
+                                className="phone-input"
+                                onChange={(value) => setFieldValue("whatsappNumber", value)}
+                              />
+                            )}
+                          </Field>
+                          <ErrorMessage
+                            name="whatsappNumber"
+                            component="div"
+                            className="text-error-500 text-xs mt-1"
+                          />
+                        </div>
+                      </div>
+                    )
+                  )}
+                </Field>
 
                 {/* Password */}
                 <div>
