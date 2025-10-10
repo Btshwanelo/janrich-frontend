@@ -114,7 +114,9 @@ export default function SavingsGoalModal({
 
           {/* Header */}
           <div className="text-center mb-6">
-            <h2 className="text-md font-semibold text-gray-900">How much do you want to save?</h2>
+            <h2 className="text-md font-semibold text-gray-900">
+              How much do you want to save?
+            </h2>
           </div>
 
           <div className="space-y-6 mx-4">
@@ -129,18 +131,18 @@ export default function SavingsGoalModal({
               </div>
 
               <div className="w-full px-1 mb-6 overflow-hidden max-w-full">
-                <div className="slider-container">
+                <div className="mb-6 left-0 [&_.bg-brand-solid]:bg-[#E31B54] [&_.ring-\\[\\#155EEF\\]]:ring-[#E31B54] [&_.text-\\[\\#E31B54\\]]:text-[#E31B54] [&_.bg-slider-handle-bg]:bg-white">
                   <Slider
                     value={amount}
                     onChange={(value) =>
                       setAmount(Array.isArray(value) ? value : [value])
                     }
-                    minValue={minAmount}
-                    maxValue={maxAmount}
-                    step={step}
+                    minValue={5000}
+                    maxValue={1000000}
+                    step={500}
                     labelFormatter={(value) => formatCurrency(value)}
-                    labelPosition="bottom"
-                    className="w-full max-w-full"
+                    // labelPosition="bottom"
+                    // className="w-full max-w-full"
                   />
                 </div>
               </div>
@@ -168,7 +170,7 @@ export default function SavingsGoalModal({
               disabled={isSaving || isUpdatingGoal}
               isLoading={isSaving || isUpdatingGoal}
             >
-              {(isSaving || isUpdatingGoal) ? "Saving..." : buttonText}
+              {isSaving || isUpdatingGoal ? "Saving..." : buttonText}
             </Button>
           </div>
         </Dialog>

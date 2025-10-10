@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   X,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
@@ -114,9 +115,23 @@ const Dashboard = () => {
     { key: "purchase", label: "Purchase" },
   ];
 
+  const chartData = [
+    { month: "Jan", orange: 3000, blue: 3000, gray: 4000 },
+    { month: "Feb", orange: 3500, blue: 3500, gray: 3000 },
+    { month: "Mar", orange: 2500, blue: 2500, gray: 3500 },
+    { month: "Apr", orange: 3000, blue: 3000, gray: 2000 },
+    { month: "May", orange: 2800, blue: 2000, gray: 3000 },
+    { month: "Jun", orange: 3500, blue: 3000, gray: 2500 },
+    { month: "Jul", orange: 2700, blue: 2800, gray: 2800 },
+    { month: "Aug", orange: 3200, blue: 3300, gray: 3200 },
+    { month: "Sep", orange: 2900, blue: 2400, gray: 2600 },
+    { month: "Oct", orange: 2600, blue: 2200, gray: 2400 },
+    { month: "Nov", orange: 2400, blue: 2000, gray: 2200 },
+    { month: "Dec", orange: 2500, blue: 2300, gray: 2500 },
+  ];
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-white flex">
         {/* Left Sidebar */}
         <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
         <SavingsGoalModal
@@ -141,26 +156,29 @@ const Dashboard = () => {
           }`}
         >
           {/* Header */}
-          <header className="bg-white border-b border-gray-200 px-6 py-4">
+          <header className="bg-white border-b border-gray-200 px-8 py-5">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-semibold text-gray-900">
+              <h1 className="text-3xl font-semibold text-gray-900">
                 Welcome back,{" "}
                 {fullName ||
                   (typeof user === "string"
-                    ? user
-                    : (user as any)?.name || (user as any)?.email || "User")}
+                    ? user.split(" ")[0]
+                    : (user as any)?.name?.split(" ")[0] || "Olivia")}
               </h1>
-              <div className="flex items-center space-x-4">
-                <Input icon={Search} placeholder="Search" className="w-64" />
+              <div className="flex items-center gap-3">
                 <Button
                   color="secondary"
-                  className="flex items-center space-x-2"
+                  size="md"
+                  className="gap-2"
+                  iconLeading={<Settings data-icon />}
                 >
                   <span>Customize</span>
                 </Button>
                 <Button
                   color="secondary"
-                  className="flex items-center space-x-2"
+                  size="md"
+                  className="gap-2"
+                  iconLeading={<FileText data-icon />}
                 >
                   <span>Export</span>
                 </Button>
@@ -169,12 +187,12 @@ const Dashboard = () => {
           </header>
 
           {/* Dashboard Content */}
-          <main className="flex-1 p-6">
+          <main className="flex-1 p-8 bg-gray-50">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               {/* Savings Breakdown Chart */}
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
+              <Card className="lg:col-span-2 shadow-sm">
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-lg font-semibold text-gray-900 mb-1">
                         Savings breakdown
@@ -184,168 +202,113 @@ const Dashboard = () => {
                       </p>
                     </div>
                     <Button color="tertiary" size="sm">
-                      <MoreHorizontal className="w-4 h-4" />
+                      <MoreHorizontal className="w-5 h-5" />
                     </Button>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   {/* Chart Area */}
-                  <div className="h-64 flex items-end justify-between space-x-2 mb-4">
-                    <div className="flex flex-col items-center">
+                  <div className="h-64 flex items-end justify-between gap-4 mb-6 px-4">
+                    {chartData.map((item, index) => (
                       <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "60px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Jan</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "80px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Feb</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "100px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Mar</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "120px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Apr</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "90px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">May</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "110px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Jun</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "95px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Jul</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "105px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Aug</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "85px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Sep</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "75px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Oct</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "65px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Nov</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div
-                        className="w-8 bg-gray-200 rounded-t"
-                        style={{ height: "70px" }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-2">Dec</span>
-                    </div>
+                        key={index}
+                        className="flex flex-col items-center flex-1"
+                      >
+                        <div
+                          className="w-full flex flex-col items-center relative"
+                          style={{ height: "200px" }}
+                        >
+                          <div className="w-full flex flex-col justify-end items-center h-full gap-0.5">
+                            <div
+                              className="w-12 bg-gray-200 rounded-t"
+                              style={{
+                                height: `${(item.gray / 10000) * 200}px`,
+                              }}
+                            ></div>
+                            <div
+                              className="w-12 bg-blue-600 rounded-t"
+                              style={{
+                                height: `${(item.blue / 10000) * 200}px`,
+                              }}
+                            ></div>
+                            <div
+                              className="w-12 bg-orange-500"
+                              style={{
+                                height: `${(item.orange / 10000) * 200}px`,
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                        <span className="text-xs text-gray-600 mt-3 font-medium">
+                          {item.month}
+                        </span>
+                      </div>
+                    ))}
+                    
                   </div>
 
-                  <div className="flex justify-end">
-                    <Button color="secondary" size="sm">
-                      View full report
+                  <div className="text-sm text-gray-500 mb-4 px-4">Month</div>
+
+                  <div className="flex justify-end pt-4 border-t border-gray-100">
+                    <Button
+                      color="secondary"
+                      size="md"
+                      className="gap-2"
+                      iconLeading={<FileText data-icon />}
+                    >
+                      <span>Get statement</span>
                     </Button>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Keep it up Card */}
-              <Card className="border-2 border-[#155EEF]">
-                <CardHeader>
+              {/* Lets Get Going Card */}
+              <Card className="border-2 border-blue-600 shadow-sm">
+                <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg font-semibold text-gray-900">
-                      Keep it up
+                      Lets get going
                     </CardTitle>
                     <Button color="tertiary" size="sm">
-                      <MoreHorizontal className="w-4 h-4" />
+                      <MoreHorizontal className="w-5 h-5" />
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
                   {/* Circular Progress */}
                   <div className="flex items-center justify-center mb-6">
-                    <div className="relative w-full h-32">
-                      <img
-                        src="/Progress circle.svg"
-                        alt="Savings Goal Chart"
-                        className="w-full max-h-60"
-                      />
-                      {/* <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-gray-900">
-                            40%
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            Savings goal
-                          </div>
+                    <div className="relativeh-48 flex items-center justify-center">
+                      {/* Background circle */}
+                      <img src={'/goal.svg'} alt="Circle Background" className="h-48" />
+                      {/* <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <div className="text-sm text-gray-600 mb-1">
+                          Savings goal
+                        </div>
+                        <div className="text-4xl font-semibold text-gray-900">
+                          40%
                         </div>
                       </div> */}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-center mb-4">
-                    <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
-                    <span className="text-sm text-green-500 font-medium">
-                      10%
-                    </span>
-                  </div>
-
-                  <div className="mb-6 border-b border-gray-100 pb-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      You've almost reached your goal
+                  <div className="mb-6 pb-6 border-b border-gray-200">
+                    <h3 className="text-base font-semibold text-gray-900 mb-2">
+                      The best way to win is to keep going.
                     </h3>
-                    <p className="text-sm text-gray-600">
-                      Save R 12 500 by November 2025 to meet your savings goal.
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      You're 40% of the way there, you're more likely to meet
+                      your savings goal by December if you don't stop now.
                     </p>
                   </div>
 
-                  <div className="flex justify-end">
+                  <div className="justify-end flex">
                     <Button
                       color="secondary"
-                      className=""
-                      onClick={() => {
-                        setIsModalOpen(true);
-                        setHasUserDismissedModal(false);
-                      }}
-                      iconLeading={<Zap data-icon />}
+                      size="md"
+                      className="justify-center"
+                      iconLeading={<Zap data-icon />} 
                     >
-                      <span>Set Savings Goal</span>
+                      <span>Beat the first deposit slump</span>
                     </Button>
                   </div>
                 </CardContent>
@@ -353,69 +316,45 @@ const Dashboard = () => {
             </div>
 
             {/* Transactions */}
-            <TableCard.Root className="">
+            <TableCard.Root className="shadow-sm">
               <TableCard.Header
                 title="Transactions"
                 badge="240 Transaction"
                 description="Keep track of your transactions."
-                // contentTrailing={
-                //   <div className="flex items-center space-x-4">
-                //     <Input
-                //       leftIcon={<Search className="w-4 h-4" />}
-                //       placeholder="Search"
-                //       className="w-64"
-                //       rightIcon={
-                //         <span className="text-xs text-gray-400">⌘K</span>
-                //       }
-                //     />
-                //     <Button
-                //       color="secondary"
-                //       size="sm"
-                //       className="flex items-center space-x-2"
-                //     >
-                //       <Filter className="w-4 h-4" />
-                //       <span>Filters</span>
-                //     </Button>
-                //   </div>
-                // }
               />
 
-              {/* Tabs */}
-              <div className="flex space-x-1 p-4 bg-gray-100 border-b border-gray-200">
-                <div className="flex items-center justify-end space-x-4">
+              {/* Search and Filter Bar */}
+              <div className="flex items-center justify-end gap-3 px-6 py-4 bg-white border-b border-gray-200">
+                <div className="relative">
                   <Input
                     icon={Search}
                     placeholder="Search"
-                    className="w-64"
+                    className="w-80"
                     shortcut="⌘K"
                   />
-                  <Button
-                    color="secondary"
-                    size="md"
-                    className="flex items-center space-x-2"
-                    iconTrailing={<Filter className="w-4 h-4" />}
-                  >
-                    <span>Filters</span>
-                  </Button>
                 </div>
+                <Button
+                  color="secondary"
+                  size="md"
+                  iconTrailing={<Filter className="w-4 h-4" />}
+                >
+                  <span>Filters</span>
+                </Button>
               </div>
 
               <Table
                 selectionMode="multiple"
                 selectionBehavior="toggle"
                 size="sm"
-                className={"border border-gray-50"}
+                className="border-0"
               >
-                <Table.Header
-                  columns={columns}
-                  className={"bg-gray-50 border border-gray-50"}
-                >
+                <Table.Header columns={columns} className="bg-gray-50">
                   {(column) => (
                     <Table.Head
                       id={column.key}
                       isRowHeader={column.key === "reference"}
                       label={column.label}
-                      className={"bg-gray-50"}
+                      className="bg-gray-50 text-xs font-medium text-gray-600"
                     />
                   )}
                 </Table.Header>
@@ -423,31 +362,38 @@ const Dashboard = () => {
                   {transactions.map((item) => (
                     <Table.Row key={item.id} columns={columns}>
                       <Table.Cell>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-sm text-gray-900">
                           {item.id}
                         </span>
                       </Table.Cell>
                       <Table.Cell>
-                        <span className="text-gray-600">{item.date}</span>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            item.status === "Paid"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {item.status === "Paid" ? "✓" : "⏳"} {item.status}
+                        <span className="text-sm text-gray-600">
+                          {item.date}
                         </span>
                       </Table.Cell>
                       <Table.Cell>
-                        <span className="font-medium text-gray-900">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                            item.status === "Paid"
+                              ? "bg-green-50 text-green-700 border border-green-200"
+                              : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                          }`}
+                        >
+                          <span className="text-base leading-none">
+                            {item.status === "Paid" ? "✓" : "⏳"}
+                          </span>
+                          {item.status}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span className="font-medium text-sm text-gray-900">
                           {item.amount}
                         </span>
                       </Table.Cell>
                       <Table.Cell>
-                        <span className="text-gray-600">{item.type}</span>
+                        <span className="text-sm text-gray-600">
+                          {item.type}
+                        </span>
                       </Table.Cell>
                     </Table.Row>
                   ))}

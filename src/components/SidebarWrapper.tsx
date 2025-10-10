@@ -61,7 +61,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
             href="/dashboard"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-            } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
+            } py-2 text-[#535862] text-sm bg-gray-100 hover:bg-gray-100 rounded-lg`}
             title={isSidebarCollapsed ? "Dashboard" : ""}
           >
             <Home className="w-5 h-5" />
@@ -81,7 +81,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
             href="/profile"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-            } py-2 text-[#535862] text-sm bg-gray-100 rounded-lg`}
+            } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
             title={isSidebarCollapsed ? "Community" : ""}
           >
             <Users className="w-5 h-5" />

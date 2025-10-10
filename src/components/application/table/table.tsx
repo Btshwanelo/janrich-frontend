@@ -52,7 +52,7 @@ const TableContext = createContext<{ size: "sm" | "md" }>({ size: "md" });
 const TableCardRoot = ({ children, className, size = "md", ...props }: HTMLAttributes<HTMLDivElement> & { size?: "sm" | "md" }) => {
     return (
         <TableContext.Provider value={{ size }}>
-            <div {...props} className={cx("overflow-hidden rounded-xl bg-primary shadow-xs ring-1 ring-secondary", className)}>
+            <div {...props} className={cx("overflow-hidden rounded-xl bg-primary shadow-xs ring-1 ring-[#E9EAEB]", className)}>
                 {children}
             </div>
         </TableContext.Provider>
@@ -78,7 +78,7 @@ const TableCardHeader = ({ title, badge, description, contentTrailing, className
     return (
         <div
             className={cx(
-                "relative flex flex-col items-start gap-4 border-b border-secondary bg-primary px-4 md:flex-row",
+                "relative flex flex-col items-start gap-4 border-b border-[#E9EAEB] bg-primary px-4 md:flex-row",
                 size === "sm" ? "py-4 md:px-5" : "py-5 md:px-6",
                 className,
             )}
@@ -140,7 +140,7 @@ const TableHeader = <T extends object>({ columns, children, bordered = true, cla
 
                     // Row border—using an "after" pseudo-element to avoid the border taking up space.
                     bordered &&
-                        "[&>tr>th]:after:pointer-events-none [&>tr>th]:after:absolute [&>tr>th]:after:inset-x-0 [&>tr>th]:after:bottom-0 [&>tr>th]:after:h-px [&>tr>th]:after:bg-border-secondary [&>tr>th]:focus-visible:after:bg-transparent",
+                        "[&>tr>th]:after:pointer-events-none [&>tr>th]:after:absolute [&>tr>th]:after:inset-x-0 [&>tr>th]:after:bottom-0 [&>tr>th]:after:h-px [&>tr>th]:after:bg-[#E9EAEB] [&>tr>th]:focus-visible:after:bg-transparent",
 
                     typeof className === "function" ? className(state) : className,
                 )
@@ -225,12 +225,12 @@ const TableRow = <T extends object>({ columns, children, className, highlightSel
             {...props}
             className={(state) =>
                 cx(
-                    "relative outline-focus-ring transition-colors after:pointer-events-none hover:bg-secondary focus-visible:outline-2 focus-visible:-outline-offset-2",
+                    "relative outline-focus-ring transition-colors after:pointer-events-none hover:bg-[#E9EAEB] focus-visible:outline-2 focus-visible:-outline-offset-2",
                     size === "sm" ? "h-14" : "h-18",
-                    highlightSelectedRow && "selected:bg-secondary",
+                    highlightSelectedRow && "selected:bg-[#E9EAEB]",
 
                     // Row border—using an "after" pseudo-element to avoid the border taking up space.
-                    "[&>td]:after:absolute [&>td]:after:inset-x-0 [&>td]:after:bottom-0 [&>td]:after:h-px [&>td]:after:w-full [&>td]:after:bg-border-secondary last:[&>td]:after:hidden [&>td]:focus-visible:after:opacity-0 focus-visible:[&>td]:after:opacity-0",
+                    "[&>td]:after:absolute [&>td]:after:inset-x-0 [&>td]:after:bottom-0 [&>td]:after:h-px [&>td]:after:w-full [&>td]:after:bg-[#E9EAEB] last:[&>td]:after:hidden [&>td]:focus-visible:after:opacity-0 focus-visible:[&>td]:after:opacity-0",
 
                     typeof className === "function" ? className(state) : className,
                 )

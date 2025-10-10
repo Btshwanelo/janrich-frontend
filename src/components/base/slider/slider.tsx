@@ -39,7 +39,7 @@ export const Slider = ({ labelPosition = "default", minValue = 0, maxValue = 100
 
                     return (
                         <>
-                            <span className="absolute top-1/2 h-2 w-full -translate-y-1/2 rounded-full bg-quaternary" />
+                            <span className="absolute left-0 top-1/2 h-2 w-full -translate-y-1/2 rounded-full bg-quaternary" />
                             <span
                                 className="absolute top-1/2 h-2 w-full -translate-y-1/2 rounded-full bg-brand-solid"
                                 style={{

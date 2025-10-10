@@ -61,14 +61,17 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             <div className="absolute bottom-8 left-8 right-8">
               <div className="bg-white/30 backdrop-blur-sm border border-white/30 rounded-2xl p-8 text-white">
                 <blockquote className="text-2xl font-medium mb-6">
-                  "We've been using Untitled to kick start every new project and
-                  can't imagine working without it. It's incredible."
+                  "JanRiches showed me the importance of saving and paying
+                  myself first. With my savings, I was able to fund my youngest
+                  brother's university fees, build our family house, and even a
+                  home for my uncle. JanRiches has transformed how I view money,
+                  enabling me to travel abroad annually."
                 </blockquote>
 
                 <div className="flex items-center justify-between">
                   <div className="w-full">
                     <div className="flex justify-between">
-                      <div className="font-semibold text-lg">Caitlyn King</div>
+                      <div className="font-semibold text-lg">Muimeleli M</div>
                       <div className="flex items-center mb-4">
                         {[...Array(5)].map((_, i) => (
                           <svg
@@ -84,10 +87,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                     <div className="flex items-center justify-between">
                       <div className="">
                         <div className="text-sm opacity-90">
-                          Lead Designer, Layers
-                        </div>
-                        <div className="text-xs opacity-75">
-                          Web Development Agency
+                          Member since 2016{" "}
                         </div>
                       </div>
                       <div className="flex gap-6 ml-auto">

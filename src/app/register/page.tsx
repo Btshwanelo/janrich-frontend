@@ -40,9 +40,10 @@ const validationSchema = Yup.object({
     .min(10, "Please enter a valid phone number"),
   whatsappNumber: Yup.string().when("whatsappSame", {
     is: false,
-    then: (schema) => schema
-      .required("WhatsApp number is required when not using same as phone")
-      .min(10, "Please enter a valid WhatsApp number"),
+    then: (schema) =>
+      schema
+        .required("WhatsApp number is required when not using same as phone")
+        .min(10, "Please enter a valid WhatsApp number"),
     otherwise: (schema) => schema.notRequired(),
   }),
   password: Yup.string()
@@ -115,7 +116,9 @@ const RegistrationScreen = () => {
         last_nameemail: values.surname,
         email: values.email,
         phone: values.phoneNumber,
-        whatsapp_number: values.whatsappSame ? values.phoneNumber : values.whatsappNumber,
+        whatsapp_number: values.whatsappSame
+          ? values.phoneNumber
+          : values.whatsappNumber,
         country_code: "+27", // You might want to make this dynamic
         new_password: values.password,
         agree_to_terms: values.agreeTerms ? 1 : 0,
@@ -231,7 +234,7 @@ const RegistrationScreen = () => {
         >
           {({ values, errors, touched, setFieldValue, isValid }) => (
             <>
-            {console.log({ values, errors, touched, isValid })}
+              {console.log({ values, errors, touched, isValid })}
               <OTPVerificationModal
                 isOpen={showOTPModal}
                 onClose={() => setShowOTPModal(false)}
@@ -421,7 +424,7 @@ const RegistrationScreen = () => {
 
                 {/* WhatsApp Number Field - Show when toggle is false */}
                 <Field name="whatsappSame">
-                  {({ field }: any) => (
+                  {({ field }: any) =>
                     !field.value && (
                       <div>
                         <Label
@@ -440,7 +443,9 @@ const RegistrationScreen = () => {
                                 placeholder="Enter WhatsApp number"
                                 defaultCountry="ZA"
                                 className="phone-input"
-                                onChange={(value) => setFieldValue("whatsappNumber", value)}
+                                onChange={(value) =>
+                                  setFieldValue("whatsappNumber", value)
+                                }
                               />
                             )}
                           </Field>
@@ -452,7 +457,7 @@ const RegistrationScreen = () => {
                         </div>
                       </div>
                     )
-                  )}
+                  }
                 </Field>
 
                 {/* Password */}
@@ -642,8 +647,7 @@ const RegistrationScreen = () => {
                         onChange={(isSelected) =>
                           setFieldValue("agreeTerms", isSelected)
                         }
-                        className="mt-1"
-                        size="sm"
+                        className="data-[selected]:bg-primary-500 data-[selected]:border-primary-500 w-6"
                       />
                     )}
                   </Field>
@@ -694,19 +698,7 @@ const RegistrationScreen = () => {
                   color="primary"
                   size="lg"
                   className="w-full"
-                  isDisabled={
-                    !isValid ||
-                    isSubmitting ||
-                    isLoading ||
-                    isRegisterLoading ||
-                    !values.name ||
-                    !values.surname ||
-                    !values.email ||
-                    !values.phoneNumber ||
-                    !values.password ||
-                    !values.confirmPassword ||
-                    !values.agreeTerms
-                  }
+                  isDisabled={isSubmitting || isLoading || isRegisterLoading}
                   isLoading={isSubmitting || isLoading || isRegisterLoading}
                 >
                   {isSubmitting || isLoading || isRegisterLoading

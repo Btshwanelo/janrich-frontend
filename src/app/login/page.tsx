@@ -321,13 +321,7 @@ const LoginScreen = () => {
                 color="primary"
                 size="lg"
                 className="w-full"
-                isDisabled={
-                  !isValid ||
-                  isLoading ||
-                  isLoginLoading ||
-                  !values.email ||
-                  !values.password
-                }
+                isDisabled={isLoading || isLoginLoading}
                 isLoading={isLoading || isLoginLoading}
               >
                 {isLoading || isLoginLoading ? "Signing in..." : "Sign in"}
