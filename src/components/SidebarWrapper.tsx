@@ -38,11 +38,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
       {/* Logo and Toggle */}
       <div className="mb-6 mt-6 px-4 flex items-center justify-between">
         {!isSidebarCollapsed && (
-          <img
-            src="/logo-svg.svg"
-            alt="JanRich Logo"
-            className="w-12 h-auto"
-          />
+          <img src="/logo-svg.svg" alt="JanRich Logo" className="w-10 h-auto" />
         )}
         <Button
           variant="tertiary"
@@ -65,7 +61,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
             href="/dashboard"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-            } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+            } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
             title={isSidebarCollapsed ? "Dashboard" : ""}
           >
             <Home className="w-5 h-5" />
@@ -75,7 +71,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
             href="#"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-            } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+            } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
             title={isSidebarCollapsed ? "Analytics" : ""}
           >
             <BarChart3 className="w-5 h-5" />
@@ -85,7 +81,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
             href="/profile"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-            } py-2 text-gray-900 bg-gray-100 rounded-lg`}
+            } py-2 text-[#535862] text-sm bg-gray-100 rounded-lg`}
             title={isSidebarCollapsed ? "Community" : ""}
           >
             <Users className="w-5 h-5" />
@@ -95,7 +91,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
             href="#"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-            } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+            } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
             title={isSidebarCollapsed ? "History" : ""}
           >
             <Clock className="w-5 h-5" />
@@ -110,7 +106,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
           href="/profile"
           className={`flex items-center ${
             isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-          } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+          } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
           title={isSidebarCollapsed ? "Support" : ""}
         >
           <HelpCircle className="w-5 h-5" />
@@ -120,7 +116,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
           href="#"
           className={`flex items-center ${
             isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-          } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+          } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
           title={isSidebarCollapsed ? "Support" : ""}
         >
           <HelpCircle className="w-5 h-5" />
@@ -131,7 +127,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
           onClick={() => setIsModalOpen(true)}
           className={`flex items-center ${
             isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-          } py-2 text-gray-600 hover:bg-gray-100 rounded-lg`}
+          } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
           title={isSidebarCollapsed ? "Settings" : ""}
         >
           <Settings className="w-5 h-5" />
@@ -141,7 +137,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
           onClick={handleLogout}
           className={`flex items-center ${
             isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-          } py-2 text-gray-600 hover:bg-gray-100 rounded-lg w-full text-left`}
+          } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg w-full text-left`}
           title={isSidebarCollapsed ? "Logout" : ""}
         >
           <LogOut className="w-5 h-5" />
@@ -158,7 +154,10 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
           {!isSidebarCollapsed && (
             <div className="flex-1">
               <div className="text-sm font-medium">
-                {fullName || (typeof user === 'string' ? user : (user as any)?.name || (user as any)?.email || "User")}
+                {fullName ||
+                  (typeof user === "string"
+                    ? user
+                    : (user as any)?.name || (user as any)?.email || "User")}
               </div>
             </div>
           )}
