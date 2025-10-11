@@ -265,16 +265,19 @@ const RegistrationScreen = () => {
                     <Field name="name">
                       {({ field }: any) => (
                         <Input
-                          {...field}
                           ref={nameRef}
                           id="name"
+                          name={field.name}
+                          value={field.value}
+                          onChange={(value: string) => {
+                            setFieldValue("name", value);
+                          }}
+                          onBlur={field.onBlur}
                           type="text"
                           size="md"
                           placeholder="Enter your name"
-                          variant={
-                            errors.name && touched.name ? "error" : "default"
-                          }
-                          error={
+                          isInvalid={!!(errors.name && touched.name)}
+                          hint={
                             errors.name && touched.name
                               ? errors.name
                               : undefined
@@ -299,18 +302,19 @@ const RegistrationScreen = () => {
                     <Field name="surname">
                       {({ field }: any) => (
                         <Input
-                          {...field}
                           ref={surnameRef}
                           id="surname"
+                          name={field.name}
+                          value={field.value}
+                          onChange={(value: string) => {
+                            setFieldValue("surname", value);
+                          }}
+                          onBlur={field.onBlur}
                           type="text"
                           size="md"
                           placeholder="Enter your surname"
-                          variant={
-                            errors.surname && touched.surname
-                              ? "error"
-                              : "default"
-                          }
-                          error={
+                          isInvalid={!!(errors.surname && touched.surname)}
+                          hint={
                             errors.surname && touched.surname
                               ? errors.surname
                               : undefined
@@ -338,16 +342,19 @@ const RegistrationScreen = () => {
                   <Field name="email">
                     {({ field }: any) => (
                       <Input
-                        {...field}
                         ref={emailRef}
                         id="email"
+                        name={field.name}
+                        value={field.value}
+                        onChange={(value: string) => {
+                          setFieldValue("email", value);
+                        }}
+                        onBlur={field.onBlur}
                         type="email"
                         size="md"
                         placeholder="Enter your email"
-                        variant={
-                          errors.email && touched.email ? "error" : "default"
-                        }
-                        error={
+                        isInvalid={!!(errors.email && touched.email)}
+                        hint={
                           errors.email && touched.email
                             ? errors.email
                             : undefined
@@ -470,55 +477,58 @@ const RegistrationScreen = () => {
                   </Label>
                   <Field name="password">
                     {({ field }: any) => (
-                      <Input
-                        {...field}
-                        ref={passwordRef}
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        size="md"
-                        placeholder="Create a password"
-                        variant={
-                          errors.password && touched.password
-                            ? "error"
-                            : "default"
-                        }
-                        error={
-                          errors.password && touched.password
-                            ? errors.password
-                            : undefined
-                        }
-                        rightIcon={
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="text-gray-400 hover:text-gray-600"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </button>
-                        }
-                        onFocus={() => setShowPasswordChecks(true)}
-                        onBlur={() => {
-                          if (!field.value) {
-                            setShowPasswordChecks(false);
+                      <div className="relative">
+                        <Input
+                          ref={passwordRef}
+                          id="password"
+                          name={field.name}
+                          value={field.value}
+                          onChange={(value: string) => {
+                            setFieldValue("password", value);
+                            if (value) {
+                              setShowPasswordChecks(true);
+                            }
+                          }}
+                          onBlur={(e: any) => {
+                            field.onBlur(e);
+                            if (!field.value) {
+                              setShowPasswordChecks(false);
+                            }
+                          }}
+                          onFocus={() => setShowPasswordChecks(true)}
+                          type={showPassword ? "text" : "password"}
+                          size="md"
+                          placeholder="Create a password"
+                          isInvalid={!!(errors.password && touched.password)}
+                          hint={
+                            errors.password && touched.password
+                              ? errors.password
+                              : undefined
                           }
-                        }}
-                        onChange={(e: any) => {
-                          field.onChange(e);
-                          if (e.target.value) {
-                            setShowPasswordChecks(true);
-                          }
-                        }}
-                        onKeyDown={(e: any) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            focusNextField(passwordRef);
-                          }
-                        }}
-                      />
+                          inputClassName="pr-10"
+                          onKeyDown={(e: any) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              focusNextField(passwordRef);
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className={`absolute  ${
+                            errors.password
+                              ? `right-3 top-[33%] -translate-y-1/2`
+                              : `right-3 top-1/2 -translate-y-1/2`
+                          } text-gray-400 hover:text-gray-600 focus:outline-none`}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                     )}
                   </Field>
                 </div>
@@ -533,57 +543,64 @@ const RegistrationScreen = () => {
                   </Label>
                   <Field name="confirmPassword">
                     {({ field }: any) => (
-                      <Input
-                        {...field}
-                        ref={confirmPasswordRef}
-                        id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
-                        size="md"
-                        placeholder="Confirm your password"
-                        variant={
-                          errors.confirmPassword && touched.confirmPassword
-                            ? "error"
-                            : "default"
-                        }
-                        error={
-                          errors.confirmPassword && touched.confirmPassword
-                            ? errors.confirmPassword
-                            : undefined
-                        }
-                        rightIcon={
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setShowConfirmPassword(!showConfirmPassword)
+                      <div className="relative">
+                        <Input
+                          ref={confirmPasswordRef}
+                          id="confirmPassword"
+                          name={field.name}
+                          value={field.value}
+                          onChange={(value: string) => {
+                            setFieldValue("confirmPassword", value);
+                            if (value || values.password) {
+                              setShowPasswordChecks(true);
                             }
-                            className="text-gray-400 hover:text-gray-600"
-                          >
-                            {showConfirmPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </button>
-                        }
-                        onFocus={() => setShowPasswordChecks(true)}
-                        onBlur={() => {
-                          if (!field.value && !values.password) {
-                            setShowPasswordChecks(false);
+                          }}
+                          onBlur={(e: any) => {
+                            field.onBlur(e);
+                            if (!field.value && !values.password) {
+                              setShowPasswordChecks(false);
+                            }
+                          }}
+                          onFocus={() => setShowPasswordChecks(true)}
+                          type={showConfirmPassword ? "text" : "password"}
+                          size="md"
+                          placeholder="Confirm your password"
+                          isInvalid={
+                            !!(
+                              errors.confirmPassword && touched.confirmPassword
+                            )
                           }
-                        }}
-                        onChange={(e: any) => {
-                          field.onChange(e);
-                          if (e.target.value || values.password) {
-                            setShowPasswordChecks(true);
+                          hint={
+                            errors.confirmPassword && touched.confirmPassword
+                              ? errors.confirmPassword
+                              : undefined
                           }
-                        }}
-                        onKeyDown={(e: any) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            focusNextField(confirmPasswordRef);
+                          inputClassName="pr-10"
+                          onKeyDown={(e: any) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              focusNextField(confirmPasswordRef);
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
                           }
-                        }}
-                      />
+                          className={`absolute  ${
+                            errors.password
+                              ? `right-3 top-[33%] -translate-y-1/2`
+                              : `right-3 top-1/2 -translate-y-1/2`
+                          } text-gray-400 hover:text-gray-600 focus:outline-none`}
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                     )}
                   </Field>
                 </div>
@@ -658,7 +675,7 @@ const RegistrationScreen = () => {
                 <ErrorMessage
                   name="agreeTerms"
                   component="div"
-                  className="text-error-500 text-xs mt-1"
+                  className="text-error-500 text-xs mt-0"
                 />
 
                 {/* Submit Button */}

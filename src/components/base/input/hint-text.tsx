@@ -21,8 +21,8 @@ export const HintText = ({ isInvalid, className, ...props }: HintTextProps) => {
                 "text-sm text-tertiary",
 
                 // Invalid state
-                isInvalid && "text-error-primary",
-                "group-invalid:text-error-primary",
+                isInvalid && "text-error-500",
+                "group-invalid:text-error-500",
 
                 className,
             )}

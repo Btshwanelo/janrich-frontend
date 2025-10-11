@@ -175,16 +175,19 @@ const LoginScreen = () => {
                     };
                   }) => (
                     <Input
-                      {...field}
                       ref={emailRef}
                       id="email"
+                      name={field.name}
+                      value={field.value}
+                      onChange={(value: string) => {
+                        setFieldValue("email", value);
+                      }}
+                      onBlur={field.onBlur}
                       type="email"
                       size="md"
                       placeholder="Enter your email"
-                      variant={
-                        errors.email && touched.email ? "error" : "default"
-                      }
-                      error={
+                      isInvalid={!!(errors.email && touched.email)}
+                      hint={
                         errors.email && touched.email ? errors.email : undefined
                       }
                       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -219,52 +222,60 @@ const LoginScreen = () => {
                       onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
                     };
                   }) => (
-                    <Input
-                      {...field}
-                      ref={passwordRef}
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      size="md"
-                      placeholder="Enter your password"
-                      variant={
-                        errors.password && touched.password
-                          ? "error"
-                          : "default"
-                      }
-                      error={
-                        errors.password && touched.password
-                          ? errors.password
-                          : undefined
-                      }
-                      rightIcon={
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="text-gray-400 hover:text-gray-600"
-                        >
-                          {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </button>
-                      }
-                      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          // Submit form on Enter in password field
-                          const form = e.currentTarget.form;
-                          if (
-                            form &&
-                            isValid &&
-                            values.email &&
-                            values.password
-                          ) {
-                            form.requestSubmit();
-                          }
+                    <div className="relative">
+                      <Input
+                        ref={passwordRef}
+                        id="password"
+                        name={field.name}
+                        value={field.value}
+                        onChange={(value: string) => {
+                          setFieldValue("password", value);
+                        }}
+                        onBlur={field.onBlur}
+                        type={showPassword ? "text" : "password"}
+                        size="md"
+                        placeholder="Enter your password"
+                        isInvalid={!!(errors.password && touched.password)}
+                        hint={
+                          errors.password && touched.password
+                            ? errors.password
+                            : undefined
                         }
-                      }}
-                    />
+                        inputClassName="pr-10"
+                        onKeyDown={(
+                          e: React.KeyboardEvent<HTMLInputElement>
+                        ) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            // Submit form on Enter in password field
+                            const form = e.currentTarget.form;
+                            if (
+                              form &&
+                              isValid &&
+                              values.email &&
+                              values.password
+                            ) {
+                              form.requestSubmit();
+                            }
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className={`absolute  ${
+                          errors.password
+                            ? `right-3 top-[33%] -translate-y-1/2`
+                            : `right-3 top-1/2 -translate-y-1/2`
+                        } text-gray-400 hover:text-gray-600 focus:outline-none`}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   )}
                 </Field>
               </div>

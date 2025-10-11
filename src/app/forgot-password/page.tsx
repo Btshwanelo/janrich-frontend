@@ -200,7 +200,7 @@ const ForgotPasswordScreen = () => {
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
               >
-                {({ values, errors, touched, isValid }) => (
+                {({ values, errors, touched, setFieldValue, isValid }) => (
                   <Form className="space-y-6">
                     {/* Email */}
                     <div>
@@ -213,14 +213,19 @@ const ForgotPasswordScreen = () => {
                       <Field name="email">
                         {({ field }: any) => (
                           <Input
-                            {...field}
                             ref={emailRef}
                             id="email"
+                            name={field.name}
+                            value={field.value}
+                            onChange={(value: string) => {
+                              setFieldValue("email", value);
+                            }}
+                            onBlur={field.onBlur}
                             type="email"
                             size="md"
                             placeholder="Enter your email"
-                            variant={errors.email && touched.email ? "error" : "default"}
-                            error={errors.email && touched.email ? errors.email : undefined}
+                            isInvalid={!!(errors.email && touched.email)}
+                            hint={errors.email && touched.email ? errors.email : undefined}
                             onKeyDown={(e: any) => {
                               if (e.key === "Enter") {
                                 e.preventDefault();
