@@ -1,10 +1,10 @@
 'use client'
 import React, { useState } from 'react'
-import { Button } from './ui/untitled-button';
 import { BarChart3, Clock, HelpCircle, Home, LogOut, Menu, Settings, Users, X } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { clearAuthCookie, clearCredentials } from '@/lib/slices/authSlice';
 import { useRouter } from 'next/navigation';
+import { Button } from './base/buttons/button';
 
 const Sidebar = () => {
       const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -34,7 +34,7 @@ const Sidebar = () => {
               />
             )}
             <Button
-              variant="tertiary"
+              color="tertiary"
               size="sm"
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
               className="ml-auto"

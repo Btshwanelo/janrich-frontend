@@ -2,10 +2,8 @@
 import React, { useState, useRef } from "react";
 import { Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
-import { Input } from "@/components/ui/untitled-input";
 import { Label } from "@/components/base/input/label";
 import { Toggle } from "@/components/base/toggle/toggle";
-import { Checkbox } from "@/components/ui/untitled-checkbox";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
@@ -23,6 +21,8 @@ import {
   setLoading,
   setRegistrationData,
 } from "@/lib/slices/authSlice";
+import { Checkbox } from "@/components/base/checkbox/checkbox";
+import { Input } from "@/components/base/input/input";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -414,8 +414,8 @@ const RegistrationScreen = () => {
                         onChange={(isSelected) =>
                           setFieldValue("whatsappSame", isSelected)
                         }
-                        label="Use WhatsApp for notifications"
-                        hint="Receive verification codes via WhatsApp"
+                        label="WhatsApp Number is the same as above."
+                        // hint="Receive verification codes via WhatsApp"
                         size="sm"
                       />
                     )}
@@ -638,7 +638,7 @@ const RegistrationScreen = () => {
                 )}
 
                 {/* Terms and Conditions */}
-                <div className="flex items-start space-x-3">
+                <div className="flex items-start space-x-2">
                   <Field name="agreeTerms">
                     {({ field }: any) => (
                       <Checkbox
@@ -647,14 +647,10 @@ const RegistrationScreen = () => {
                         onChange={(isSelected) =>
                           setFieldValue("agreeTerms", isSelected)
                         }
-                        className="data-[selected]:bg-primary-500 data-[selected]:border-primary-500 w-6"
                       />
                     )}
                   </Field>
-                  <Label
-                    htmlFor="agreeTerms"
-                    className="text-sm text-gray-700 leading-5"
-                  >
+                  <Label htmlFor="agreeTerms" className="text-sm text-gray-700">
                     I agree to the Terms and Conditions by logging and using
                     this application
                   </Label>
@@ -665,38 +661,11 @@ const RegistrationScreen = () => {
                   className="text-error-500 text-xs mt-1"
                 />
 
-                {/* Remember Me */}
-                {/* <div className="flex items-start space-x-3">
-                      <Field name="rememberMe">
-                        {({ field }: any) => (
-                          <Checkbox
-                            id="rememberMe"
-                            checked={field.value}
-                            onCheckedChange={(checked) =>
-                              setFieldValue("rememberMe", checked)
-                            }
-                            className="mt-1 data-[state=checked]:bg-[#E31B54] data-[state=checked]:border-[#E31B54]"
-                          />
-                        )}
-                      </Field>
-                      <div>
-                        <Label
-                          htmlFor="rememberMe"
-                          className="text-sm font-medium text-gray-700"
-                        >
-                          Remember me
-                        </Label>
-                        <p className="text-xs text-gray-500">
-                          Save my login details for next time.
-                        </p>
-                      </div>
-                    </div> */}
-
                 {/* Submit Button */}
                 <Button
                   type="submit"
                   color="primary"
-                  size="lg"
+                  size="md"
                   className="w-full"
                   isDisabled={isSubmitting || isLoading || isRegisterLoading}
                   isLoading={isSubmitting || isLoading || isRegisterLoading}
@@ -712,7 +681,7 @@ const RegistrationScreen = () => {
                     Already have an account?{" "}
                     <a
                       href="/login"
-                      className="text-primary-500 hover:text-primary-600 font-medium"
+                      className="text-[#E31B54] hover:text-primary-600 font-medium"
                     >
                       Log in
                     </a>

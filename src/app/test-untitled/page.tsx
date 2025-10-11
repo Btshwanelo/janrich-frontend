@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "@/components/base/buttons/button";
-import { Input } from "@/components/ui/untitled-input";
 import { useTheme } from "next-themes";
 import { Moon01, Sun, Mail01, Lock01, User01, SearchMd } from "@untitledui/icons";
 import { useEffect, useState } from "react";
+import { Input } from "@/components/base/input/input";
 
 export default function TestUntitledPage() {
     const { theme, setTheme } = useTheme();

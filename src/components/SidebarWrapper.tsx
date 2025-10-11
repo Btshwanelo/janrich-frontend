@@ -1,10 +1,10 @@
 'use client'
 import React, { useState } from 'react'
-import { Button } from './ui/untitled-button';
 import { BarChart3, Clock, HelpCircle, Home, LogOut, Menu, Settings, Users, X } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { clearAuthCookie, clearCredentials } from '@/lib/slices/authSlice';
 import { useRouter } from 'next/navigation';
+import { Button } from './base/buttons/button';
 
 interface SidebarWrapperProps {
   onCollapseChange?: (isCollapsed: boolean) => void;
@@ -41,7 +41,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
           <img src="/logo-svg.svg" alt="JanRich Logo" className="w-10 h-auto" />
         )}
         <Button
-          variant="tertiary"
+          color="tertiary"
           size="sm"
           onClick={handleToggle}
           className="ml-auto"

@@ -336,7 +336,7 @@ const PlanSelectionScreen = () => {
             {/* Pay Button */}
             <Button
               color="primary"
-              size="lg"
+              size="md"
               className="w-full"
               onClick={handlePayment}
               disabled={isProcessing}

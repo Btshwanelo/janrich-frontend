@@ -30,57 +30,67 @@ export const DatePicker = ({ value: valueProp, defaultValue, onChange, onApply, 
     const formattedDate = value ? formatter.format(value.toDate(getLocalTimeZone())) : "Select date";
 
     return (
-        <AriaDatePicker shouldCloseOnSelect={false} {...props} value={value} onChange={setValue}>
-            <AriaGroup>
-                <Button size="md" color="secondary" iconLeading={CalendarIcon}>
-                    {formattedDate}
-                </Button>
-            </AriaGroup>
-            <AriaPopover
-                offset={8}
-                placement="bottom right"
-                className={({ isEntering, isExiting }) =>
-                    cx(
-                        "origin-(--trigger-anchor-point) will-change-transform",
-                        isEntering &&
-                            "duration-150 ease-out animate-in fade-in placement-right:slide-in-from-left-0.5 placement-top:slide-in-from-bottom-0.5 placement-bottom:slide-in-from-top-0.5",
-                        isExiting &&
-                            "duration-100 ease-in animate-out fade-out placement-right:slide-out-to-left-0.5 placement-top:slide-out-to-bottom-0.5 placement-bottom:slide-out-to-top-0.5",
-                    )
-                }
-            >
-                <AriaDialog className="rounded-2xl bg-white shadow-xl ring ring-border-inactive">
-                    {({ close }) => (
-                        <>
-                            <div className="flex px-6 py-5">
-                                <Calendar highlightedDates={highlightedDates} />
-                            </div>
-                            <div className="grid grid-cols-2 gap-3 border-t border-secondary p-4">
-                                <Button
-                                    size="md"
-                                    color="secondary"
-                                    onClick={() => {
-                                        onCancel?.();
-                                        close();
-                                    }}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    size="md"
-                                    color="primary"
-                                    onClick={() => {
-                                        onApply?.();
-                                        close();
-                                    }}
-                                >
-                                    Apply
-                                </Button>
-                            </div>
-                        </>
-                    )}
-                </AriaDialog>
-            </AriaPopover>
-        </AriaDatePicker>
+      <AriaDatePicker
+        shouldCloseOnSelect={false}
+        {...props}
+        value={value}
+        onChange={setValue}
+      >
+        <AriaGroup>
+          <Button
+            size="lg"
+            color="secondary"
+            className="w-full text-[#535862]"
+            iconLeading={CalendarIcon}
+          >
+            {formattedDate}
+          </Button>
+        </AriaGroup>
+        <AriaPopover
+          offset={8}
+          placement="bottom right"
+          className={({ isEntering, isExiting }) =>
+            cx(
+              "origin-(--trigger-anchor-point) will-change-transform",
+              isEntering &&
+                "duration-150 ease-out animate-in fade-in placement-right:slide-in-from-left-0.5 placement-top:slide-in-from-bottom-0.5 placement-bottom:slide-in-from-top-0.5",
+              isExiting &&
+                "duration-100 ease-in animate-out fade-out placement-right:slide-out-to-left-0.5 placement-top:slide-out-to-bottom-0.5 placement-bottom:slide-out-to-top-0.5"
+            )
+          }
+        >
+          <AriaDialog className="rounded-2xl bg-white shadow-xl ring ring-border-inactive">
+            {({ close }) => (
+              <>
+                <div className="flex px-6 py-5">
+                  <Calendar highlightedDates={highlightedDates} />
+                </div>
+                <div className="grid grid-cols-2 gap-3 border-t border-secondary p-4">
+                  <Button
+                    size="md"
+                    color="secondary"
+                    onClick={() => {
+                      onCancel?.();
+                      close();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="md"
+                    color="primary"
+                    onClick={() => {
+                      onApply?.();
+                      close();
+                    }}
+                  >
+                    Apply
+                  </Button>
+                </div>
+              </>
+            )}
+          </AriaDialog>
+        </AriaPopover>
+      </AriaDatePicker>
     );
 };

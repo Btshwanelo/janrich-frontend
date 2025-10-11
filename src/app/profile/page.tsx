@@ -14,7 +14,6 @@ import {
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
-import { Input } from "@/components/ui/untitled-input";
 import { Label } from "@/components/base/input/label";
 import { Select } from "@/components/base/select/select";
 import { Tabs } from "@/components/application/tabs/tabs";
@@ -46,17 +45,16 @@ import {
   useUpdateProfileMutation,
 } from "@/lib/slices/authSlice";
 import { useAppSelector } from "@/lib/hooks";
+import { Input } from "@/components/base/input/input";
 
 export default function ProfileBeneficiaryScreen() {
-  const [selectedTab, setSelectedTab] = useState("beneficiary");
+  const [selectedTab, setSelectedTab] = useState("details");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [amount, setAmount] = useState([100000]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { user, customer } = useAppSelector((state) => state.auth);
-  // Fetch profile data
-  console.log("user", user);
-  console.log("customer", customer);
+
   const {
     data: profileData,
     isLoading: isProfileLoading,
@@ -70,10 +68,12 @@ export default function ProfileBeneficiaryScreen() {
   // Beneficiary update mutation
   const [updateBeneficiary, { isLoading: isUpdatingBeneficiary }] =
     useUpdateBeneficiaryMutation();
-  
+
   // Customer and Profile update mutations
-  const [updateCustomer, { isLoading: isUpdatingCustomer }] = useUpdateCustomerMutation();
-  const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
+  const [updateCustomer, { isLoading: isUpdatingCustomer }] =
+    useUpdateCustomerMutation();
+  const [updateProfile, { isLoading: isUpdatingProfile }] =
+    useUpdateProfileMutation();
 
   // Toast hooks
   const showSuccessToast = useSuccessToast();
@@ -127,15 +127,15 @@ export default function ProfileBeneficiaryScreen() {
     if (profileData?.message?.data) {
       const data = profileData.message.data;
 
-        // Basic info
-        const nameParts = data.basic_info.customer_name.split(" ");
-        setFirstName(nameParts[0] || "");
-        setLastName(nameParts.slice(1).join(" ") || "");
-        setDetailsPhoneNumber(data.basic_info.phone || "");
-        setTitle(data.basic_info.salutation || "");
-        setEmail(data.basic_info.email || "");
-        setWhatsappNumber(data.basic_info.whatsapp_number || "");
-        setCountryCode(data.basic_info.country_code || "");
+      // Basic info
+      const nameParts = data.basic_info.customer_name.split(" ");
+      setFirstName(nameParts[0] || "");
+      setLastName(nameParts.slice(1).join(" ") || "");
+      setDetailsPhoneNumber(data.basic_info.phone || "");
+      setTitle(data.basic_info.salutation || "");
+      setEmail(data.basic_info.email || "");
+      setWhatsappNumber(data.basic_info.whatsapp_number || "");
+      setCountryCode(data.basic_info.country_code || "");
 
       // About you
       setBirthdate(data.about_you.birth_date || "");
@@ -267,20 +267,27 @@ export default function ProfileBeneficiaryScreen() {
   };
 
   // Helper functions to map API values to select options
-  const mapApiValueToSelectKey = (apiValue: string, options: { id: string; label: string }[]) => {
+  const mapApiValueToSelectKey = (
+    apiValue: string,
+    options: { id: string; label: string }[]
+  ) => {
     if (!apiValue) return "";
-    
+
     // Find the option that matches the API value (case-insensitive)
-    const matchingOption = options.find(option => 
-      option.label.toLowerCase() === apiValue.toLowerCase() ||
-      option.id.toLowerCase() === apiValue.toLowerCase()
+    const matchingOption = options.find(
+      (option) =>
+        option.label.toLowerCase() === apiValue.toLowerCase() ||
+        option.id.toLowerCase() === apiValue.toLowerCase()
     );
-    
+
     return matchingOption ? matchingOption.id : "";
   };
 
-  const mapSelectKeyToApiValue = (selectKey: string, options: { id: string; label: string }[]) => {
-    const option = options.find(opt => opt.id === selectKey);
+  const mapSelectKeyToApiValue = (
+    selectKey: string,
+    options: { id: string; label: string }[]
+  ) => {
+    const option = options.find((opt) => opt.id === selectKey);
     return option ? option.label : selectKey;
   };
 
@@ -295,7 +302,7 @@ export default function ProfileBeneficiaryScreen() {
         { id: "retired", label: "Retired" },
         { id: "other", label: "Other" },
       ];
-      
+
       const depositFrequencyOptions = [
         { id: "weekly", label: "Weekly" },
         { id: "bi-weekly", label: "Bi-weekly" },
@@ -303,7 +310,7 @@ export default function ProfileBeneficiaryScreen() {
         { id: "quarterly", label: "Quarterly" },
         { id: "annually", label: "Annually" },
       ];
-      
+
       const fundSourceOptions = [
         { id: "salary", label: "Salary" },
         { id: "business", label: "Business Income" },
@@ -312,7 +319,7 @@ export default function ProfileBeneficiaryScreen() {
         { id: "gift", label: "Gift" },
         { id: "other", label: "Other" },
       ];
-      
+
       const savingForOptions = [
         { id: "house", label: "House" },
         { id: "car", label: "Car" },
@@ -325,13 +332,22 @@ export default function ProfileBeneficiaryScreen() {
 
       const financialData = {
         customer_id: "JR0020",
-        custom_employment_status: mapSelectKeyToApiValue(employmentStatus, employmentStatusOptions),
+        custom_employment_status: mapSelectKeyToApiValue(
+          employmentStatus,
+          employmentStatusOptions
+        ),
         custom_employee_status_other: employmentStatusOther,
-        custom_deposit_frequency: mapSelectKeyToApiValue(depositFrequency, depositFrequencyOptions),
+        custom_deposit_frequency: mapSelectKeyToApiValue(
+          depositFrequency,
+          depositFrequencyOptions
+        ),
         custom_deposit_frequency_other: depositFrequencyOther,
         custom_customer_bank: customerBank,
         custom_bank_other: bankOther,
-        custom_fund_source: mapSelectKeyToApiValue(fundSource, fundSourceOptions),
+        custom_fund_source: mapSelectKeyToApiValue(
+          fundSource,
+          fundSourceOptions
+        ),
         custom_fund_source_other: fundSourceOther,
         custom_saving_for: mapSelectKeyToApiValue(savingFor, savingForOptions),
         custom_saving_for_other: savingForOther,
@@ -356,7 +372,7 @@ export default function ProfileBeneficiaryScreen() {
       );
     } catch (error) {
       console.error("Failed to update financial details:", error);
-      
+
       // Show error toast
       showErrorToast(
         "Update Failed",
@@ -379,7 +395,7 @@ export default function ProfileBeneficiaryScreen() {
         { id: "My Estate", label: "My Estate" },
         { id: "My Beneficiary", label: "My Beneficiary" },
       ];
-      
+
       const beneficiaryRelationOptions = [
         { id: "spouse", label: "Spouse" },
         { id: "child", label: "Child" },
@@ -415,7 +431,7 @@ export default function ProfileBeneficiaryScreen() {
       );
     } catch (error) {
       console.error("Failed to update beneficiary:", error);
-      
+
       // Show error toast
       showErrorToast(
         "Update Failed",
@@ -466,7 +482,7 @@ export default function ProfileBeneficiaryScreen() {
 
       const result = await updateCustomer(customerData).unwrap();
       console.log("Customer updated successfully:", result);
-      
+
       if (result.message.result === "failed") {
         showErrorToast(
           "Update Failed",
@@ -490,7 +506,7 @@ export default function ProfileBeneficiaryScreen() {
       }
     } catch (error) {
       console.error("Failed to update customer:", error);
-      
+
       showErrorToast(
         "Update Failed",
         "Unable to save your customer information. Please try again.",
@@ -512,8 +528,8 @@ export default function ProfileBeneficiaryScreen() {
       const formatBirthDate = (dateString: string) => {
         if (!dateString) return "";
         const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
       };
@@ -547,7 +563,7 @@ export default function ProfileBeneficiaryScreen() {
 
       const result = await updateProfile(profileData).unwrap();
       console.log("Profile updated successfully:", result);
-      
+
       if (result.message.ok) {
         showSuccessToast(
           "Profile Updated!",
@@ -571,7 +587,7 @@ export default function ProfileBeneficiaryScreen() {
       }
     } catch (error) {
       console.error("Failed to update profile:", error);
-      
+
       showErrorToast(
         "Update Failed",
         "Unable to save your profile information. Please try again.",
@@ -591,7 +607,7 @@ export default function ProfileBeneficiaryScreen() {
     try {
       // Update customer information first
       // await handleCustomerUpdate();
-      
+
       // Then update profile information
       await handleProfileUpdate();
     } catch (error) {
@@ -749,22 +765,28 @@ export default function ProfileBeneficiaryScreen() {
                       {/* Right column - Form */}
                       <CardContent className="col-span-9 max-w-[720px] space-y-6 border border-gra-50 shadow p-6 rounded-lg">
                         <div>
-                           <Select
-                             label="Beneficiary Type"
-                             placeholder="Select an option"
-                             items={[
-                               { id: "My Estate", label: "My Estate" },
-                               { id: "My Beneficiary", label: "My Beneficiary" },
-                             ]}
-                             className="w-full"
-                             defaultSelectedKey={mapApiValueToSelectKey(beneficiaryType, [
-                               { id: "My Estate", label: "My Estate" },
-                               { id: "My Beneficiary", label: "My Beneficiary" },
-                             ])}
-                             onSelectionChange={(key) =>
-                               setBeneficiaryType(key as string)
-                             }
-                           >
+                          <Select
+                            label="Beneficiary Type"
+                            placeholder="Select an option"
+                            items={[
+                              { id: "My Estate", label: "My Estate" },
+                              { id: "My Beneficiary", label: "My Beneficiary" },
+                            ]}
+                            className="w-full"
+                            defaultSelectedKey={mapApiValueToSelectKey(
+                              beneficiaryType,
+                              [
+                                { id: "My Estate", label: "My Estate" },
+                                {
+                                  id: "My Beneficiary",
+                                  label: "My Beneficiary",
+                                },
+                              ]
+                            )}
+                            onSelectionChange={(key) =>
+                              setBeneficiaryType(key as string)
+                            }
+                          >
                             {(item) => (
                               <Select.Item key={item.id} id={item.id}>
                                 {item.label}
@@ -782,7 +804,7 @@ export default function ProfileBeneficiaryScreen() {
                               onChange={(e) =>
                                 setBeneficiaryName(e.target.value)
                               }
-                              required
+                              isisRequired
                             />
                           </div>
 
@@ -794,7 +816,7 @@ export default function ProfileBeneficiaryScreen() {
                               onChange={(e) =>
                                 setBeneficiarySurname(e.target.value)
                               }
-                              required
+                              isisRequired
                             />
                           </div>
                         </div>
@@ -820,29 +842,32 @@ export default function ProfileBeneficiaryScreen() {
                         </div>
 
                         <div>
-                           <Select
-                             label="Relation"
-                             placeholder="Select an option"
-                             items={[
-                               { id: "spouse", label: "Spouse" },
-                               { id: "child", label: "Child" },
-                               { id: "parent", label: "Parent" },
-                               { id: "sibling", label: "Sibling" },
-                               { id: "other", label: "Other" },
-                             ]}
-                             className="w-full"
-                             defaultSelectedKey={mapApiValueToSelectKey(beneficiaryRelation, [
-                               { id: "spouse", label: "Spouse" },
-                               { id: "child", label: "Child" },
-                               { id: "parent", label: "Parent" },
-                               { id: "sibling", label: "Sibling" },
-                               { id: "other", label: "Other" },
-                             ])}
-                             onSelectionChange={(key) =>
-                               setBeneficiaryRelation(key as string)
-                             }
-                             isRequired
-                           >
+                          <Select
+                            label="Relation"
+                            placeholder="Select an option"
+                            items={[
+                              { id: "spouse", label: "Spouse" },
+                              { id: "child", label: "Child" },
+                              { id: "parent", label: "Parent" },
+                              { id: "sibling", label: "Sibling" },
+                              { id: "other", label: "Other" },
+                            ]}
+                            className="w-full"
+                            defaultSelectedKey={mapApiValueToSelectKey(
+                              beneficiaryRelation,
+                              [
+                                { id: "spouse", label: "Spouse" },
+                                { id: "child", label: "Child" },
+                                { id: "parent", label: "Parent" },
+                                { id: "sibling", label: "Sibling" },
+                                { id: "other", label: "Other" },
+                              ]
+                            )}
+                            onSelectionChange={(key) =>
+                              setBeneficiaryRelation(key as string)
+                            }
+                            isisRequired
+                          >
                             {(item) => (
                               <Select.Item key={item.id} id={item.id}>
                                 {item.label}
@@ -893,7 +918,7 @@ export default function ProfileBeneficiaryScreen() {
                                 placeholder="Enter your first name"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
-                                required
+                                isisRequired
                               />
                             </div>
                             <div>
@@ -902,7 +927,7 @@ export default function ProfileBeneficiaryScreen() {
                                 placeholder="Enter your last name"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                required
+                                isisRequired
                               />
                             </div>
                           </div>
@@ -991,13 +1016,16 @@ export default function ProfileBeneficiaryScreen() {
                                 { id: "prof", label: "Prof" },
                               ]}
                               className="w-full"
-                              defaultSelectedKey={mapApiValueToSelectKey(title, [
-                                { id: "mr", label: "Mr" },
-                                { id: "mrs", label: "Mrs" },
-                                { id: "ms", label: "Ms" },
-                                { id: "dr", label: "Dr" },
-                                { id: "prof", label: "Prof" },
-                              ])}
+                              defaultSelectedKey={mapApiValueToSelectKey(
+                                title,
+                                [
+                                  { id: "mr", label: "Mr" },
+                                  { id: "mrs", label: "Mrs" },
+                                  { id: "ms", label: "Ms" },
+                                  { id: "dr", label: "Dr" },
+                                  { id: "prof", label: "Prof" },
+                                ]
+                              )}
                               onSelectionChange={(key) =>
                                 setTitle(key as string)
                               }
@@ -1017,7 +1045,7 @@ export default function ProfileBeneficiaryScreen() {
                                 type="date"
                                 value={birthdate}
                                 onChange={(e) => setBirthdate(e.target.value)}
-                                required
+                                isRequired
                               />
                             </div>
                             <div>
@@ -1034,12 +1062,18 @@ export default function ProfileBeneficiaryScreen() {
                                   },
                                 ]}
                                 className="w-full"
-                                defaultSelectedKey={mapApiValueToSelectKey(gender, [
-                                  { id: "male", label: "Male" },
-                                  { id: "female", label: "Female" },
-                                  { id: "other", label: "Other" },
-                                  { id: "prefer-not-to-say", label: "Prefer not to say" },
-                                ])}
+                                defaultSelectedKey={mapApiValueToSelectKey(
+                                  gender,
+                                  [
+                                    { id: "male", label: "Male" },
+                                    { id: "female", label: "Female" },
+                                    { id: "other", label: "Other" },
+                                    {
+                                      id: "prefer-not-to-say",
+                                      label: "Prefer not to say",
+                                    },
+                                  ]
+                                )}
                                 onSelectionChange={(key) =>
                                   setGender(key as string)
                                 }
@@ -1060,7 +1094,7 @@ export default function ProfileBeneficiaryScreen() {
                                 placeholder="Enter nationality"
                                 value={nationality}
                                 onChange={(e) => setNationality(e.target.value)}
-                                required
+                                isRequired
                               />
                             </div>
                             <div>
@@ -1071,7 +1105,7 @@ export default function ProfileBeneficiaryScreen() {
                                 onChange={(e) =>
                                   setCountryOfResidence(e.target.value)
                                 }
-                                required
+                                isRequired
                               />
                             </div>
                           </div>
@@ -1098,7 +1132,10 @@ export default function ProfileBeneficiaryScreen() {
                                 { id: "indian", label: "Indian/Asian" },
                                 { id: "white", label: "White" },
                                 { id: "other", label: "Other" },
-                                { id: "prefer-not-to-say", label: "Prefer not to say" },
+                                {
+                                  id: "prefer-not-to-say",
+                                  label: "Prefer not to say",
+                                },
                               ])}
                               onSelectionChange={(key) =>
                                 setRace(key as string)
@@ -1181,12 +1218,14 @@ export default function ProfileBeneficiaryScreen() {
 
                           <div className="flex justify-end gap-3 pt-4">
                             <Button color="secondary">Cancel</Button>
-                            <Button 
-                              color="primary" 
+                            <Button
+                              color="primary"
                               onClick={handleMyDetailsSubmit}
                               disabled={isUpdatingCustomer || isUpdatingProfile}
                             >
-                              {(isUpdatingCustomer || isUpdatingProfile) ? "Saving..." : "Save changes"}
+                              {isUpdatingCustomer || isUpdatingProfile
+                                ? "Saving..."
+                                : "Save changes"}
                             </Button>
                           </div>
                         </CardContent>
@@ -1252,32 +1291,35 @@ export default function ProfileBeneficiaryScreen() {
 
                         {/* What are you saving for - Full width */}
                         <div>
-                           <Select
-                             label="What are you saving for"
-                             placeholder="Select an option"
-                             items={[
-                               { id: "house", label: "House" },
-                               { id: "car", label: "Car" },
-                               { id: "education", label: "Education" },
-                               { id: "retirement", label: "Retirement" },
-                               { id: "emergency", label: "Emergency Fund" },
-                               { id: "vacation", label: "Vacation" },
-                               { id: "other", label: "Other" },
-                             ]}
-                             className="w-full"
-                             defaultSelectedKey={mapApiValueToSelectKey(savingFor, [
-                               { id: "house", label: "House" },
-                               { id: "car", label: "Car" },
-                               { id: "education", label: "Education" },
-                               { id: "retirement", label: "Retirement" },
-                               { id: "emergency", label: "Emergency Fund" },
-                               { id: "vacation", label: "Vacation" },
-                               { id: "other", label: "Other" },
-                             ])}
-                             onSelectionChange={(key) =>
-                               setSavingFor(key as string)
-                             }
-                           >
+                          <Select
+                            label="What are you saving for"
+                            placeholder="Select an option"
+                            items={[
+                              { id: "house", label: "House" },
+                              { id: "car", label: "Car" },
+                              { id: "education", label: "Education" },
+                              { id: "retirement", label: "Retirement" },
+                              { id: "emergency", label: "Emergency Fund" },
+                              { id: "vacation", label: "Vacation" },
+                              { id: "other", label: "Other" },
+                            ]}
+                            className="w-full"
+                            defaultSelectedKey={mapApiValueToSelectKey(
+                              savingFor,
+                              [
+                                { id: "house", label: "House" },
+                                { id: "car", label: "Car" },
+                                { id: "education", label: "Education" },
+                                { id: "retirement", label: "Retirement" },
+                                { id: "emergency", label: "Emergency Fund" },
+                                { id: "vacation", label: "Vacation" },
+                                { id: "other", label: "Other" },
+                              ]
+                            )}
+                            onSelectionChange={(key) =>
+                              setSavingFor(key as string)
+                            }
+                          >
                             {(item) => (
                               <Select.Item key={item.id} id={item.id}>
                                 {item.label}
@@ -1289,30 +1331,36 @@ export default function ProfileBeneficiaryScreen() {
                         {/* Two column grid for remaining fields */}
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                             <Select
-                               label="Employment status"
-                               placeholder="Select an option"
-                               items={[
-                                 { id: "employed", label: "Employed" },
-                                 { id: "self-employed", label: "Self-employed" },
-                                 { id: "unemployed", label: "Unemployed" },
-                                 { id: "student", label: "Student" },
-                                 { id: "retired", label: "Retired" },
-                                 { id: "other", label: "Other" },
-                               ]}
-                               className="w-full"
-                               defaultSelectedKey={mapApiValueToSelectKey(employmentStatus, [
-                                 { id: "employed", label: "Employed" },
-                                 { id: "self-employed", label: "Self-employed" },
-                                 { id: "unemployed", label: "Unemployed" },
-                                 { id: "student", label: "Student" },
-                                 { id: "retired", label: "Retired" },
-                                 { id: "other", label: "Other" },
-                               ])}
-                               onSelectionChange={(key) =>
-                                 setEmploymentStatus(key as string)
-                               }
-                             >
+                            <Select
+                              label="Employment status"
+                              placeholder="Select an option"
+                              items={[
+                                { id: "employed", label: "Employed" },
+                                { id: "self-employed", label: "Self-employed" },
+                                { id: "unemployed", label: "Unemployed" },
+                                { id: "student", label: "Student" },
+                                { id: "retired", label: "Retired" },
+                                { id: "other", label: "Other" },
+                              ]}
+                              className="w-full"
+                              defaultSelectedKey={mapApiValueToSelectKey(
+                                employmentStatus,
+                                [
+                                  { id: "employed", label: "Employed" },
+                                  {
+                                    id: "self-employed",
+                                    label: "Self-employed",
+                                  },
+                                  { id: "unemployed", label: "Unemployed" },
+                                  { id: "student", label: "Student" },
+                                  { id: "retired", label: "Retired" },
+                                  { id: "other", label: "Other" },
+                                ]
+                              )}
+                              onSelectionChange={(key) =>
+                                setEmploymentStatus(key as string)
+                              }
+                            >
                               {(item) => (
                                 <Select.Item key={item.id} id={item.id}>
                                   {item.label}
@@ -1322,28 +1370,31 @@ export default function ProfileBeneficiaryScreen() {
                           </div>
 
                           <div>
-                             <Select
-                               label="Deposit frequency"
-                               placeholder="Select an option"
-                               items={[
-                                 { id: "weekly", label: "Weekly" },
-                                 { id: "bi-weekly", label: "Bi-weekly" },
-                                 { id: "monthly", label: "Monthly" },
-                                 { id: "quarterly", label: "Quarterly" },
-                                 { id: "annually", label: "Annually" },
-                               ]}
-                               className="w-full"
-                               defaultSelectedKey={mapApiValueToSelectKey(depositFrequency, [
-                                 { id: "weekly", label: "Weekly" },
-                                 { id: "bi-weekly", label: "Bi-weekly" },
-                                 { id: "monthly", label: "Monthly" },
-                                 { id: "quarterly", label: "Quarterly" },
-                                 { id: "annually", label: "Annually" },
-                               ])}
-                               onSelectionChange={(key) =>
-                                 setDepositFrequency(key as string)
-                               }
-                             >
+                            <Select
+                              label="Deposit frequency"
+                              placeholder="Select an option"
+                              items={[
+                                { id: "weekly", label: "Weekly" },
+                                { id: "bi-weekly", label: "Bi-weekly" },
+                                { id: "monthly", label: "Monthly" },
+                                { id: "quarterly", label: "Quarterly" },
+                                { id: "annually", label: "Annually" },
+                              ]}
+                              className="w-full"
+                              defaultSelectedKey={mapApiValueToSelectKey(
+                                depositFrequency,
+                                [
+                                  { id: "weekly", label: "Weekly" },
+                                  { id: "bi-weekly", label: "Bi-weekly" },
+                                  { id: "monthly", label: "Monthly" },
+                                  { id: "quarterly", label: "Quarterly" },
+                                  { id: "annually", label: "Annually" },
+                                ]
+                              )}
+                              onSelectionChange={(key) =>
+                                setDepositFrequency(key as string)
+                              }
+                            >
                               {(item) => (
                                 <Select.Item key={item.id} id={item.id}>
                                   {item.label}
@@ -1360,7 +1411,7 @@ export default function ProfileBeneficiaryScreen() {
                               placeholder="Enter bank name"
                               value={customerBank}
                               onChange={(e) => setCustomerBank(e.target.value)}
-                              required
+                              isRequired
                             />
                           </div>
 
@@ -1370,40 +1421,46 @@ export default function ProfileBeneficiaryScreen() {
                               placeholder="Enter account number"
                               value={ibanAccount}
                               onChange={(e) => setIbanAccount(e.target.value)}
-                              required
+                              isRequired
                             />
                           </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                             <Select
-                               label="Source of funds"
-                               placeholder="Select an option"
-                               items={[
-                                 { id: "salary", label: "Salary" },
-                                 { id: "business", label: "Business Income" },
-                                 {
-                                   id: "investment",
-                                   label: "Investment Returns",
-                                 },
-                                 { id: "inheritance", label: "Inheritance" },
-                                 { id: "gift", label: "Gift" },
-                                 { id: "other", label: "Other" },
-                               ]}
-                               className="w-full"
-                               defaultSelectedKey={mapApiValueToSelectKey(fundSource, [
-                                 { id: "salary", label: "Salary" },
-                                 { id: "business", label: "Business Income" },
-                                 { id: "investment", label: "Investment Returns" },
-                                 { id: "inheritance", label: "Inheritance" },
-                                 { id: "gift", label: "Gift" },
-                                 { id: "other", label: "Other" },
-                               ])}
-                               onSelectionChange={(key) =>
-                                 setFundSource(key as string)
-                               }
-                             >
+                            <Select
+                              label="Source of funds"
+                              placeholder="Select an option"
+                              items={[
+                                { id: "salary", label: "Salary" },
+                                { id: "business", label: "Business Income" },
+                                {
+                                  id: "investment",
+                                  label: "Investment Returns",
+                                },
+                                { id: "inheritance", label: "Inheritance" },
+                                { id: "gift", label: "Gift" },
+                                { id: "other", label: "Other" },
+                              ]}
+                              className="w-full"
+                              defaultSelectedKey={mapApiValueToSelectKey(
+                                fundSource,
+                                [
+                                  { id: "salary", label: "Salary" },
+                                  { id: "business", label: "Business Income" },
+                                  {
+                                    id: "investment",
+                                    label: "Investment Returns",
+                                  },
+                                  { id: "inheritance", label: "Inheritance" },
+                                  { id: "gift", label: "Gift" },
+                                  { id: "other", label: "Other" },
+                                ]
+                              )}
+                              onSelectionChange={(key) =>
+                                setFundSource(key as string)
+                              }
+                            >
                               {(item) => (
                                 <Select.Item key={item.id} id={item.id}>
                                   {item.label}
@@ -1423,7 +1480,7 @@ export default function ProfileBeneficiaryScreen() {
                               onChange={(e) =>
                                 setPayDay(parseInt(e.target.value) || 1)
                               }
-                              required
+                              isRequired
                             />
                           </div>
                         </div>

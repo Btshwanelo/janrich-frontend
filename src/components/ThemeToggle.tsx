@@ -1,9 +1,9 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/untitled-button";
 import { Moon01, Sun } from "@untitledui/icons";
 import { useEffect, useState } from "react";
+import { Button } from "./base/buttons/button";
 
 export function ThemeToggle() {
     const { theme, setTheme } = useTheme();
@@ -17,7 +17,7 @@ export function ThemeToggle() {
     if (!mounted) {
         return (
             <Button
-                variant="tertiary"
+                color="tertiary"
                 size="sm"
                 aria-label="Toggle theme"
             >
@@ -28,9 +28,9 @@ export function ThemeToggle() {
 
     return (
         <Button
-            variant="tertiary"
+            color="tertiary"
             size="sm"
-            onPress={() => setTheme(theme === "light" ? "dark" : "light")}
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             aria-label="Toggle theme"
         >
             {theme === "light" ? <Moon01 className="w-4 h-4" /> : <Sun className="w-4 h-4" />}

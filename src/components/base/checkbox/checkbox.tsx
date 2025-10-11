@@ -17,9 +17,9 @@ export const CheckboxBase = ({ className, isSelected, isDisabled, isIndeterminat
     return (
         <div
             className={cx(
-                "flex size-4 shrink-0 cursor-pointer appearance-none items-center justify-center rounded bg-primary ring-1 ring-primary ring-inset",
+                "flex size-4 relative shrink-0 cursor-pointer appearance-none items-center justify-center rounded bg-primary ring-1 ring-primary ring-inset",
                 size === "md" && "size-5 rounded-md",
-                (isSelected || isIndeterminate) && "bg-[#155EEF] ring-[#155EEF]",
+                (isSelected || isIndeterminate) && "bg-brand-solid ring-bg-brand-solid",
                 isDisabled && "cursor-not-allowed bg-disabled_subtle ring-disabled",
                 isFocusVisible && "outline-2 outline-offset-2 outline-focus-ring",
                 className,
@@ -30,7 +30,7 @@ export const CheckboxBase = ({ className, isSelected, isDisabled, isIndeterminat
                 viewBox="0 0 14 14"
                 fill="none"
                 className={cx(
-                    "pointer-events-none absolute h-3 w-2.5 text-white opacity-0 transition-inherit-all",
+                    "pointer-events-none absolute h-3 w-2.5 text-fg-white opacity-0 transition-inherit-all",
                     size === "md" && "size-3.5",
                     isIndeterminate && "opacity-100",
                     isDisabled && "text-fg-disabled_subtle",
@@ -44,13 +44,13 @@ export const CheckboxBase = ({ className, isSelected, isDisabled, isIndeterminat
                 viewBox="0 0 14 14"
                 fill="none"
                 className={cx(
-                    "pointer-events-none absolute size-3 text-white opacity-0 transition-inherit-all",
+                    "pointer-events-none absolute size-3 text-fg-white opacity-0 transition-inherit-all",
                     size === "md" && "size-3.5",
                     isSelected && !isIndeterminate && "opacity-100",
                     isDisabled && "text-fg-disabled_subtle",
                 )}
             >
-                <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
         </div>
     );

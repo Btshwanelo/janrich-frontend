@@ -205,11 +205,14 @@ const Onboarding = () => {
                       label="What do we call you?"
                       placeholder="Select an option"
                       size="md"
+                      isRequired
                       selectedKey={values.whatToCallYou}
                       onSelectionChange={(key) =>
                         setFieldValue("whatToCallYou", key)
                       }
-                      isInvalid={!!(errors.whatToCallYou && touched.whatToCallYou)}
+                      isInvalid={
+                        !!(errors.whatToCallYou && touched.whatToCallYou)
+                      }
                     >
                       <Select.Item id="mr">Mr</Select.Item>
                       <Select.Item id="mrs">Mrs</Select.Item>
@@ -218,14 +221,16 @@ const Onboarding = () => {
                       <Select.Item id="prof">Prof</Select.Item>
                     </Select>
                     {errors.whatToCallYou && touched.whatToCallYou && (
-                      <p className="text-error-500 text-sm mt-1">{String(errors.whatToCallYou)}</p>
+                      <p className="text-error-500 text-sm mt-1">
+                        {String(errors.whatToCallYou)}
+                      </p>
                     )}
                   </div>
 
                   {/* Birthdate and Gender */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-gray-700 mb-1 block">
+                      <label className="text-sm font-medium text-gray-700 block">
                         Birthdate <span className="text-error-500">*</span>
                       </label>
                       <DatePicker
@@ -233,10 +238,17 @@ const Onboarding = () => {
                         onChange={(date) => setFieldValue("birthdate", date)}
                         onApply={() => setOpen(false)}
                         onCancel={() => setOpen(false)}
-                        className={'py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 ' + (errors.birthdate && touched.birthdate ? 'border-error-500' : 'border-gray-300')    }
+                        className={
+                          "py-[0.4rem] w-full focus:outline-none focus:ring-2 focus:ring-primary-500 " +
+                          (errors.birthdate && touched.birthdate
+                            ? "border-error-500"
+                            : "border-gray-300")
+                        }
                       />
                       {errors.birthdate && touched.birthdate && (
-                        <p className="text-error-500 text-sm mt-1">{String(errors.birthdate)}</p>
+                        <p className="text-error-500 text-sm mt-1">
+                          {String(errors.birthdate)}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -244,17 +256,24 @@ const Onboarding = () => {
                         label="Gender"
                         placeholder="Select gender"
                         size="md"
+                        isRequired
                         selectedKey={values.gender}
-                        onSelectionChange={(key) => setFieldValue("gender", key)}
+                        onSelectionChange={(key) =>
+                          setFieldValue("gender", key)
+                        }
                         isInvalid={!!(errors.gender && touched.gender)}
                       >
                         <Select.Item id="male">Male</Select.Item>
                         <Select.Item id="female">Female</Select.Item>
                         <Select.Item id="non-binary">Non-binary</Select.Item>
-                        <Select.Item id="prefer-not-to-say">Prefer not to say</Select.Item>
+                        <Select.Item id="prefer-not-to-say">
+                          Prefer not to say
+                        </Select.Item>
                       </Select>
                       {errors.gender && touched.gender && (
-                        <p className="text-error-500 text-sm mt-1">{String(errors.gender)}</p>
+                        <p className="text-error-500 text-sm mt-1">
+                          {String(errors.gender)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -265,8 +284,11 @@ const Onboarding = () => {
                       label="Nationality"
                       placeholder="Select nationality"
                       size="md"
+                      isRequired
                       selectedKey={values.nationality}
-                      onSelectionChange={(key) => setFieldValue("nationality", key)}
+                      onSelectionChange={(key) =>
+                        setFieldValue("nationality", key)
+                      }
                       isInvalid={!!(errors.nationality && touched.nationality)}
                     >
                       <Select.Item id="South Africa">South African</Select.Item>
@@ -277,7 +299,9 @@ const Onboarding = () => {
                       <Select.Item id="other">Other</Select.Item>
                     </Select>
                     {errors.nationality && touched.nationality && (
-                      <p className="text-error-500 text-sm mt-1">{String(errors.nationality)}</p>
+                      <p className="text-error-500 text-sm mt-1">
+                        {String(errors.nationality)}
+                      </p>
                     )}
                   </div>
 
@@ -287,20 +311,35 @@ const Onboarding = () => {
                       label="Country of Residence"
                       placeholder="Select country"
                       size="md"
+                      isRequired
                       selectedKey={values.countryOfResidence}
-                      onSelectionChange={(key) => setFieldValue("countryOfResidence", key)}
-                      isInvalid={!!(errors.countryOfResidence && touched.countryOfResidence)}
+                      onSelectionChange={(key) =>
+                        setFieldValue("countryOfResidence", key)
+                      }
+                      isInvalid={
+                        !!(
+                          errors.countryOfResidence &&
+                          touched.countryOfResidence
+                        )
+                      }
                     >
                       <Select.Item id="South Africa">South Africa</Select.Item>
-                      <Select.Item id="united-states">United States</Select.Item>
-                      <Select.Item id="united-kingdom">United Kingdom</Select.Item>
+                      <Select.Item id="united-states">
+                        United States
+                      </Select.Item>
+                      <Select.Item id="united-kingdom">
+                        United Kingdom
+                      </Select.Item>
                       <Select.Item id="canada">Canada</Select.Item>
                       <Select.Item id="australia">Australia</Select.Item>
                       <Select.Item id="other">Other</Select.Item>
                     </Select>
-                    {errors.countryOfResidence && touched.countryOfResidence && (
-                      <p className="text-error-500 text-sm mt-1">{String(errors.countryOfResidence)}</p>
-                    )}
+                    {errors.countryOfResidence &&
+                      touched.countryOfResidence && (
+                        <p className="text-error-500 text-sm mt-1">
+                          {String(errors.countryOfResidence)}
+                        </p>
+                      )}
                   </div>
 
                   {/* Race */}
@@ -309,6 +348,7 @@ const Onboarding = () => {
                       label="Race"
                       placeholder="Select race"
                       size="md"
+                      isRequired
                       selectedKey={values.race}
                       onSelectionChange={(key) => setFieldValue("race", key)}
                       isInvalid={!!(errors.race && touched.race)}
@@ -321,7 +361,9 @@ const Onboarding = () => {
                       <Select.Item id="Other">Other</Select.Item>
                     </Select>
                     {errors.race && touched.race && (
-                      <p className="text-error-500 text-sm mt-1">{String(errors.race)}</p>
+                      <p className="text-error-500 text-sm mt-1">
+                        {String(errors.race)}
+                      </p>
                     )}
                   </div>
 
@@ -407,7 +449,7 @@ const Onboarding = () => {
                   <Button
                     type="submit"
                     color="primary"
-                    size="lg"
+                    size="md"
                     className="w-full mt-6"
                     isDisabled={isSubmitting || isLoading}
                     isLoading={isSubmitting || isLoading}
@@ -441,7 +483,7 @@ const Onboarding = () => {
               Already have an account?{" "}
               <a
                 href="/login"
-                className="text-primary-500 hover:text-primary-600 font-medium"
+                className="text-[#E31B54] hover:text-primary-600 font-medium"
               >
                 Log in
               </a>

@@ -2,9 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
-import { Input } from "@/components/ui/untitled-input";
 import { Label } from "@/components/base/input/label";
-import { Checkbox } from "@/components/ui/untitled-checkbox";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
@@ -18,6 +16,8 @@ import {
 import { useRouter } from "next/navigation";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 import AuthLayout from "@/components/layouts/AuthLayout";
+import { Checkbox } from "@/components/base/checkbox/checkbox";
+import { Input } from "@/components/base/input/input";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -291,7 +291,6 @@ const LoginScreen = () => {
                         onChange={(isSelected) =>
                           setFieldValue("rememberMe", isSelected)
                         }
-                        className="data-[selected]:bg-primary-500 data-[selected]:border-primary-500"
                       />
                     )}
                   </Field>
@@ -319,7 +318,7 @@ const LoginScreen = () => {
               <Button
                 type="submit"
                 color="primary"
-                size="lg"
+                size="md"
                 className="w-full"
                 isDisabled={isLoading || isLoginLoading}
                 isLoading={isLoading || isLoginLoading}
@@ -333,7 +332,7 @@ const LoginScreen = () => {
                   Don't have an account?{" "}
                   <a
                     href="/register"
-                    className="text-primary-500 hover:text-primary-600 font-medium"
+                    className="text-[#E31B54] hover:text-primary-600 font-medium"
                   >
                     Sign up
                   </a>

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { X, Edit, Check, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/untitled-button";
-import { Input } from "@/components/ui/untitled-input";
 import { Label } from "@/components/base/input/label";
 import { Select } from "@/components/base/select/select";
+import { Button } from "./base/buttons/button";
+import { Input } from "./base/input/input";
 
 const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [formData, setFormData] = useState({
@@ -223,7 +223,7 @@ const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
           <div className="flex gap-3 mt-8">
             <Button
               onClick={handleSaveDraft}
-              variant="secondary"
+              color="secondary"
               className="flex-1 flex items-center justify-center gap-2"
             >
               <svg

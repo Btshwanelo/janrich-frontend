@@ -165,7 +165,7 @@ export default function SavingsGoalModal({
             <Button
               onClick={handleSubmit}
               color="primary"
-              size="lg"
+              size="md"
               className="w-full"
               disabled={isSaving || isUpdatingGoal}
               isLoading={isSaving || isUpdatingGoal}

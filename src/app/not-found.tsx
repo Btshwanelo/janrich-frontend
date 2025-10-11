@@ -1,6 +1,6 @@
 "use client";
+import { Button } from "@/components/base/buttons/button";
 import React from "react";
-import { Button } from "@/components/ui/untitled-button";
 
 const PageNotFound = () => {
   const handleGoHome = () => {

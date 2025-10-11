@@ -57,7 +57,7 @@ const PaymentErrorPage = () => {
           {/* Action Button */}
           <Button
             color="primary"
-            size="lg"
+            size="md"
             onClick={handleTryAgain}
             className=""
           >

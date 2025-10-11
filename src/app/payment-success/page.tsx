@@ -57,7 +57,7 @@ const PaymentSuccessPage = () => {
           {/* Action Button */}
           <Button
             color="primary"
-            size="lg"
+            size="md"
             onClick={handleAccessAccount}
             className=""
           >

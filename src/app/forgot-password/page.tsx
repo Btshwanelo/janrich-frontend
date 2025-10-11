@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 import AuthLayout from "@/components/layouts/AuthLayout";
 import { Button } from "@/components/base/buttons/button";
-import { Input } from "@/components/ui/untitled-input";
+import { Input } from "@/components/base/input/input";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -121,7 +121,7 @@ const ForgotPasswordScreen = () => {
                 <Button
                   onClick={handleBackToLogin}
                   color="secondary"
-                  size="lg"
+                  size="md"
                   className="w-full"
                 >
                   Back to Login
@@ -240,7 +240,7 @@ const ForgotPasswordScreen = () => {
                     <Button
                       type="submit"
                       color="primary"
-                      size="lg"
+                      size="md"
                       className="w-full"
                       disabled={!isValid || isSubmitting || !values.email}
                     >
