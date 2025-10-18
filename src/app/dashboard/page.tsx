@@ -46,7 +46,7 @@ import PublicRouteGuard from "@/components/PublicRouteGuard";
 import SavingsGoalModal from "@/components/SavingsGoalModal";
 import SidebarWrapper from "@/components/SidebarWrapper";
 import MobileTopNav from "@/components/MobileTopNav";
-import { PaginationCardDefault } from "@/components/application/pagination/pagination";
+import { PaginationPageMinimalCenter } from "@/components/application/pagination/pagination";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("View all");
@@ -196,7 +196,7 @@ const Dashboard = () => {
       <div className="min-h-screen bg-white flex">
         {/* Mobile Top Navigation */}
         <MobileTopNav />
-        
+
         {/* Left Sidebar */}
         <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
         <SavingsGoalModal
@@ -243,7 +243,9 @@ const Dashboard = () => {
                   className="gap-2 hidden sm:flex"
                   iconLeading={<ChartPie className="w-4 h-4 " />}
                 >
-                  <span className="hidden sm:inline">View Group Savings Dashboard</span>
+                  <span className="hidden sm:inline">
+                    View Group Savings Dashboard
+                  </span>
                   <span className="sm:hidden">Group Dashboard</span>
                 </Button>
               </div>
@@ -312,7 +314,9 @@ const Dashboard = () => {
                     </div>
                   </div>
 
-                  <div className="text-sm text-gray-500 justify-center align-middle items-center flex mb-4 px-4">Month</div>
+                  <div className="text-sm text-gray-500 justify-center align-middle items-center flex mb-4 px-4">
+                    Month
+                  </div>
 
                   <div className="flex justify-end pt-4 border-t border-gray-100">
                     <Button
@@ -420,105 +424,104 @@ const Dashboard = () => {
             </div>
 
             {/* Transactions */}
-            <TableCard.Root className="shadow-sm bg-white">
+            <TableCard.Root className="max-w-[calc(100vw-2rem)] sm:max-w-full">
               <TableCard.Header
                 title="Transactions"
-                // badge="240 Transaction"
+                badge={`${transactions.length} Transaction${
+                  transactions.length !== 1 ? "s" : ""
+                }`}
                 description="Keep track of your transactions."
+                contentTrailing={
+                  currentTransactions.length > 0 && (
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <Input
+                          icon={Search}
+                          placeholder="Search"
+                          className="w-80"
+                          shortcut="⌘K"
+                        />
+                      </div>
+                      <Button
+                        color="secondary"
+                        size="md"
+                        iconTrailing={<Filter className="w-4 h-4" />}
+                      >
+                        <span>Filters</span>
+                      </Button>
+                    </div>
+                  )
+                }
               />
 
-              {/* Search and Filter Bar */}
-              {currentTransactions.length > 0 && (
-                <div className="flex flex-row items-stretch sm:items-center justify-end gap-3 px-4 sm:px-6 py-4 bg-white border-b border-gray-200">
-                  <div className="relative flex-1 sm:flex-none">
-                    <Input
-                      icon={Search}
-                      placeholder="Search"
-                      className="w-full sm:w-80"
-                      shortcut="⌘K"
-                    />
-                  </div>
-                  <Button
-                    color="secondary"
-                    size="md"
-                    iconTrailing={<Filter className="w-4 h-4" />}
+              <Table
+                aria-label="Transactions"
+                selectionMode="multiple"
+                sortDescriptor={undefined}
+                onSortChange={() => {}}
+              >
+                <Table.Header>
+                  <Table.Head
+                    id="reference"
+                    label="Reference"
+                    isRowHeader
                     className=""
-                  >
-                    <span>Filters</span>
-                  </Button>
-                </div>
-              )}
+                  />
+                  <Table.Head id="date" label="Date" />
+                  <Table.Head id="status" label="Status" />
+                  <Table.Head id="amount" label="Amount" />
+                  <Table.Head id="purchase" label="Purchase" className="" />
+                </Table.Header>
 
-              {/* Responsive Table Container */}
-              <div className="overflow-x-auto">
-                <Table
-                  selectionMode="multiple"
-                  selectionBehavior="toggle"
-                  size="sm"
-                  className="border-0"
-                >
-                {currentTransactions.length > 0 && (
-                  <Table.Header columns={columns} className="bg-gray-50">
-                    {(column) => (
-                      <Table.Head
-                        id={column.key}
-                        isRowHeader={column.key === "reference"}
-                        label={column.label}
-                        className="bg-gray-50 text-xs font-medium text-gray-600"
-                      />
-                    )}
-                  </Table.Header>
-                )}
-                <Table.Body>
-                  {currentTransactions.length > 0 &&
-                    currentTransactions.map((item) => (
-                      <Table.Row key={item.id} columns={columns}>
-                        <Table.Cell>
-                          <span className="font-medium text-sm text-gray-900">
-                            {item.id}
+                <Table.Body items={currentTransactions}>
+                  {(item) => (
+                    <Table.Row id={item.id}>
+                      <Table.Cell>
+                        <span className="font-medium text-sm text-gray-900">
+                          {item.id}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span className="text-sm text-gray-600">
+                          {item.date}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                            item.status === "Paid"
+                              ? "bg-green-50 text-green-700 border border-green-200"
+                              : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                          }`}
+                        >
+                          <span className="text-base leading-none">
+                            {item.status === "Paid" ? "✓" : "⏳"}
                           </span>
-                        </Table.Cell>
-                        <Table.Cell>
-                          <span className="text-sm inline-flex text-gray-600">
-                            {item.date}
-                          </span>
-                        </Table.Cell>
-                        <Table.Cell>
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                              item.status === "Paid"
-                                ? "bg-green-50 text-green-700 border border-green-200"
-                                : "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                            }`}
-                          >
-                            <span className="text-base leading-none">
-                              {item.status === "Paid" ? "✓" : "⏳"}
-                            </span>
-                            {item.status}
-                          </span>
-                        </Table.Cell>
-                        <Table.Cell>
-                          <span className="font-medium text-sm text-gray-900">
-                            {item.amount}
-                          </span>
-                        </Table.Cell>
-                        <Table.Cell>
-                          <span className="text-sm text-gray-600">
-                            {item.type}
-                          </span>
-                        </Table.Cell>
-                      </Table.Row>
-                    ))}
+                          {item.status}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span className="font-medium text-sm text-gray-900">
+                          {item.amount}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell className="">
+                        <span className="text-sm text-gray-600">
+                          {item.type}
+                        </span>
+                      </Table.Cell>
+                    </Table.Row>
+                  )}
                 </Table.Body>
-                </Table>
-              </div>
+              </Table>
 
               {/* Pagination */}
               {transactions.length > itemsPerPage && (
-                <PaginationCardDefault
+                <PaginationPageMinimalCenter
                   page={currentPage}
                   total={totalPages}
                   onPageChange={handlePageChange}
+                  className="px-4 py-3 md:px-6 md:pt-3 md:pb-4"
                 />
               )}
 
