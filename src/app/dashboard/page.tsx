@@ -280,21 +280,21 @@ const Dashboard = () => {
                 <CardContent>
                   {/* Circular Progress */}
                   <div className="flex items-center justify-center mb-6">
-                    <div className="relativeh-48 flex items-center justify-center">
+                    <div className="relative h-48 flex items-center justify-center">
                       {/* Background circle */}
                       <img
-                        src={"/goal.svg"}
+                        src={"/Background.svg"}
                         alt="Circle Background"
                         className="h-48"
                       />
-                      {/* <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <div className="text-sm text-gray-600 mb-1">
+                      <div className="absolute inset-0 flex top-14 flex-col items-center justify-center">
+                        <div className="text-3xl font-semibold text-[#535862] mb-1">
                           Savings goal
                         </div>
-                        <div className="text-4xl font-semibold text-gray-900">
+                        <div className="text-3xl font-semibold text-[#181D27]">
                           40%
                         </div>
-                      </div> */}
+                      </div>
                     </div>
                   </div>
 
