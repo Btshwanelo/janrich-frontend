@@ -46,6 +46,7 @@ import PublicRouteGuard from "@/components/PublicRouteGuard";
 import SavingsGoalModal from "@/components/SavingsGoalModal";
 import SidebarWrapper from "@/components/SidebarWrapper";
 import MobileTopNav from "@/components/MobileTopNav";
+import { PaginationCardDefault } from "@/components/application/pagination/pagination";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("View all");
@@ -53,6 +54,8 @@ const Dashboard = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [hasUserDismissedModal, setHasUserDismissedModal] = useState(false);
   const [savingsProgress, setSavingsProgress] = useState(40); // Dynamic percentage
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = React.useState(true);
 
@@ -105,21 +108,66 @@ const Dashboard = () => {
       amount: "R 0.90",
       type: "Savings Deposit",
     },
-    // {
-    //   id: "JR0002",
-    //   date: "Jan 5, 2025",
-    //   status: "Pending",
-    //   amount: "R 2500.00",
-    //   type: "Investment",
-    // },
-    // {
-    //   id: "JR0003",
-    //   date: "Jan 4, 2025",
-    //   status: "Paid",
-    //   amount: "R 1800.50",
-    //   type: "Savings Deposit",
-    // },
+    {
+      id: "JR0002",
+      date: "Jan 5, 2025",
+      status: "Pending",
+      amount: "R 2500.00",
+      type: "Investment",
+    },
+    {
+      id: "JR0003",
+      date: "Jan 4, 2025",
+      status: "Paid",
+      amount: "R 1800.50",
+      type: "Savings Deposit",
+    },
+    {
+      id: "JR0004",
+      date: "Jan 3, 2025",
+      status: "Paid",
+      amount: "R 1200.00",
+      type: "Savings Deposit",
+    },
+    {
+      id: "JR0005",
+      date: "Jan 2, 2025",
+      status: "Pending",
+      amount: "R 500.00",
+      type: "Investment",
+    },
+    {
+      id: "JR0006",
+      date: "Jan 1, 2025",
+      status: "Paid",
+      amount: "R 750.25",
+      type: "Savings Deposit",
+    },
+    {
+      id: "JR0007",
+      date: "Dec 31, 2024",
+      status: "Paid",
+      amount: "R 3000.00",
+      type: "Investment",
+    },
+    {
+      id: "JR0008",
+      date: "Dec 30, 2024",
+      status: "Paid",
+      amount: "R 150.75",
+      type: "Savings Deposit",
+    },
   ];
+
+  // Pagination logic
+  const totalPages = Math.ceil(transactions.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentTransactions = transactions.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const columns = [
     { key: "reference", label: "Reference" },
@@ -380,8 +428,8 @@ const Dashboard = () => {
               />
 
               {/* Search and Filter Bar */}
-              {transactions.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 px-4 sm:px-6 py-4 bg-white border-b border-gray-200">
+              {currentTransactions.length > 0 && (
+                <div className="flex flex-row items-stretch sm:items-center justify-end gap-3 px-4 sm:px-6 py-4 bg-white border-b border-gray-200">
                   <div className="relative flex-1 sm:flex-none">
                     <Input
                       icon={Search}
@@ -394,20 +442,22 @@ const Dashboard = () => {
                     color="secondary"
                     size="md"
                     iconTrailing={<Filter className="w-4 h-4" />}
-                    className="w-full sm:w-auto"
+                    className=""
                   >
                     <span>Filters</span>
                   </Button>
                 </div>
               )}
 
-              <Table
-                selectionMode="multiple"
-                selectionBehavior="toggle"
-                size="sm"
-                className="border-0"
-              >
-                {transactions.length > 0 && (
+              {/* Responsive Table Container */}
+              <div className="overflow-x-auto">
+                <Table
+                  selectionMode="multiple"
+                  selectionBehavior="toggle"
+                  size="sm"
+                  className="border-0"
+                >
+                {currentTransactions.length > 0 && (
                   <Table.Header columns={columns} className="bg-gray-50">
                     {(column) => (
                       <Table.Head
@@ -420,8 +470,8 @@ const Dashboard = () => {
                   </Table.Header>
                 )}
                 <Table.Body>
-                  {transactions.length > 0 &&
-                    transactions.map((item) => (
+                  {currentTransactions.length > 0 &&
+                    currentTransactions.map((item) => (
                       <Table.Row key={item.id} columns={columns}>
                         <Table.Cell>
                           <span className="font-medium text-sm text-gray-900">
@@ -429,7 +479,7 @@ const Dashboard = () => {
                           </span>
                         </Table.Cell>
                         <Table.Cell>
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm inline-flex text-gray-600">
                             {item.date}
                           </span>
                         </Table.Cell>
@@ -460,7 +510,18 @@ const Dashboard = () => {
                       </Table.Row>
                     ))}
                 </Table.Body>
-              </Table>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {transactions.length > itemsPerPage && (
+                <PaginationCardDefault
+                  page={currentPage}
+                  total={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              )}
+
               {transactions.length == 0 && (
                 <EmptyState size="md" className="py-16">
                   <EmptyState.Header pattern="none">
