@@ -15,7 +15,7 @@ import {
   LogOut,
   Menu,
   X,
-  FileText,
+  PiggyBank,
 } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
@@ -27,6 +27,8 @@ import {
   CardTitle,
 } from "@/components/ui/untitled-card";
 import { Table, TableCard } from "@/components/application/table/table";
+import { EmptyState } from "@/components/application/empty-state/empty-state";
+import { Download01, File01 } from "@untitledui/icons";
 import ProfileModal from "@/components/ProfileModal";
 import AuthGuard from "@/components/AuthGuard";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
@@ -50,7 +52,7 @@ const Dashboard = () => {
 
   const router = useRouter();
   const { user, fullName, customer } = useAppSelector((state) => state.auth);
-  const { data, refetch } = useGetProfileQuery(customer);
+  const { data, refetch } = useGetProfileQuery(customer || "");
 
   useEffect(() => {
     // Check if savings goal hasn't been set (0, null, undefined, or missing)
@@ -83,28 +85,29 @@ const Dashboard = () => {
     type: string;
   }
 
+  // For testing empty state, you can temporarily set this to an empty array: []
   const transactions: Transaction[] = [
-    {
-      id: "JR0001",
-      date: "Jan 6, 2025",
-      status: "Paid",
-      amount: "R 3500.90",
-      type: "Savings Deposit",
-    },
-    {
-      id: "JR0002",
-      date: "Jan 5, 2025",
-      status: "Pending",
-      amount: "R 2500.00",
-      type: "Investment",
-    },
-    {
-      id: "JR0003",
-      date: "Jan 4, 2025",
-      status: "Paid",
-      amount: "R 1800.50",
-      type: "Savings Deposit",
-    },
+    // {
+    //   id: "JR0001",
+    //   date: "Jan 6, 2025",
+    //   status: "Paid",
+    //   amount: "R 3500.90",
+    //   type: "Savings Deposit",
+    // },
+    // {
+    //   id: "JR0002",
+    //   date: "Jan 5, 2025",
+    //   status: "Pending",
+    //   amount: "R 2500.00",
+    //   type: "Investment",
+    // },
+    // {
+    //   id: "JR0003",
+    //   date: "Jan 4, 2025",
+    //   status: "Paid",
+    //   amount: "R 1800.50",
+    //   type: "Savings Deposit",
+    // },
   ];
 
   const columns = [
@@ -178,7 +181,7 @@ const Dashboard = () => {
                   color="secondary"
                   size="md"
                   className="gap-2"
-                  iconLeading={<FileText data-icon />}
+                  iconLeading={<Download01 className="w-4 h-4" />}
                 >
                   <span>Export</span>
                 </Button>
@@ -244,7 +247,6 @@ const Dashboard = () => {
                         </span>
                       </div>
                     ))}
-                    
                   </div>
 
                   <div className="text-sm text-gray-500 mb-4 px-4">Month</div>
@@ -254,7 +256,7 @@ const Dashboard = () => {
                       color="secondary"
                       size="md"
                       className="gap-2"
-                      iconLeading={<FileText data-icon />}
+                      iconLeading={<File01 className="w-4 h-4" />}
                     >
                       <span>Get statement</span>
                     </Button>
@@ -279,7 +281,11 @@ const Dashboard = () => {
                   <div className="flex items-center justify-center mb-6">
                     <div className="relativeh-48 flex items-center justify-center">
                       {/* Background circle */}
-                      <img src={'/goal.svg'} alt="Circle Background" className="h-48" />
+                      <img
+                        src={"/goal.svg"}
+                        alt="Circle Background"
+                        className="h-48"
+                      />
                       {/* <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <div className="text-sm text-gray-600 mb-1">
                           Savings goal
@@ -306,7 +312,7 @@ const Dashboard = () => {
                       color="secondary"
                       size="md"
                       className="justify-center"
-                      iconLeading={<Zap data-icon />} 
+                      iconLeading={<Zap data-icon />}
                     >
                       <span>Beat the first deposit slump</span>
                     </Button>
@@ -316,31 +322,33 @@ const Dashboard = () => {
             </div>
 
             {/* Transactions */}
-            <TableCard.Root className="shadow-sm">
+            <TableCard.Root className="shadow-sm bg-white">
               <TableCard.Header
                 title="Transactions"
-                badge="240 Transaction"
+                // badge="240 Transaction"
                 description="Keep track of your transactions."
               />
 
               {/* Search and Filter Bar */}
-              <div className="flex items-center justify-end gap-3 px-6 py-4 bg-white border-b border-gray-200">
-                <div className="relative">
-                  <Input
-                    icon={Search}
-                    placeholder="Search"
-                    className="w-80"
-                    shortcut="⌘K"
-                  />
+              {transactions.length > 0 && (
+                <div className="flex items-center justify-end gap-3 px-6 py-4 bg-white border-b border-gray-200">
+                  <div className="relative">
+                    <Input
+                      icon={Search}
+                      placeholder="Search"
+                      className="w-80"
+                      shortcut="⌘K"
+                    />
+                  </div>
+                  <Button
+                    color="secondary"
+                    size="md"
+                    iconTrailing={<Filter className="w-4 h-4" />}
+                  >
+                    <span>Filters</span>
+                  </Button>
                 </div>
-                <Button
-                  color="secondary"
-                  size="md"
-                  iconTrailing={<Filter className="w-4 h-4" />}
-                >
-                  <span>Filters</span>
-                </Button>
-              </div>
+              )}
 
               <Table
                 selectionMode="multiple"
@@ -348,57 +356,93 @@ const Dashboard = () => {
                 size="sm"
                 className="border-0"
               >
-                <Table.Header columns={columns} className="bg-gray-50">
-                  {(column) => (
-                    <Table.Head
-                      id={column.key}
-                      isRowHeader={column.key === "reference"}
-                      label={column.label}
-                      className="bg-gray-50 text-xs font-medium text-gray-600"
-                    />
-                  )}
-                </Table.Header>
+                {transactions.length > 0 && (
+                  <Table.Header columns={columns} className="bg-gray-50">
+                    {(column) => (
+                      <Table.Head
+                        id={column.key}
+                        isRowHeader={column.key === "reference"}
+                        label={column.label}
+                        className="bg-gray-50 text-xs font-medium text-gray-600"
+                      />
+                    )}
+                  </Table.Header>
+                )}
                 <Table.Body>
-                  {transactions.map((item) => (
-                    <Table.Row key={item.id} columns={columns}>
-                      <Table.Cell>
-                        <span className="font-medium text-sm text-gray-900">
-                          {item.id}
-                        </span>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <span className="text-sm text-gray-600">
-                          {item.date}
-                        </span>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                            item.status === "Paid"
-                              ? "bg-green-50 text-green-700 border border-green-200"
-                              : "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                          }`}
-                        >
-                          <span className="text-base leading-none">
-                            {item.status === "Paid" ? "✓" : "⏳"}
+                  {transactions.length > 0 &&
+                    transactions.map((item) => (
+                      <Table.Row key={item.id} columns={columns}>
+                        <Table.Cell>
+                          <span className="font-medium text-sm text-gray-900">
+                            {item.id}
                           </span>
-                          {item.status}
-                        </span>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <span className="font-medium text-sm text-gray-900">
-                          {item.amount}
-                        </span>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <span className="text-sm text-gray-600">
-                          {item.type}
-                        </span>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
+                        </Table.Cell>
+                        <Table.Cell>
+                          <span className="text-sm text-gray-600">
+                            {item.date}
+                          </span>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                              item.status === "Paid"
+                                ? "bg-green-50 text-green-700 border border-green-200"
+                                : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                            }`}
+                          >
+                            <span className="text-base leading-none">
+                              {item.status === "Paid" ? "✓" : "⏳"}
+                            </span>
+                            {item.status}
+                          </span>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <span className="font-medium text-sm text-gray-900">
+                            {item.amount}
+                          </span>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <span className="text-sm text-gray-600">
+                            {item.type}
+                          </span>
+                        </Table.Cell>
+                      </Table.Row>
+                    ))}
                 </Table.Body>
               </Table>
+              {transactions.length == 0 && (
+                <EmptyState size="md" className="py-16">
+                  <EmptyState.Header pattern="none">
+                    <div
+                      className="flex items-center 
+                    "
+                    >
+                      <img
+                        src="Illustration.svg"
+                        alt="No Transactions"
+                        className="w-[152px] h-[118px]"
+                      />
+                    </div>
+                  </EmptyState.Header>
+                  <EmptyState.Content>
+                    <EmptyState.Title>
+                      First step to a million is R100
+                    </EmptyState.Title>
+                    <EmptyState.Description>
+                      Take the first step and make a deposit.
+                    </EmptyState.Description>
+                  </EmptyState.Content>
+                  <EmptyState.Footer>
+                    <Button
+                      color="primary"
+                      size="md"
+                      iconLeading={<PiggyBank />}
+                    >
+                      Pay yourself first
+                    </Button>
+                  </EmptyState.Footer>
+                </EmptyState>
+              )}
             </TableCard.Root>
           </main>
         </div>
