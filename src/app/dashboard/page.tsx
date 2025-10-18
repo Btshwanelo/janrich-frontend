@@ -438,7 +438,7 @@ const Dashboard = () => {
                         <Input
                           icon={Search}
                           placeholder="Search"
-                          className="w-80"
+                          className=""
                           shortcut="⌘K"
                         />
                       </div>
