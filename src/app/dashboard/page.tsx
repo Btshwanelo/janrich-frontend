@@ -32,6 +32,7 @@ import {
 import { Table, TableCard } from "@/components/application/table/table";
 import { EmptyState } from "@/components/application/empty-state/empty-state";
 import { Download01, File01 } from "@untitledui/icons";
+import { CircularProgress } from "@/components/CircularProgress";
 import ProfileModal from "@/components/ProfileModal";
 import AuthGuard from "@/components/AuthGuard";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
@@ -50,6 +51,7 @@ const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [hasUserDismissedModal, setHasUserDismissedModal] = useState(false);
+  const [savingsProgress, setSavingsProgress] = useState(40); // Dynamic percentage
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = React.useState(true);
 
@@ -78,6 +80,11 @@ const Dashboard = () => {
     dispatch(clearCredentials());
     clearAuthCookie();
     router.push("/login");
+  };
+
+  // Function to update savings progress (you can connect this to real data)
+  const updateSavingsProgress = (newProgress: number) => {
+    setSavingsProgress(Math.min(100, Math.max(0, newProgress)));
   };
 
   interface Transaction {
@@ -164,7 +171,7 @@ const Dashboard = () => {
           {/* Header */}
           <header className="bg-white border-b border-gray-200 px-8 py-5">
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-semibold text-gray-900">
+              <h1 className="text-2xl font-semibold text-gray-900">
                 Welcome back,{" "}
                 {fullName ||
                   (typeof user === "string"
@@ -250,7 +257,7 @@ const Dashboard = () => {
                     ))}
                   </div>
 
-                  <div className="text-sm text-gray-500 mb-4 px-4">Month</div>
+                  <div className="text-sm text-gray-500 justify-center align-middle items-center flex mb-4 px-4">Month</div>
 
                   <div className="flex justify-end pt-4 border-t border-gray-100">
                     <Button
@@ -278,37 +285,72 @@ const Dashboard = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {/* Circular Progress */}
+                  {/* Dynamic Circular Progress */}
                   <div className="flex items-center justify-center mb-6">
-                    <div className="relative h-48 flex items-center justify-center">
-                      {/* Background circle */}
-                      <img
-                        src={"/Background.svg"}
-                        alt="Circle Background"
-                        className="h-48"
-                      />
-                      <div className="absolute inset-0 flex top-14 flex-col items-center justify-center">
+                    <CircularProgress
+                      percentage={savingsProgress}
+                      size={400}
+                      strokeWidth={16}
+                      className="h-64 w-full"
+                      color={
+                        savingsProgress >= 100
+                          ? "green"
+                          : savingsProgress >= 75
+                          ? "blue"
+                          : savingsProgress >= 50
+                          ? "yellow"
+                          : "red"
+                      }
+                    >
+                      <div className="flex flex-col items-center justify-center">
                         <div className="text-3xl font-semibold text-[#535862] mb-1">
                           Savings goal
                         </div>
                         <div className="text-3xl font-semibold text-[#181D27]">
-                          40%
+                          {savingsProgress}%
                         </div>
                       </div>
-                    </div>
+                    </CircularProgress>
                   </div>
 
                   <div className="mb-6 pb-6 border-b border-gray-200">
                     <h3 className="text-base font-semibold text-gray-900 mb-2">
-                      The best way to win is to keep going.
+                      {savingsProgress >= 100
+                        ? "Congratulations! You've reached your goal!"
+                        : "The best way to win is to keep going."}
                     </h3>
                     <p className="text-sm text-gray-600 leading-relaxed">
-                      You're 40% of the way there, you're more likely to meet
-                      your savings goal by December if you don't stop now.
+                      {savingsProgress >= 100
+                        ? "You've successfully achieved your savings target. Consider setting a new goal to continue your financial journey."
+                        : `You're ${savingsProgress}% of the way there, you're more likely to meet your savings goal by December if you don't stop now.`}
                     </p>
                   </div>
 
-                  <div className="justify-end flex">
+                  <div className="flex justify-between items-center">
+                    {/* Demo controls - remove these in production */}
+                    <div className="flex gap-2">
+                      <Button
+                        color="secondary"
+                        size="sm"
+                        onClick={() =>
+                          updateSavingsProgress(savingsProgress - 10)
+                        }
+                        disabled={savingsProgress <= 0}
+                      >
+                        -10%
+                      </Button>
+                      <Button
+                        color="secondary"
+                        size="sm"
+                        onClick={() =>
+                          updateSavingsProgress(savingsProgress + 10)
+                        }
+                        disabled={savingsProgress >= 100}
+                      >
+                        +10%
+                      </Button>
+                    </div>
+
                     <Button
                       color="secondary"
                       size="md"
