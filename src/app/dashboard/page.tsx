@@ -16,6 +16,9 @@ import {
   Menu,
   X,
   PiggyBank,
+  FileText,
+  ChartPie,
+  SearchCheck,
 } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
@@ -91,7 +94,7 @@ const Dashboard = () => {
     //   id: "JR0001",
     //   date: "Jan 6, 2025",
     //   status: "Paid",
-    //   amount: "R 3500.90",
+    //   amount: "R 0.90",
     //   type: "Savings Deposit",
     // },
     // {
@@ -119,18 +122,18 @@ const Dashboard = () => {
   ];
 
   const chartData = [
-    { month: "Jan", orange: 3000, blue: 3000, gray: 4000 },
-    { month: "Feb", orange: 3500, blue: 3500, gray: 3000 },
-    { month: "Mar", orange: 2500, blue: 2500, gray: 3500 },
-    { month: "Apr", orange: 3000, blue: 3000, gray: 2000 },
-    { month: "May", orange: 2800, blue: 2000, gray: 3000 },
-    { month: "Jun", orange: 3500, blue: 3000, gray: 2500 },
-    { month: "Jul", orange: 2700, blue: 2800, gray: 2800 },
-    { month: "Aug", orange: 3200, blue: 3300, gray: 3200 },
-    { month: "Sep", orange: 2900, blue: 2400, gray: 2600 },
-    { month: "Oct", orange: 2600, blue: 2200, gray: 2400 },
-    { month: "Nov", orange: 2400, blue: 2000, gray: 2200 },
-    { month: "Dec", orange: 2500, blue: 2300, gray: 2500 },
+    { month: "Jan", orange: 0, blue: 0, gray: 10000 },
+    { month: "Feb", orange: 0, blue: 0, gray: 0 },
+    { month: "Mar", orange: 0, blue: 0, gray: 0 },
+    { month: "Apr", orange: 0, blue: 0, gray: 0 },
+    { month: "May", orange: 0, blue: 0, gray: 0 },
+    { month: "Jun", orange: 0, blue: 0, gray: 0 },
+    { month: "Jul", orange: 0, blue: 0, gray: 0 },
+    { month: "Aug", orange: 0, blue: 0, gray: 0 },
+    { month: "Sep", orange: 0, blue: 0, gray: 0 },
+    { month: "Oct", orange: 0, blue: 0, gray: 0 },
+    { month: "Nov", orange: 0, blue: 0, gray: 0 },
+    { month: "Dec", orange: 0, blue: 0, gray: 0 },
   ];
   return (
     <AuthGuard>
@@ -170,20 +173,18 @@ const Dashboard = () => {
               </h1>
               <div className="flex items-center gap-3">
                 <Button
-                  color="secondary"
+                  color="link-gray"
                   size="md"
                   className="gap-2"
-                  iconLeading={<Settings data-icon />}
-                >
-                  <span>Customize</span>
-                </Button>
+                  iconLeading={<Search data-icon />}
+                ></Button>
                 <Button
                   color="secondary"
                   size="md"
                   className="gap-2"
-                  iconLeading={<Download01 className="w-4 h-4" />}
+                  iconLeading={<ChartPie className="w-4 h-4" />}
                 >
-                  <span>Export</span>
+                  <span>View Group Savings Dashboard</span>
                 </Button>
               </div>
             </div>
@@ -256,7 +257,7 @@ const Dashboard = () => {
                       color="secondary"
                       size="md"
                       className="gap-2"
-                      iconLeading={<File01 className="w-4 h-4" />}
+                      iconLeading={<FileText className="w-4 h-4" />}
                     >
                       <span>Get statement</span>
                     </Button>
@@ -312,7 +313,7 @@ const Dashboard = () => {
                       color="secondary"
                       size="md"
                       className="justify-center"
-                      iconLeading={<Zap data-icon />}
+                      // iconLeading={<Zap data-icon />}
                     >
                       <span>Beat the first deposit slump</span>
                     </Button>
