@@ -45,6 +45,7 @@ import { useRouter } from "next/navigation";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 import SavingsGoalModal from "@/components/SavingsGoalModal";
 import SidebarWrapper from "@/components/SidebarWrapper";
+import MobileTopNav from "@/components/MobileTopNav";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("View all");
@@ -97,13 +98,13 @@ const Dashboard = () => {
 
   // For testing empty state, you can temporarily set this to an empty array: []
   const transactions: Transaction[] = [
-    // {
-    //   id: "JR0001",
-    //   date: "Jan 6, 2025",
-    //   status: "Paid",
-    //   amount: "R 0.90",
-    //   type: "Savings Deposit",
-    // },
+    {
+      id: "JR0001",
+      date: "Jan 6, 2025",
+      status: "Paid",
+      amount: "R 0.90",
+      type: "Savings Deposit",
+    },
     // {
     //   id: "JR0002",
     //   date: "Jan 5, 2025",
@@ -145,6 +146,9 @@ const Dashboard = () => {
   return (
     <AuthGuard>
       <div className="min-h-screen bg-white flex">
+        {/* Mobile Top Navigation */}
+        <MobileTopNav />
+        
         {/* Left Sidebar */}
         <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
         <SavingsGoalModal
@@ -165,20 +169,20 @@ const Dashboard = () => {
         {/* Main Content */}
         <div
           className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
-            isSidebarCollapsed ? "ml-16" : "ml-64"
+            isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
           }`}
         >
           {/* Header */}
-          <header className="bg-white border-b border-gray-200 px-8 py-5">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-semibold text-gray-900">
+          <header className="bg-white border-b border-gray-200 px-4 lg:px-8 py-4 lg:py-5 mt-16 lg:mt-0">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <h1 className="text-base lg:text-2xl font-semibold text-gray-900">
                 Welcome back,{" "}
                 {fullName ||
                   (typeof user === "string"
                     ? user.split(" ")[0]
                     : (user as any)?.name?.split(" ")[0] || "Olivia")}
               </h1>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 lg:gap-3">
                 <Button
                   color="link-gray"
                   size="md"
@@ -188,17 +192,18 @@ const Dashboard = () => {
                 <Button
                   color="secondary"
                   size="md"
-                  className="gap-2"
-                  iconLeading={<ChartPie className="w-4 h-4" />}
+                  className="gap-2 hidden sm:flex"
+                  iconLeading={<ChartPie className="w-4 h-4 " />}
                 >
-                  <span>View Group Savings Dashboard</span>
+                  <span className="hidden sm:inline">View Group Savings Dashboard</span>
+                  <span className="sm:hidden">Group Dashboard</span>
                 </Button>
               </div>
             </div>
           </header>
 
           {/* Dashboard Content */}
-          <main className="flex-1 p-8 bg-gray-50">
+          <main className="flex-1 p-4 lg:p-8 bg-gray-50">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               {/* Savings Breakdown Chart */}
               <Card className="lg:col-span-2 shadow-sm">
@@ -219,42 +224,44 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent className="pt-6">
                   {/* Chart Area */}
-                  <div className="h-64 flex items-end justify-between gap-4 mb-6 px-4">
-                    {chartData.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex flex-col items-center flex-1"
-                      >
+                  <div className="overflow-x-auto">
+                    <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 mb-6 px-2 sm:px-4 min-w-[600px]">
+                      {chartData.map((item, index) => (
                         <div
-                          className="w-full flex flex-col items-center relative"
-                          style={{ height: "200px" }}
+                          key={index}
+                          className="flex flex-col items-center flex-1 min-w-[40px]"
                         >
-                          <div className="w-full flex flex-col justify-end items-center h-full gap-0.5">
-                            <div
-                              className="w-12 bg-gray-200 rounded-t"
-                              style={{
-                                height: `${(item.gray / 10000) * 200}px`,
-                              }}
-                            ></div>
-                            <div
-                              className="w-12 bg-blue-600 rounded-t"
-                              style={{
-                                height: `${(item.blue / 10000) * 200}px`,
-                              }}
-                            ></div>
-                            <div
-                              className="w-12 bg-orange-500"
-                              style={{
-                                height: `${(item.orange / 10000) * 200}px`,
-                              }}
-                            ></div>
+                          <div
+                            className="w-full flex flex-col items-center relative"
+                            style={{ height: "200px" }}
+                          >
+                            <div className="w-full flex flex-col justify-end items-center h-full gap-0.5">
+                              <div
+                                className="w-8 sm:w-12 bg-gray-200 rounded-t"
+                                style={{
+                                  height: `${(item.gray / 10000) * 200}px`,
+                                }}
+                              ></div>
+                              <div
+                                className="w-8 sm:w-12 bg-blue-600 rounded-t"
+                                style={{
+                                  height: `${(item.blue / 10000) * 200}px`,
+                                }}
+                              ></div>
+                              <div
+                                className="w-8 sm:w-12 bg-orange-500"
+                                style={{
+                                  height: `${(item.orange / 10000) * 200}px`,
+                                }}
+                              ></div>
+                            </div>
                           </div>
+                          <span className="text-xs text-gray-600 mt-3 font-medium">
+                            {item.month}
+                          </span>
                         </div>
-                        <span className="text-xs text-gray-600 mt-3 font-medium">
-                          {item.month}
-                        </span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
 
                   <div className="text-sm text-gray-500 justify-center align-middle items-center flex mb-4 px-4">Month</div>
@@ -328,7 +335,7 @@ const Dashboard = () => {
 
                   <div className="flex justify-between items-center">
                     {/* Demo controls - remove these in production */}
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                       <Button
                         color="secondary"
                         size="sm"
@@ -349,7 +356,7 @@ const Dashboard = () => {
                       >
                         +10%
                       </Button>
-                    </div>
+                    </div> */}
 
                     <Button
                       color="secondary"
@@ -374,12 +381,12 @@ const Dashboard = () => {
 
               {/* Search and Filter Bar */}
               {transactions.length > 0 && (
-                <div className="flex items-center justify-end gap-3 px-6 py-4 bg-white border-b border-gray-200">
-                  <div className="relative">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 px-4 sm:px-6 py-4 bg-white border-b border-gray-200">
+                  <div className="relative flex-1 sm:flex-none">
                     <Input
                       icon={Search}
                       placeholder="Search"
-                      className="w-80"
+                      className="w-full sm:w-80"
                       shortcut="⌘K"
                     />
                   </div>
@@ -387,6 +394,7 @@ const Dashboard = () => {
                     color="secondary"
                     size="md"
                     iconTrailing={<Filter className="w-4 h-4" />}
+                    className="w-full sm:w-auto"
                   >
                     <span>Filters</span>
                   </Button>
