@@ -138,7 +138,7 @@ export const PaginationPageMinimalCenter = ({ rounded, page = 1, total = 10, cla
             {...props}
             page={page}
             total={total}
-            className={cx("flex w-full items-center justify-between gap-3 border-t border-secondary pt-4 md:pt-5", className)}
+            className={cx("flex w-full items-center justify-between gap-3 pt-4 md:pt-5", className)}
         >
             <div className="flex flex-1 justify-start">
                 <Pagination.PrevTrigger asChild>

@@ -19,6 +19,7 @@ import {
   FileText,
   ChartPie,
   SearchCheck,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
@@ -47,6 +48,7 @@ import SavingsGoalModal from "@/components/SavingsGoalModal";
 import SidebarWrapper from "@/components/SidebarWrapper";
 import MobileTopNav from "@/components/MobileTopNav";
 import { PaginationPageMinimalCenter } from "@/components/application/pagination/pagination";
+import { Badge, BadgeWithDot, BadgeWithIcon } from "@/components/base/badges/badges";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("View all");
@@ -228,7 +230,7 @@ const Dashboard = () => {
                 {fullName ||
                   (typeof user === "string"
                     ? user.split(" ")[0]
-                    : (user as any)?.name?.split(" ")[0] || "Olivia")}
+                    : (user as any)?.name?.split(" ")[0])}
               </h1>
               <div className="flex items-center gap-2 lg:gap-3">
                 <Button
@@ -424,7 +426,7 @@ const Dashboard = () => {
             </div>
 
             {/* Transactions */}
-            <TableCard.Root className="max-w-[calc(100vw-2rem)] sm:max-w-full">
+            <TableCard.Root className="max-w-[calc(100vw-2rem)] bg-white sm:max-w-full">
               <TableCard.Header
                 title="Transactions"
                 badge={`${transactions.length} Transaction${
@@ -460,13 +462,8 @@ const Dashboard = () => {
                 sortDescriptor={undefined}
                 onSortChange={() => {}}
               >
-                <Table.Header>
-                  <Table.Head
-                    id="reference"
-                    label="Reference"
-                    isRowHeader
-                    className=""
-                  />
+                <Table.Header className="bg-gray-50">
+                  <Table.Head id="reference" label="Reference" isRowHeader />
                   <Table.Head id="date" label="Date" />
                   <Table.Head id="status" label="Status" />
                   <Table.Head id="amount" label="Amount" />
@@ -477,17 +474,17 @@ const Dashboard = () => {
                   {(item) => (
                     <Table.Row id={item.id}>
                       <Table.Cell>
-                        <span className="font-medium text-sm text-gray-900">
+                        <span className="font-medium text-sm text-[#181D27]">
                           {item.id}
                         </span>
                       </Table.Cell>
                       <Table.Cell>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-[#535862]">
                           {item.date}
                         </span>
                       </Table.Cell>
                       <Table.Cell>
-                        <span
+                        {/* <span
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                             item.status === "Paid"
                               ? "bg-green-50 text-green-700 border border-green-200"
@@ -498,15 +495,23 @@ const Dashboard = () => {
                             {item.status === "Paid" ? "✓" : "⏳"}
                           </span>
                           {item.status}
-                        </span>
+                        </span> */}
+                        <BadgeWithIcon
+                          type="pill-color"
+                          color="success"
+                          size="md"
+                          iconLeading={Check}
+                        >
+                          {item.status}
+                        </BadgeWithIcon>
                       </Table.Cell>
                       <Table.Cell>
-                        <span className="font-medium text-sm text-gray-900">
+                        <span className="font-medium text-sm text-[#535862]">
                           {item.amount}
                         </span>
                       </Table.Cell>
                       <Table.Cell className="">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-[#535862]">
                           {item.type}
                         </span>
                       </Table.Cell>
