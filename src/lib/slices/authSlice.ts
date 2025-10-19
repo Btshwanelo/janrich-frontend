@@ -197,6 +197,7 @@ export interface ProfileUpdateResponse {
     customer: string;
     message: string;
     age: number;
+    result: string
   };
 }
 

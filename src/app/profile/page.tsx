@@ -565,7 +565,7 @@ export default function ProfileBeneficiaryScreen() {
       const result = await updateProfile(profileData).unwrap();
       console.log("Profile updated successfully:", result);
 
-      if (result.message.ok) {
+      if (result.message.result === 'success') {
         showSuccessToast(
           "Profile Updated!",
           "Your profile information has been saved successfully.",
@@ -579,10 +579,10 @@ export default function ProfileBeneficiaryScreen() {
           "Unable to update your profile information. Please try again.",
           {
             duration: 0, // Don't auto-dismiss
-            action: {
-              label: "Retry",
-              onClick: () => handleProfileUpdate(),
-            },
+            // action: {
+            //   label: "Retry",
+            //   onClick: () => handleProfileUpdate(),
+            // },
           }
         );
       }
@@ -628,9 +628,8 @@ export default function ProfileBeneficiaryScreen() {
             }`}
           >
             <div className="flex items-center justify-center h-full mt-16 lg:mt-0">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading profile...</p>
+              <div className="flex justify-center items-center min-h-screen">
+                <div className="loader"></div>
               </div>
             </div>
           </div>

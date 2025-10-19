@@ -23,8 +23,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       }}
     >
       {/* Left Panel - Form (Scrollable) */}
-      <div className="flex-1 flex flex-col justify-center p-6 sm:p-0 pr-0">
-        <div className="w-full max-h-screen overflow-y-auto pr-6">
+      <div className="flex-1 flex flex-col justify-center sm:p-0 pr-0">
+        <div className="w-full max-h-screen overflow-y-auto">
           <div className="max-w-md mx-auto py-6">
             <div className="text-center relative mb-8">
               <div className="mb-6">

@@ -218,7 +218,7 @@ const RegistrationScreen = () => {
         showTestimonial={true}
       >
         {/* Progress Steps */}
-        <div className="mb-8 mx-12">
+        <div className="mb-8 mx-auto">
           <div className="flex items-center justify-center">
             <CircularProgressStep status={"isActive"} />
             <div className="flex-1 h-[3px] bg-primary-500" />
@@ -254,7 +254,7 @@ const RegistrationScreen = () => {
 
               <Form className="space-y-6">
                 {/* Name and Surname */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="">
                   <div>
                     <Label
                       htmlFor="name"
