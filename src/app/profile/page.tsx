@@ -37,6 +37,7 @@ import {
 } from "@/components/application/file-upload/file-upload-base";
 import AuthGuard from "@/components/AuthGuard";
 import SidebarWrapper from "@/components/SidebarWrapper";
+import MobileTopNav from "@/components/MobileTopNav";
 import {
   useGetProfileQuery,
   useUpdateFinancialDetailsMutation,
@@ -59,7 +60,7 @@ export default function ProfileBeneficiaryScreen() {
     data: profileData,
     isLoading: isProfileLoading,
     error: profileError,
-  } = useGetProfileQuery(customer);
+  } = useGetProfileQuery(customer || "");
 
   // Financial details update mutation
   const [updateFinancialDetails, { isLoading: isUpdatingFinancials }] =
@@ -405,7 +406,7 @@ export default function ProfileBeneficiaryScreen() {
       ];
 
       const beneficiaryData = {
-        customer_id: customer,
+        customer_id: customer || "",
         beneficiary_type: mapSelectKeyToApiValue(
           beneficiaryType,
           beneficiaryTypeOptions
@@ -618,14 +619,15 @@ export default function ProfileBeneficiaryScreen() {
   if (isProfileLoading) {
     return (
       <AuthGuard>
-        <div className="flex h-screen bg-white">
+        <div className="min-h-screen bg-white flex">
+          <MobileTopNav />
           <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
           <div
-            className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${
-              isSidebarCollapsed ? "ml-16" : "ml-64"
+            className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+              isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
             }`}
           >
-            <div className="flex items-center justify-center h-full">
+            <div className="flex items-center justify-center h-full mt-16 lg:mt-0">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <p className="text-gray-600">Loading profile...</p>
@@ -641,14 +643,15 @@ export default function ProfileBeneficiaryScreen() {
   if (profileError) {
     return (
       <AuthGuard>
-        <div className="flex h-screen bg-white">
+        <div className="min-h-screen bg-white flex">
+          <MobileTopNav />
           <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
           <div
-            className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${
-              isSidebarCollapsed ? "ml-16" : "ml-64"
+            className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+              isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
             }`}
           >
-            <div className="flex items-center justify-center h-full">
+            <div className="flex items-center justify-center h-full mt-16 lg:mt-0">
               <div className="text-center">
                 <div className="text-red-500 text-lg mb-4">
                   Failed to load profile
@@ -664,64 +667,81 @@ export default function ProfileBeneficiaryScreen() {
 
   return (
     <AuthGuard>
-      <div className="flex h-screen bg-white">
+      <div className="min-h-screen bg-white flex">
+        {/* Mobile Top Navigation */}
+        <MobileTopNav />
+
         {/* Left Sidebar */}
         <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
 
         {/* Main Content */}
         <div
-          className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${
-            isSidebarCollapsed ? "ml-16" : "ml-64"
+          className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+            isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
           }`}
         >
+          {/* Header */}
+          <header className="bg-white border-b border-gray-200 px-4 lg:px-8 py-4 lg:py-5 mt-16 lg:mt-0">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <h1 className="text-base lg:text-2xl font-semibold text-gray-900">
+                Profile Settings
+              </h1>
+            </div>
+          </header>
+
           {/* Blue Header */}
-          <div className="h-56 relative">
-            <div className="absolute  inset-0">
+          <div className="h-32 lg:h-56 relative">
+            <div className="absolute inset-0">
               <img
                 src="/image 5.png"
                 alt="User"
-                className="w-full h-full  object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
 
           {/* Profile Section */}
-          <div className=" mx-auto relative">
-            <div className=" px-8 py-4 mb-6">
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center gap-6">
-                  <div className="relative -mt-12">
+          <div className="max-w-sm sm:max-w-full mx-auto sm:mx-0 relative">
+            <div className="px-4 lg:px-8 py-4 mb-6">
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-6 gap-4">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 lg:gap-6">
+                  <div className="relative -mt-8 lg:-mt-12">
                     <Avatar
                       size="2xl"
                       src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
                       alt="Profile"
                       verified={true}
                       contrastBorder={true}
-                      className="shadow-lg border-4 border-white w-28 h-28"
+                      className="shadow-lg border-4 border-white w-20 h-20 lg:w-28 lg:h-28"
                     />
                   </div>
 
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                  <div className="text-center sm:text-left">
+                    <h1 className="text-lg lg:text-2xl font-bold text-gray-900 mb-1">
                       {profileData?.message?.data?.basic_info?.customer_name ||
                         "Loading..."}
                     </h1>
-                    <p className="text-gray-600">
+                    <p className="text-sm lg:text-base text-gray-600">
                       {profileData?.message?.data?.basic_info?.email ||
                         "Loading..."}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                   <Button
                     color="secondary"
                     iconLeading={<Share size={14} data-icon />}
                     size="md"
+                    className="w-full sm:w-auto"
                   >
                     Share
                   </Button>
-                  <Button color="primary" size="md">
+                  <Button
+                    color="primary"
+                    size="md"
+                    className="w-full sm:w-auto"
+                  >
                     View profile
                   </Button>
                 </div>
@@ -741,18 +761,18 @@ export default function ProfileBeneficiaryScreen() {
                     { id: "beneficiary", label: "Beneficiary Details" },
                     { id: "financial", label: "Financial details" },
                   ]}
-                  className="w-full justify-start"
+                  className="w-full justify-start overflow-x-auto"
                 >
                   {(tab) => <Tabs.Item {...tab} />}
                 </Tabs.List>
 
                 <Tabs.Panel id="beneficiary" className="mt-1">
-                  <Card className="p-8 border-none rounded-none shadow-none">
-                    <div className="grid grid-cols-12 gap-8">
+                  <Card className="p-4 lg:p-8 border-none rounded-none shadow-none">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8">
                       {/* Left column - Description */}
-                      <div className="col-span-3">
+                      <div className="lg:col-span-3">
                         <CardHeader className="p-0">
-                          <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
+                          <CardTitle className="text-base lg:text-lg font-semibold text-gray-900 mb-2">
                             Beneficiary Details
                           </CardTitle>
                           <CardDescription className="text-sm text-gray-600">
@@ -763,7 +783,7 @@ export default function ProfileBeneficiaryScreen() {
                       </div>
 
                       {/* Right column - Form */}
-                      <CardContent className="col-span-9 max-w-[720px] space-y-6 border border-gra-50 shadow p-6 rounded-lg">
+                      <CardContent className="lg:col-span-9 max-w-full lg:max-w-[720px] space-y-6 border border-gra-50 shadow p-4 lg:p-6 rounded-lg">
                         <div>
                           <Select
                             label="Beneficiary Type"
@@ -795,16 +815,14 @@ export default function ProfileBeneficiaryScreen() {
                           </Select>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
                             <Input
                               label="Beneficiary name"
                               placeholder="Enter beneficiary name"
                               value={beneficiaryName}
-                              onChange={(e) =>
-                                setBeneficiaryName(e.target.value)
-                              }
-                              isisRequired
+                              onChange={setBeneficiaryName}
+                              isRequired
                             />
                           </div>
 
@@ -813,10 +831,8 @@ export default function ProfileBeneficiaryScreen() {
                               label="Beneficiary Surname"
                               placeholder="Enter beneficiary surname"
                               value={beneficiarySurname}
-                              onChange={(e) =>
-                                setBeneficiarySurname(e.target.value)
-                              }
-                              isisRequired
+                              onChange={setBeneficiarySurname}
+                              isRequired
                             />
                           </div>
                         </div>
@@ -866,7 +882,7 @@ export default function ProfileBeneficiaryScreen() {
                             onSelectionChange={(key) =>
                               setBeneficiaryRelation(key as string)
                             }
-                            isisRequired
+                            isRequired
                           >
                             {(item) => (
                               <Select.Item key={item.id} id={item.id}>
@@ -894,12 +910,12 @@ export default function ProfileBeneficiaryScreen() {
                 </Tabs.Panel>
 
                 <Tabs.Panel id="details">
-                  <Card className="p-8 border-none rounded-none shadow-none">
-                    <div className="grid grid-cols-12 gap-8">
+                  <Card className="p-4 lg:p-8 border-none rounded-none shadow-none">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8">
                       {/* Left column - Description */}
-                      <div className="col-span-3">
+                      <div className="lg:col-span-3">
                         <CardHeader className="p-0">
-                          <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
+                          <CardTitle className="text-base lg:text-lg font-semibold text-gray-900 mb-2">
                             Personal info{" "}
                           </CardTitle>
                           <CardDescription className="text-sm text-gray-600">
@@ -908,17 +924,17 @@ export default function ProfileBeneficiaryScreen() {
                         </CardHeader>
                       </div>
 
-                      <div className="col-span-9 max-w-[720px] space-y-6">
+                      <div className="lg:col-span-9 max-w-full lg:max-w-[720px] space-y-6">
                         {/* First Section - Basic Info */}
-                        <CardContent className="space-y-6 border border-gra-50 shadow p-6 rounded-lg">
-                          <div className="grid grid-cols-2 gap-4">
+                        <CardContent className="space-y-6 border border-gra-50 shadow p-4 lg:p-6 rounded-lg">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                               <Input
                                 label="First Name"
                                 placeholder="Enter your first name"
                                 value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                isisRequired
+                                onChange={setFirstName}
+                                isRequired
                               />
                             </div>
                             <div>
@@ -926,8 +942,8 @@ export default function ProfileBeneficiaryScreen() {
                                 label="Last Name"
                                 placeholder="Enter your last name"
                                 value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                                isisRequired
+                                onChange={setLastName}
+                                isRequired
                               />
                             </div>
                           </div>
@@ -962,8 +978,8 @@ export default function ProfileBeneficiaryScreen() {
                               size="sm"
                             />
                           </div>
-                          <div className="flex gap-6 items-start">
-                            <div className="flex-shrink-0">
+                          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start">
+                            <div className="flex-shrink-0 mx-auto sm:mx-0">
                               <Avatar
                                 size="2xl"
                                 src={
@@ -977,10 +993,10 @@ export default function ProfileBeneficiaryScreen() {
                                 }
                                 alt="Profile"
                                 contrastBorder={true}
-                                className="shadow-lg border-4 border-white w-28 h-28"
+                                className="shadow-lg border-4 border-white w-20 h-20 sm:w-28 sm:h-28"
                               />
                             </div>
-                            <div className="flex-1">
+                            <div className="flex-1 w-full">
                               <FileUpload.Root>
                                 <FileUpload.DropZone
                                   onDropFiles={handleDropFiles}
@@ -1003,7 +1019,7 @@ export default function ProfileBeneficiaryScreen() {
                         </CardContent>
 
                         {/* Second Section - Personal Information */}
-                        <CardContent className="space-y-6 border border-gra-50 shadow p-6 rounded-lg">
+                        <CardContent className="space-y-6 border border-gra-50 shadow p-4 lg:p-6 rounded-lg">
                           <div>
                             <Select
                               label="What do we call you"
@@ -1038,13 +1054,13 @@ export default function ProfileBeneficiaryScreen() {
                             </Select>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                               <Input
                                 label="Birthdate"
                                 type="date"
                                 value={birthdate}
-                                onChange={(e) => setBirthdate(e.target.value)}
+                                onChange={setBirthdate}
                                 isRequired
                               />
                             </div>
@@ -1087,13 +1103,13 @@ export default function ProfileBeneficiaryScreen() {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                               <Input
                                 label="Nationality"
                                 placeholder="Enter nationality"
                                 value={nationality}
-                                onChange={(e) => setNationality(e.target.value)}
+                                onChange={setNationality}
                                 isRequired
                               />
                             </div>
@@ -1102,9 +1118,7 @@ export default function ProfileBeneficiaryScreen() {
                                 label="Country of Residence"
                                 placeholder="Enter country of residence"
                                 value={countryOfResidence}
-                                onChange={(e) =>
-                                  setCountryOfResidence(e.target.value)
-                                }
+                                onChange={setCountryOfResidence}
                                 isRequired
                               />
                             </div>
@@ -1235,12 +1249,12 @@ export default function ProfileBeneficiaryScreen() {
                 </Tabs.Panel>
 
                 <Tabs.Panel id="financial">
-                  <Card className="p-8 border-none rounded-none shadow-none">
-                    <div className="grid grid-cols-12 gap-8">
+                  <Card className="p-4 lg:p-8 border-none rounded-none shadow-none">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8">
                       {/* Left column - Description */}
-                      <div className="col-span-3">
+                      <div className="lg:col-span-3">
                         <CardHeader className="p-0">
-                          <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
+                          <CardTitle className="text-base lg:text-lg font-semibold text-gray-900 mb-2">
                             Financial Information{" "}
                           </CardTitle>
                           <CardDescription className="text-sm text-gray-600">
@@ -1250,63 +1264,52 @@ export default function ProfileBeneficiaryScreen() {
                       </div>
 
                       {/* Right column - Form */}
-                      <CardContent className="col-span-9 max-w-[720px] space-y-6 border border-gra-50 shadow p-6 rounded-lg">
-                        <div className="relative h-48 w-full p-8">
-                          <div className="absolute inset-0">
-                            <img
-                              src="/image 5.png"
-                              alt="User"
-                              className="w-full h-full rounded-lg object-cover"
-                            />
-                          </div>
-                          <div className="relative z-10">
-                            <span className="text-base text-white">
-                              I want to save
-                            </span>
-                          </div>
-                          <div className="flex text-center font-bold z-10 text-7xl justify-center text-white mb-4 px-1 relative">
-                            <span className="font-bold">
-                              {formatCurrency(amount[0])}
-                            </span>
-                          </div>
-                          <div className="relative z-10">
-                            <div className="mb-6 [&_.bg-brand-solid]:bg-[#E31B54] [&_.ring-\\[\\#155EEF\\]]:ring-[#E31B54] [&_.text-\\[\\#E31B54\\]]:text-[#E31B54] [&_.bg-slider-handle-bg]:bg-white">
-                              <Slider
-                                value={amount}
-                                onChange={(value) =>
-                                  setAmount(
-                                    Array.isArray(value) ? value : [value]
-                                  )
-                                }
-                                minValue={5000}
-                                maxValue={1000000}
-                                step={500}
-                                labelFormatter={(value) =>
-                                  formatCurrency(value)
-                                }
+                      <div className="lg:col-span-9 max-w-full lg:max-w-[720px] space-y-6">
+                        <CardContent className="space-y-6 border border-gra-50 shadow p-4 lg:p-6 rounded-lg">
+                          <div className="relative h-32 lg:h-48 w-full p-4 lg:p-8">
+                            <div className="absolute inset-0">
+                              <img
+                                src="/image 5.png"
+                                alt="User"
+                                className="w-full h-full rounded-lg object-cover"
                               />
                             </div>
+                            <div className="relative z-10">
+                              <span className="text-sm lg:text-base text-white">
+                                I want to save
+                              </span>
+                            </div>
+                            <div className="flex text-center font-bold z-10 text-3xl lg:text-7xl justify-center text-white mb-2 lg:mb-4 px-1 relative">
+                              <span className="font-bold">
+                                {formatCurrency(amount[0])}
+                              </span>
+                            </div>
+                            <div className="relative z-10">
+                              <div className="mb-4 lg:mb-6 [&_.bg-brand-solid]:bg-[#E31B54] [&_.ring-\\[\\#155EEF\\]]:ring-[#E31B54] [&_.text-\\[\\#E31B54\\]]:text-[#E31B54] [&_.bg-slider-handle-bg]:bg-white">
+                                <Slider
+                                  value={amount}
+                                  onChange={(value) =>
+                                    setAmount(
+                                      Array.isArray(value) ? value : [value]
+                                    )
+                                  }
+                                  minValue={5000}
+                                  maxValue={1000000}
+                                  step={500}
+                                  labelFormatter={(value) =>
+                                    formatCurrency(value)
+                                  }
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </div>
 
-                        {/* What are you saving for - Full width */}
-                        <div>
-                          <Select
-                            label="What are you saving for"
-                            placeholder="Select an option"
-                            items={[
-                              { id: "house", label: "House" },
-                              { id: "car", label: "Car" },
-                              { id: "education", label: "Education" },
-                              { id: "retirement", label: "Retirement" },
-                              { id: "emergency", label: "Emergency Fund" },
-                              { id: "vacation", label: "Vacation" },
-                              { id: "other", label: "Other" },
-                            ]}
-                            className="w-full"
-                            defaultSelectedKey={mapApiValueToSelectKey(
-                              savingFor,
-                              [
+                          {/* What are you saving for - Full width */}
+                          <div>
+                            <Select
+                              label="What are you saving for"
+                              placeholder="Select an option"
+                              items={[
                                 { id: "house", label: "House" },
                                 { id: "car", label: "Car" },
                                 { id: "education", label: "Education" },
@@ -1314,38 +1317,39 @@ export default function ProfileBeneficiaryScreen() {
                                 { id: "emergency", label: "Emergency Fund" },
                                 { id: "vacation", label: "Vacation" },
                                 { id: "other", label: "Other" },
-                              ]
-                            )}
-                            onSelectionChange={(key) =>
-                              setSavingFor(key as string)
-                            }
-                          >
-                            {(item) => (
-                              <Select.Item key={item.id} id={item.id}>
-                                {item.label}
-                              </Select.Item>
-                            )}
-                          </Select>
-                        </div>
-
-                        {/* Two column grid for remaining fields */}
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Select
-                              label="Employment status"
-                              placeholder="Select an option"
-                              items={[
-                                { id: "employed", label: "Employed" },
-                                { id: "self-employed", label: "Self-employed" },
-                                { id: "unemployed", label: "Unemployed" },
-                                { id: "student", label: "Student" },
-                                { id: "retired", label: "Retired" },
-                                { id: "other", label: "Other" },
                               ]}
                               className="w-full"
                               defaultSelectedKey={mapApiValueToSelectKey(
-                                employmentStatus,
+                                savingFor,
                                 [
+                                  { id: "house", label: "House" },
+                                  { id: "car", label: "Car" },
+                                  { id: "education", label: "Education" },
+                                  { id: "retirement", label: "Retirement" },
+                                  { id: "emergency", label: "Emergency Fund" },
+                                  { id: "vacation", label: "Vacation" },
+                                  { id: "other", label: "Other" },
+                                ]
+                              )}
+                              onSelectionChange={(key) =>
+                                setSavingFor(key as string)
+                              }
+                            >
+                              {(item) => (
+                                <Select.Item key={item.id} id={item.id}>
+                                  {item.label}
+                                </Select.Item>
+                              )}
+                            </Select>
+                          </div>
+
+                          {/* Two column grid for remaining fields */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <Select
+                                label="Employment status"
+                                placeholder="Select an option"
+                                items={[
                                   { id: "employed", label: "Employed" },
                                   {
                                     id: "self-employed",
@@ -1355,97 +1359,97 @@ export default function ProfileBeneficiaryScreen() {
                                   { id: "student", label: "Student" },
                                   { id: "retired", label: "Retired" },
                                   { id: "other", label: "Other" },
-                                ]
-                              )}
-                              onSelectionChange={(key) =>
-                                setEmploymentStatus(key as string)
-                              }
-                            >
-                              {(item) => (
-                                <Select.Item key={item.id} id={item.id}>
-                                  {item.label}
-                                </Select.Item>
-                              )}
-                            </Select>
-                          </div>
+                                ]}
+                                className="w-full"
+                                defaultSelectedKey={mapApiValueToSelectKey(
+                                  employmentStatus,
+                                  [
+                                    { id: "employed", label: "Employed" },
+                                    {
+                                      id: "self-employed",
+                                      label: "Self-employed",
+                                    },
+                                    { id: "unemployed", label: "Unemployed" },
+                                    { id: "student", label: "Student" },
+                                    { id: "retired", label: "Retired" },
+                                    { id: "other", label: "Other" },
+                                  ]
+                                )}
+                                onSelectionChange={(key) =>
+                                  setEmploymentStatus(key as string)
+                                }
+                              >
+                                {(item) => (
+                                  <Select.Item key={item.id} id={item.id}>
+                                    {item.label}
+                                  </Select.Item>
+                                )}
+                              </Select>
+                            </div>
 
-                          <div>
-                            <Select
-                              label="Deposit frequency"
-                              placeholder="Select an option"
-                              items={[
-                                { id: "weekly", label: "Weekly" },
-                                { id: "bi-weekly", label: "Bi-weekly" },
-                                { id: "monthly", label: "Monthly" },
-                                { id: "quarterly", label: "Quarterly" },
-                                { id: "annually", label: "Annually" },
-                              ]}
-                              className="w-full"
-                              defaultSelectedKey={mapApiValueToSelectKey(
-                                depositFrequency,
-                                [
+                            <div>
+                              <Select
+                                label="Deposit frequency"
+                                placeholder="Select an option"
+                                items={[
                                   { id: "weekly", label: "Weekly" },
                                   { id: "bi-weekly", label: "Bi-weekly" },
                                   { id: "monthly", label: "Monthly" },
                                   { id: "quarterly", label: "Quarterly" },
                                   { id: "annually", label: "Annually" },
-                                ]
-                              )}
-                              onSelectionChange={(key) =>
-                                setDepositFrequency(key as string)
-                              }
-                            >
-                              {(item) => (
-                                <Select.Item key={item.id} id={item.id}>
-                                  {item.label}
-                                </Select.Item>
-                              )}
-                            </Select>
+                                ]}
+                                className="w-full"
+                                defaultSelectedKey={mapApiValueToSelectKey(
+                                  depositFrequency,
+                                  [
+                                    { id: "weekly", label: "Weekly" },
+                                    { id: "bi-weekly", label: "Bi-weekly" },
+                                    { id: "monthly", label: "Monthly" },
+                                    { id: "quarterly", label: "Quarterly" },
+                                    { id: "annually", label: "Annually" },
+                                  ]
+                                )}
+                                onSelectionChange={(key) =>
+                                  setDepositFrequency(key as string)
+                                }
+                              >
+                                {(item) => (
+                                  <Select.Item key={item.id} id={item.id}>
+                                    {item.label}
+                                  </Select.Item>
+                                )}
+                              </Select>
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Input
-                              label="Bank name"
-                              placeholder="Enter bank name"
-                              value={customerBank}
-                              onChange={(e) => setCustomerBank(e.target.value)}
-                              isRequired
-                            />
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <Input
+                                label="Bank name"
+                                placeholder="Enter bank name"
+                                value={customerBank}
+                                onChange={setCustomerBank}
+                                isRequired
+                              />
+                            </div>
+
+                            <div>
+                              <Input
+                                label="Account number"
+                                placeholder="Enter account number"
+                                value={ibanAccount}
+                                onChange={setIbanAccount}
+                                isRequired
+                              />
+                            </div>
                           </div>
 
-                          <div>
-                            <Input
-                              label="Account number"
-                              placeholder="Enter account number"
-                              value={ibanAccount}
-                              onChange={(e) => setIbanAccount(e.target.value)}
-                              isRequired
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Select
-                              label="Source of funds"
-                              placeholder="Select an option"
-                              items={[
-                                { id: "salary", label: "Salary" },
-                                { id: "business", label: "Business Income" },
-                                {
-                                  id: "investment",
-                                  label: "Investment Returns",
-                                },
-                                { id: "inheritance", label: "Inheritance" },
-                                { id: "gift", label: "Gift" },
-                                { id: "other", label: "Other" },
-                              ]}
-                              className="w-full"
-                              defaultSelectedKey={mapApiValueToSelectKey(
-                                fundSource,
-                                [
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <Select
+                                label="Source of funds"
+                                placeholder="Select an option"
+                                items={[
                                   { id: "salary", label: "Salary" },
                                   { id: "business", label: "Business Income" },
                                   {
@@ -1455,49 +1459,65 @@ export default function ProfileBeneficiaryScreen() {
                                   { id: "inheritance", label: "Inheritance" },
                                   { id: "gift", label: "Gift" },
                                   { id: "other", label: "Other" },
-                                ]
-                              )}
-                              onSelectionChange={(key) =>
-                                setFundSource(key as string)
-                              }
+                                ]}
+                                className="w-full"
+                                defaultSelectedKey={mapApiValueToSelectKey(
+                                  fundSource,
+                                  [
+                                    { id: "salary", label: "Salary" },
+                                    {
+                                      id: "business",
+                                      label: "Business Income",
+                                    },
+                                    {
+                                      id: "investment",
+                                      label: "Investment Returns",
+                                    },
+                                    { id: "inheritance", label: "Inheritance" },
+                                    { id: "gift", label: "Gift" },
+                                    { id: "other", label: "Other" },
+                                  ]
+                                )}
+                                onSelectionChange={(key) =>
+                                  setFundSource(key as string)
+                                }
+                              >
+                                {(item) => (
+                                  <Select.Item key={item.id} id={item.id}>
+                                    {item.label}
+                                  </Select.Item>
+                                )}
+                              </Select>
+                            </div>
+
+                            <div>
+                              <Input
+                                label="Pay day"
+                                type="number"
+                                placeholder="Enter day of month (1-31)"
+                                value={payDay.toString()}
+                                onChange={(value) =>
+                                  setPayDay(parseInt(value) || 1)
+                                }
+                                isRequired
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex justify-end gap-3 pt-4">
+                            <Button color="secondary">Cancel</Button>
+                            <Button
+                              color="primary"
+                              onClick={handleFinancialDetailsSubmit}
+                              disabled={isUpdatingFinancials}
                             >
-                              {(item) => (
-                                <Select.Item key={item.id} id={item.id}>
-                                  {item.label}
-                                </Select.Item>
-                              )}
-                            </Select>
+                              {isUpdatingFinancials
+                                ? "Saving..."
+                                : "Save changes"}
+                            </Button>
                           </div>
-
-                          <div>
-                            <Input
-                              label="Pay day"
-                              type="number"
-                              placeholder="Enter day of month (1-31)"
-                              min="1"
-                              max="31"
-                              value={payDay}
-                              onChange={(e) =>
-                                setPayDay(parseInt(e.target.value) || 1)
-                              }
-                              isRequired
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex justify-end gap-3 pt-4">
-                          <Button color="secondary">Cancel</Button>
-                          <Button
-                            color="primary"
-                            onClick={handleFinancialDetailsSubmit}
-                            disabled={isUpdatingFinancials}
-                          >
-                            {isUpdatingFinancials
-                              ? "Saving..."
-                              : "Save changes"}
-                          </Button>
-                        </div>
-                      </CardContent>
+                        </CardContent>
+                      </div>
                     </div>
                   </Card>
                 </Tabs.Panel>
