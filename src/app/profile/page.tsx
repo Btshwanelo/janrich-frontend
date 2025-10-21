@@ -37,6 +37,11 @@ import {
 } from "@/components/application/file-upload/file-upload-base";
 import AuthGuard from "@/components/AuthGuard";
 import SidebarWrapper from "@/components/SidebarWrapper";
+import MobileTopNav from "@/components/MobileTopNav";
+import {
+  ProfileLoadingState,
+  ProfileErrorState,
+} from "@/components/profile";
 import {
   useGetProfileQuery,
   useUpdateFinancialDetailsMutation,
@@ -128,7 +133,8 @@ export default function ProfileBeneficiaryScreen() {
       const data = profileData.message.data;
 
       // Basic info
-      const nameParts = data.basic_info.customer_name.split(" ");
+      const customerName = data.basic_info?.customer_name || "";
+      const nameParts = customerName.split(" ");
       setFirstName(nameParts[0] || "");
       setLastName(nameParts.slice(1).join(" ") || "");
       setDetailsPhoneNumber(data.basic_info.phone || "");
@@ -354,7 +360,7 @@ export default function ProfileBeneficiaryScreen() {
         custom_account_holder: accountHolder,
         custom_branch_code: branchCode,
         custom_iban_account: ibanAccount,
-        custom_annual_savings_goal: amount[0],
+        custom_annual_savings_goal: amount?.[0] || 0,
         custom_household_size: householdSize,
         custom_pay_day: payDay,
       };
@@ -618,19 +624,17 @@ export default function ProfileBeneficiaryScreen() {
   if (isProfileLoading) {
     return (
       <AuthGuard>
-        <div className="flex h-screen bg-white">
+        <div className="min-h-screen bg-white flex">
+          {/* Mobile Top Navigation */}
+          <MobileTopNav />
+          
           <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
           <div
-            className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${
-              isSidebarCollapsed ? "ml-16" : "ml-64"
+            className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+              isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
             }`}
           >
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading profile...</p>
-              </div>
-            </div>
+            <ProfileLoadingState />
           </div>
         </div>
       </AuthGuard>
@@ -641,21 +645,17 @@ export default function ProfileBeneficiaryScreen() {
   if (profileError) {
     return (
       <AuthGuard>
-        <div className="flex h-screen bg-white">
+        <div className="min-h-screen bg-white flex">
+          {/* Mobile Top Navigation */}
+          <MobileTopNav />
+          
           <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
           <div
-            className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${
-              isSidebarCollapsed ? "ml-16" : "ml-64"
+            className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+              isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
             }`}
           >
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <div className="text-red-500 text-lg mb-4">
-                  Failed to load profile
-                </div>
-                <p className="text-gray-600">Please try refreshing the page</p>
-              </div>
-            </div>
+            <ProfileErrorState />
           </div>
         </div>
       </AuthGuard>
@@ -664,93 +664,105 @@ export default function ProfileBeneficiaryScreen() {
 
   return (
     <AuthGuard>
-      <div className="flex h-screen bg-white">
+      <div className="min-h-screen bg-white flex">
+        {/* Mobile Top Navigation */}
+        <MobileTopNav />
+
         {/* Left Sidebar */}
         <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
 
         {/* Main Content */}
         <div
-          className={`flex-1 overflow-auto transition-all duration-300 ease-in-out ${
-            isSidebarCollapsed ? "ml-16" : "ml-64"
+          className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+            isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
           }`}
         >
+          <div className="flex-1 overflow-auto">
           {/* Blue Header */}
-          <div className="h-56 relative">
-            <div className="absolute  inset-0">
+          <div className="h-32 sm:h-40 lg:h-56 relative mt-16 lg:mt-0">
+            <div className="absolute inset-0">
               <img
                 src="/image 5.png"
                 alt="User"
-                className="w-full h-full  object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
 
           {/* Profile Section */}
-          <div className=" mx-auto relative">
-            <div className=" px-8 py-4 mb-6">
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center gap-6">
-                  <div className="relative -mt-12">
+          <div className="mx-auto relative">
+            <div className="px-0 sm:px-4 sm:px-6 lg:px-8 py-4 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+                  <div className="relative -mt-8 sm:-mt-12 self-center sm:self-auto">
                     <Avatar
                       size="2xl"
                       src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
                       alt="Profile"
                       verified={true}
                       contrastBorder={true}
-                      className="shadow-lg border-4 border-white w-28 h-28"
+                      className="shadow-lg border-4 border-white w-20 h-20 sm:w-28 sm:h-28"
                     />
                   </div>
 
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                  <div className="text-center sm:text-left">
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
                       {profileData?.message?.data?.basic_info?.customer_name ||
                         "Loading..."}
                     </h1>
-                    <p className="text-gray-600">
+                    <p className="text-sm sm:text-base text-gray-600">
                       {profileData?.message?.data?.basic_info?.email ||
                         "Loading..."}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3 self-center sm:self-auto">
                   <Button
                     color="secondary"
                     iconLeading={<Share size={14} data-icon />}
-                    size="md"
+                    size="sm"
+                    className="w-full sm:w-auto"
                   >
-                    Share
+                    <span className="hidden sm:inline">Share</span>
+                    <span className="sm:hidden">Share Profile</span>
                   </Button>
-                  <Button color="primary" size="md">
-                    View profile
+                  <Button 
+                    color="primary" 
+                    size="sm"
+                    className="w-full sm:w-auto"
+                  >
+                    <span className="hidden sm:inline">View profile</span>
+                    <span className="sm:hidden">View Profile</span>
                   </Button>
                 </div>
               </div>
 
               {/* Tabs */}
-              <Tabs
-                selectedKey={selectedTab}
-                onSelectionChange={(key) => setSelectedTab(key as string)}
-                className="w-full bg-[#FAFAFA]"
-              >
-                <Tabs.List
-                  type="button-gray"
-                  size="sm"
-                  items={[
-                    { id: "details", label: "My details" },
-                    { id: "beneficiary", label: "Beneficiary Details" },
-                    { id: "financial", label: "Financial details" },
-                  ]}
-                  className="w-full justify-start"
+              <div className="w-full bg-[#FAFAFA] overflow-x-auto">
+                <Tabs
+                  selectedKey={selectedTab}
+                  onSelectionChange={(key) => setSelectedTab(key as string)}
+                  className="w-full"
                 >
+                  <Tabs.List
+                    type="button-gray"
+                    size="sm"
+                    items={[
+                      { id: "details", label: "My details" },
+                      { id: "beneficiary", label: "Beneficiary Details" },
+                      { id: "financial", label: "Financial details" },
+                    ]}
+                    className="flex-nowrap"
+                  >
                   {(tab) => <Tabs.Item {...tab} />}
                 </Tabs.List>
 
                 <Tabs.Panel id="beneficiary" className="mt-1">
-                  <Card className="p-8 border-none rounded-none shadow-none">
-                    <div className="grid grid-cols-12 gap-8">
+                  <Card className="p-4 sm:p-6 lg:p-8 border-none rounded-none shadow-none">
+                    <div className="grid grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
                       {/* Left column - Description */}
-                      <div className="col-span-3">
+                      <div className="col-span-12 lg:col-span-3">
                         <CardHeader className="p-0">
                           <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
                             Beneficiary Details
@@ -763,7 +775,7 @@ export default function ProfileBeneficiaryScreen() {
                       </div>
 
                       {/* Right column - Form */}
-                      <CardContent className="col-span-9 max-w-[720px] space-y-6 border border-gra-50 shadow p-6 rounded-lg">
+                      <CardContent className="col-span-12 lg:col-span-9 max-w-full lg:max-w-[720px] space-y-4 sm:space-y-6 border border-gra-50 shadow p-4 sm:p-6 rounded-lg">
                         <div>
                           <Select
                             label="Beneficiary Type"
@@ -795,7 +807,7 @@ export default function ProfileBeneficiaryScreen() {
                           </Select>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <div>
                             <Input
                               label="Beneficiary name"
@@ -876,12 +888,13 @@ export default function ProfileBeneficiaryScreen() {
                           </Select>
                         </div>
 
-                        <div className="flex justify-end gap-3 pt-4">
-                          <Button color="secondary">Cancel</Button>
+                        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+                          <Button color="secondary" className="w-full sm:w-auto">Cancel</Button>
                           <Button
                             color="primary"
                             onClick={handleBeneficiarySubmit}
                             disabled={isUpdatingBeneficiary}
+                            className="w-full sm:w-auto"
                           >
                             {isUpdatingBeneficiary
                               ? "Saving..."
@@ -894,10 +907,10 @@ export default function ProfileBeneficiaryScreen() {
                 </Tabs.Panel>
 
                 <Tabs.Panel id="details">
-                  <Card className="p-8 border-none rounded-none shadow-none">
-                    <div className="grid grid-cols-12 gap-8">
+                  <Card className="p-4 sm:p-6 lg:p-8 border-none rounded-none shadow-none">
+                    <div className="grid grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
                       {/* Left column - Description */}
-                      <div className="col-span-3">
+                      <div className="col-span-12 lg:col-span-3">
                         <CardHeader className="p-0">
                           <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
                             Personal info{" "}
@@ -908,10 +921,10 @@ export default function ProfileBeneficiaryScreen() {
                         </CardHeader>
                       </div>
 
-                      <div className="col-span-9 max-w-[720px] space-y-6">
+                      <div className="col-span-12 lg:col-span-9 max-w-full lg:max-w-[720px] space-y-4 sm:space-y-6">
                         {/* First Section - Basic Info */}
-                        <CardContent className="space-y-6 border border-gra-50 shadow p-6 rounded-lg">
-                          <div className="grid grid-cols-2 gap-4">
+                        <CardContent className="space-y-4 sm:space-y-6 border border-gra-50 shadow p-4 sm:p-6 rounded-lg">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div>
                               <Input
                                 label="First Name"
@@ -967,6 +980,7 @@ export default function ProfileBeneficiaryScreen() {
                               <Avatar
                                 size="2xl"
                                 src={
+                                  uploadedFiles && 
                                   uploadedFiles.length > 0 &&
                                   uploadedFiles[0].progress === 100 &&
                                   uploadedFiles[0].fileObject
@@ -987,7 +1001,7 @@ export default function ProfileBeneficiaryScreen() {
                                   className="w-full"
                                 />
                                 <FileUpload.List>
-                                  {uploadedFiles.map((file) => (
+                                  {uploadedFiles && uploadedFiles.map((file) => (
                                     <FileUpload.ListItemProgressBar
                                       key={file.id}
                                       {...file}
@@ -1003,7 +1017,7 @@ export default function ProfileBeneficiaryScreen() {
                         </CardContent>
 
                         {/* Second Section - Personal Information */}
-                        <CardContent className="space-y-6 border border-gra-50 shadow p-6 rounded-lg">
+                        <CardContent className="space-y-4 sm:space-y-6 border border-gra-50 shadow p-4 sm:p-6 rounded-lg">
                           <div>
                             <Select
                               label="What do we call you"
@@ -1038,7 +1052,7 @@ export default function ProfileBeneficiaryScreen() {
                             </Select>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div>
                               <Input
                                 label="Birthdate"
@@ -1087,7 +1101,7 @@ export default function ProfileBeneficiaryScreen() {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div>
                               <Input
                                 label="Nationality"
@@ -1216,12 +1230,13 @@ export default function ProfileBeneficiaryScreen() {
                             </div>
                           </div>
 
-                          <div className="flex justify-end gap-3 pt-4">
-                            <Button color="secondary">Cancel</Button>
+                          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+                            <Button color="secondary" className="w-full sm:w-auto">Cancel</Button>
                             <Button
                               color="primary"
                               onClick={handleMyDetailsSubmit}
                               disabled={isUpdatingCustomer || isUpdatingProfile}
+                              className="w-full sm:w-auto"
                             >
                               {isUpdatingCustomer || isUpdatingProfile
                                 ? "Saving..."
@@ -1235,10 +1250,10 @@ export default function ProfileBeneficiaryScreen() {
                 </Tabs.Panel>
 
                 <Tabs.Panel id="financial">
-                  <Card className="p-8 border-none rounded-none shadow-none">
-                    <div className="grid grid-cols-12 gap-8">
+                  <Card className="p-4 sm:p-6 lg:p-8 border-none rounded-none shadow-none">
+                    <div className="grid grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
                       {/* Left column - Description */}
-                      <div className="col-span-3">
+                      <div className="col-span-12 lg:col-span-3">
                         <CardHeader className="p-0">
                           <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
                             Financial Information{" "}
@@ -1250,8 +1265,8 @@ export default function ProfileBeneficiaryScreen() {
                       </div>
 
                       {/* Right column - Form */}
-                      <CardContent className="col-span-9 max-w-[720px] space-y-6 border border-gra-50 shadow p-6 rounded-lg">
-                        <div className="relative h-48 w-full p-8">
+                      <CardContent className="col-span-12 lg:col-span-9 max-w-full lg:max-w-[720px] space-y-4 sm:space-y-6 border border-gra-50 shadow p-4 sm:p-6 rounded-lg">
+                        <div className="relative h-32 sm:h-40 lg:h-48 w-full p-4 sm:p-6 lg:p-8">
                           <div className="absolute inset-0">
                             <img
                               src="/image 5.png"
@@ -1264,9 +1279,9 @@ export default function ProfileBeneficiaryScreen() {
                               I want to save
                             </span>
                           </div>
-                          <div className="flex text-center font-bold z-10 text-7xl justify-center text-white mb-4 px-1 relative">
+                          <div className="flex text-center font-bold z-10 text-4xl sm:text-5xl lg:text-7xl justify-center text-white mb-4 px-1 relative">
                             <span className="font-bold">
-                              {formatCurrency(amount[0])}
+                              {formatCurrency(amount?.[0] || 0)}
                             </span>
                           </div>
                           <div className="relative z-10">
@@ -1329,7 +1344,7 @@ export default function ProfileBeneficiaryScreen() {
                         </div>
 
                         {/* Two column grid for remaining fields */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <div>
                             <Select
                               label="Employment status"
@@ -1404,7 +1419,7 @@ export default function ProfileBeneficiaryScreen() {
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <div>
                             <Input
                               label="Bank name"
@@ -1426,7 +1441,7 @@ export default function ProfileBeneficiaryScreen() {
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <div>
                             <Select
                               label="Source of funds"
@@ -1485,12 +1500,13 @@ export default function ProfileBeneficiaryScreen() {
                           </div>
                         </div>
 
-                        <div className="flex justify-end gap-3 pt-4">
-                          <Button color="secondary">Cancel</Button>
+                        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+                          <Button color="secondary" className="w-full sm:w-auto">Cancel</Button>
                           <Button
                             color="primary"
                             onClick={handleFinancialDetailsSubmit}
                             disabled={isUpdatingFinancials}
+                            className="w-full sm:w-auto"
                           >
                             {isUpdatingFinancials
                               ? "Saving..."
@@ -1501,8 +1517,10 @@ export default function ProfileBeneficiaryScreen() {
                     </div>
                   </Card>
                 </Tabs.Panel>
-              </Tabs>
+                </Tabs>
+              </div>
             </div>
+          </div>
           </div>
         </div>
       </div>

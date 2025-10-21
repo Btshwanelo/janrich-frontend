@@ -24,8 +24,17 @@ const Dashboard = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { user, fullName, customer } = useAppSelector((state) => state.auth);
-  const { data, refetch, isLoading: isProfileLoading, error: profileError } = useGetProfileQuery(customer || "");
-  const { data: dataLedger, isLoading: isLedgerLoading, error: ledgerError } = useGetLedgerQuery(customer || "");
+  const {
+    data,
+    refetch,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useGetProfileQuery(customer || "");
+  const {
+    data: dataLedger,
+    isLoading: isLedgerLoading,
+    error: ledgerError,
+  } = useGetLedgerQuery(customer || "");
 
   const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
   const transactions: Transaction[] = dataLedger?.message?.data || [];
@@ -36,15 +45,16 @@ const Dashboard = () => {
 
   // Custom hooks
   const savingsResult = useSavingsCalculation(savingsGoal, transactions);
-  const { currentPage, totalPages, currentItems: currentTransactions, handlePageChange } = usePagination({
+  const {
+    currentPage,
+    totalPages,
+    currentItems: currentTransactions,
+    handlePageChange,
+  } = usePagination({
     items: transactions,
     itemsPerPage: DASHBOARD_CONSTANTS.ITEMS_PER_PAGE,
   });
-  const {
-    isModalOpen,
-    handleModalClose,
-    handleModalSave,
-  } = useSavingsModal({
+  const { isModalOpen, handleModalClose, handleModalSave } = useSavingsModal({
     savingsGoal: data?.message?.data?.financials?.annual_savings_goal,
     refetch,
   });
@@ -85,10 +95,14 @@ const Dashboard = () => {
             {isLoading ? (
               <LoadingState />
             ) : hasError ? (
-              <ErrorState 
+              <ErrorState
                 error={
-                  (profileError && 'message' in profileError ? profileError.message : '') ||
-                  (ledgerError && 'message' in ledgerError ? ledgerError.message : '') ||
+                  (profileError && "message" in profileError
+                    ? profileError.message
+                    : "") ||
+                  (ledgerError && "message" in ledgerError
+                    ? ledgerError.message
+                    : "") ||
                   "Failed to load dashboard data"
                 }
                 onRetry={handleRetry}
@@ -100,7 +114,9 @@ const Dashboard = () => {
                   <SavingsBreakdownChart chartData={savingsResult.chartData} />
 
                   {/* Savings Goal Card */}
-                  <SavingsGoalCard savingsGoalPercentage={savingsResult.saving_goal_percentage} />
+                  <SavingsGoalCard
+                    savingsGoalPercentage={savingsResult.saving_goal_percentage}
+                  />
                 </div>
 
                 {/* Transactions */}
