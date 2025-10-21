@@ -64,7 +64,7 @@ export default function ProfileBeneficiaryScreen() {
     data: profileData,
     isLoading: isProfileLoading,
     error: profileError,
-  } = useGetProfileQuery(customer);
+  } = useGetProfileQuery(customer || "");
 
   // Financial details update mutation
   const [updateFinancialDetails, { isLoading: isUpdatingFinancials }] =
@@ -411,7 +411,7 @@ export default function ProfileBeneficiaryScreen() {
       ];
 
       const beneficiaryData = {
-        customer_id: customer,
+        customer_id: customer || "",
         beneficiary_type: mapSelectKeyToApiValue(
           beneficiaryType,
           beneficiaryTypeOptions
@@ -691,7 +691,7 @@ export default function ProfileBeneficiaryScreen() {
 
           {/* Profile Section */}
           <div className="mx-auto relative">
-            <div className="px-0 sm:px-4 sm:px-6 lg:px-8 py-4 mb-6">
+            <div className="px-0 sm:px-6 lg:px-8 py-4 mb-6">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                   <div className="relative -mt-8 sm:-mt-12 self-center sm:self-auto">
@@ -717,7 +717,7 @@ export default function ProfileBeneficiaryScreen() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 self-center sm:self-auto">
+                <div className="hidden sm:flex flex-col sm:flex-row gap-3 self-center sm:self-auto">
                   <Button
                     color="secondary"
                     iconLeading={<Share size={14} data-icon />}
@@ -813,10 +813,10 @@ export default function ProfileBeneficiaryScreen() {
                               label="Beneficiary name"
                               placeholder="Enter beneficiary name"
                               value={beneficiaryName}
-                              onChange={(e) =>
-                                setBeneficiaryName(e.target.value)
+                              onChange={(value) =>
+                                setBeneficiaryName(value)
                               }
-                              isisRequired
+                              isRequired
                             />
                           </div>
 
@@ -825,10 +825,10 @@ export default function ProfileBeneficiaryScreen() {
                               label="Beneficiary Surname"
                               placeholder="Enter beneficiary surname"
                               value={beneficiarySurname}
-                              onChange={(e) =>
-                                setBeneficiarySurname(e.target.value)
+                              onChange={(value) =>
+                                setBeneficiarySurname(value)
                               }
-                              isisRequired
+                              isRequired
                             />
                           </div>
                         </div>
@@ -878,7 +878,7 @@ export default function ProfileBeneficiaryScreen() {
                             onSelectionChange={(key) =>
                               setBeneficiaryRelation(key as string)
                             }
-                            isisRequired
+                            isRequired
                           >
                             {(item) => (
                               <Select.Item key={item.id} id={item.id}>
@@ -930,8 +930,8 @@ export default function ProfileBeneficiaryScreen() {
                                 label="First Name"
                                 placeholder="Enter your first name"
                                 value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                isisRequired
+                                onChange={(value) => setFirstName(value)}
+                                isRequired
                               />
                             </div>
                             <div>
@@ -939,8 +939,8 @@ export default function ProfileBeneficiaryScreen() {
                                 label="Last Name"
                                 placeholder="Enter your last name"
                                 value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                                isisRequired
+                                onChange={(value) => setLastName(value)}
+                                isRequired
                               />
                             </div>
                           </div>
@@ -1058,7 +1058,7 @@ export default function ProfileBeneficiaryScreen() {
                                 label="Birthdate"
                                 type="date"
                                 value={birthdate}
-                                onChange={(e) => setBirthdate(e.target.value)}
+                                onChange={(value) => setBirthdate(value)}
                                 isRequired
                               />
                             </div>
@@ -1107,7 +1107,7 @@ export default function ProfileBeneficiaryScreen() {
                                 label="Nationality"
                                 placeholder="Enter nationality"
                                 value={nationality}
-                                onChange={(e) => setNationality(e.target.value)}
+                                onChange={(value) => setNationality(value)}
                                 isRequired
                               />
                             </div>
@@ -1116,8 +1116,8 @@ export default function ProfileBeneficiaryScreen() {
                                 label="Country of Residence"
                                 placeholder="Enter country of residence"
                                 value={countryOfResidence}
-                                onChange={(e) =>
-                                  setCountryOfResidence(e.target.value)
+                                onChange={(value) =>
+                                  setCountryOfResidence(value)
                                 }
                                 isRequired
                               />
@@ -1425,7 +1425,7 @@ export default function ProfileBeneficiaryScreen() {
                               label="Bank name"
                               placeholder="Enter bank name"
                               value={customerBank}
-                              onChange={(e) => setCustomerBank(e.target.value)}
+                              onChange={(value) => setCustomerBank(value)}
                               isRequired
                             />
                           </div>
@@ -1435,7 +1435,7 @@ export default function ProfileBeneficiaryScreen() {
                               label="Account number"
                               placeholder="Enter account number"
                               value={ibanAccount}
-                              onChange={(e) => setIbanAccount(e.target.value)}
+                              onChange={(value) => setIbanAccount(value)}
                               isRequired
                             />
                           </div>
@@ -1489,11 +1489,9 @@ export default function ProfileBeneficiaryScreen() {
                               label="Pay day"
                               type="number"
                               placeholder="Enter day of month (1-31)"
-                              min="1"
-                              max="31"
-                              value={payDay}
-                              onChange={(e) =>
-                                setPayDay(parseInt(e.target.value) || 1)
+                              value={payDay.toString()}
+                              onChange={(value) =>
+                                setPayDay(parseInt(value) || 1)
                               }
                               isRequired
                             />
