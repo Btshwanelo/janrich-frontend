@@ -11,7 +11,6 @@ export function ThemeProvider({ children }: PropsWithChildren) {
             value={{ light: "light-mode", dark: "dark-mode" }}
             enableSystem={false}
             defaultTheme="light"
-            suppressHydrationWarning
         >
             {children}
         </NextThemeProvider>

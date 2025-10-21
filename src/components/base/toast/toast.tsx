@@ -54,7 +54,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     // Auto remove toast after duration
     if (newToast.duration && newToast.duration > 0) {
       setTimeout(() => {
-        removeToast(id);
+        setToasts((prev) => prev.filter((toast) => toast.id !== id));
       }, newToast.duration);
     }
   }, []);
