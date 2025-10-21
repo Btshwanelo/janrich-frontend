@@ -179,6 +179,61 @@ export interface CustomerUpdateResponse {
   };
 }
 
+// Ledger interfaces
+export interface LedgerRequest {
+  customer_id: string;
+}
+
+export interface LedgerEntry {
+  customer_id: string;
+  customer_name: string;
+  payment_date: string;
+  amount: number;
+  currency: string;
+  gateway: string;
+  status: string;
+  payment_type: string;
+  transaction_ref: string;
+}
+
+export interface LedgerResponse {
+  message: {
+    result: string;
+    customer_id: string;
+    total_records: number;
+    data: LedgerEntry[];
+  };
+}
+
+// Deposit interfaces
+export interface DepositRequest {
+  customer: string;
+  amount: number;
+  currency: string;
+  payment_type: string;
+  payment_date: string;
+  gateway: string;
+  status: string;
+  transaction_ref: string;
+}
+
+export interface DepositResponse {
+  message: {
+    result: string;
+    message: string;
+    data: {
+      customer: string;
+      amount: number;
+      currency: string;
+      payment_type: string;
+      payment_date: string;
+      gateway: string;
+      status: string;
+      transaction_ref: string;
+    };
+  };
+}
+
 export interface ProfileUpdateRequest {
   customer_id: string;
   birth_date: string;
@@ -197,7 +252,7 @@ export interface ProfileUpdateResponse {
     customer: string;
     message: string;
     age: number;
-    result: string
+    result: string;
   };
 }
 
@@ -368,6 +423,21 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
+    getLedger: builder.query<LedgerResponse, string>({
+      query: (customerId) => ({
+        url: `jan.ledger?customer_id=${customerId}`,
+        method: "GET",
+      }),
+      providesTags: ["Auth"],
+    }),
+    addDeposit: builder.mutation<DepositResponse, DepositRequest>({
+      query: (depositData) => ({
+        url: "jan.deposit",
+        method: "POST",
+        body: depositData,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
   }),
 });
 
@@ -382,6 +452,8 @@ export const {
   useSendRegistrationOTPMutation,
   useVerifyRegistrationOTPMutation,
   useUpdateSavingsGoalMutation,
+  useGetLedgerQuery,
+  useAddDepositMutation,
 } = authApiSlice;
 
 // Auth slice

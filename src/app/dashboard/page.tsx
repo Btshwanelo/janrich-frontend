@@ -1,29 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import {
-  Home,
-  BarChart3,
-  Users,
-  Clock,
-  Settings,
   Search,
   Filter,
   MoreHorizontal,
-  TrendingUp,
-  Zap,
-  HelpCircle,
-  LogOut,
-  Menu,
-  X,
   PiggyBank,
   FileText,
   ChartPie,
-  SearchCheck,
   Check,
 } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
-import { Checkbox } from "@/components/base/checkbox/checkbox";
 import {
   Card,
   CardContent,
@@ -32,23 +19,17 @@ import {
 } from "@/components/ui/untitled-card";
 import { Table, TableCard } from "@/components/application/table/table";
 import { EmptyState } from "@/components/application/empty-state/empty-state";
-import { Download01, File01 } from "@untitledui/icons";
 import { CircularProgress } from "@/components/CircularProgress";
-import ProfileModal from "@/components/ProfileModal";
 import AuthGuard from "@/components/AuthGuard";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import {
-  clearCredentials,
-  clearAuthCookie,
-  useGetProfileQuery,
-} from "@/lib/slices/authSlice";
+import { useGetProfileQuery, useGetLedgerQuery } from "@/lib/slices/authSlice";
 import { useRouter } from "next/navigation";
-import PublicRouteGuard from "@/components/PublicRouteGuard";
 import SavingsGoalModal from "@/components/SavingsGoalModal";
 import SidebarWrapper from "@/components/SidebarWrapper";
 import MobileTopNav from "@/components/MobileTopNav";
 import { PaginationPageMinimalCenter } from "@/components/application/pagination/pagination";
-import { Badge, BadgeWithDot, BadgeWithIcon } from "@/components/base/badges/badges";
+import { BadgeWithIcon } from "@/components/base/badges/badges";
+import { strict } from "assert";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("View all");
@@ -64,29 +45,20 @@ const Dashboard = () => {
   const router = useRouter();
   const { user, fullName, customer } = useAppSelector((state) => state.auth);
   const { data, refetch } = useGetProfileQuery(customer || "");
+  const { data: dataLedger } = useGetLedgerQuery(customer || "");
 
+  const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
+  const transactions: Transaction[] = dataLedger?.message?.data || [];
   useEffect(() => {
     // Check if savings goal hasn't been set (0, null, undefined, or missing)
     const savingsGoal = data?.message?.data?.financials?.annual_savings_goal;
     if (savingsGoal === 0 && !hasUserDismissedModal) {
-      console.log(
-        "Savings goal not set, opening modal. Current value:",
-        savingsGoal
-      );
       setIsModalOpen(true);
     } else if (savingsGoal && savingsGoal > 0) {
-      console.log("Savings goal already set:", savingsGoal);
       setIsModalOpen(false);
       setHasUserDismissedModal(false); // Reset dismissal flag when goal is set
     }
   }, [data, hasUserDismissedModal]);
-
-  console.log("profile data", data);
-  const handleLogout = () => {
-    dispatch(clearCredentials());
-    clearAuthCookie();
-    router.push("/login");
-  };
 
   // Function to update savings progress (you can connect this to real data)
   const updateSavingsProgress = (newProgress: number) => {
@@ -94,72 +66,18 @@ const Dashboard = () => {
   };
 
   interface Transaction {
-    id: string;
-    date: string;
+    amount: number;
+    currency: string;
+    customer_id: string;
+    customer_name: string;
+    gateway: string;
+    payment_date: string;
+    payment_type: string;
     status: string;
-    amount: string;
-    type: string;
+    transaction_ref: string;
   }
 
   // For testing empty state, you can temporarily set this to an empty array: []
-  const transactions: Transaction[] = [
-    {
-      id: "JR0001",
-      date: "Jan 6, 2025",
-      status: "Paid",
-      amount: "R 0.90",
-      type: "Savings Deposit",
-    },
-    {
-      id: "JR0002",
-      date: "Jan 5, 2025",
-      status: "Pending",
-      amount: "R 2500.00",
-      type: "Investment",
-    },
-    {
-      id: "JR0003",
-      date: "Jan 4, 2025",
-      status: "Paid",
-      amount: "R 1800.50",
-      type: "Savings Deposit",
-    },
-    {
-      id: "JR0004",
-      date: "Jan 3, 2025",
-      status: "Paid",
-      amount: "R 1200.00",
-      type: "Savings Deposit",
-    },
-    {
-      id: "JR0005",
-      date: "Jan 2, 2025",
-      status: "Pending",
-      amount: "R 500.00",
-      type: "Investment",
-    },
-    {
-      id: "JR0006",
-      date: "Jan 1, 2025",
-      status: "Paid",
-      amount: "R 750.25",
-      type: "Savings Deposit",
-    },
-    {
-      id: "JR0007",
-      date: "Dec 31, 2024",
-      status: "Paid",
-      amount: "R 3000.00",
-      type: "Investment",
-    },
-    {
-      id: "JR0008",
-      date: "Dec 30, 2024",
-      status: "Paid",
-      amount: "R 150.75",
-      type: "Savings Deposit",
-    },
-  ];
 
   // Pagination logic
   const totalPages = Math.ceil(transactions.length / itemsPerPage);
@@ -171,28 +89,74 @@ const Dashboard = () => {
     setCurrentPage(page);
   };
 
-  const columns = [
-    { key: "reference", label: "Reference" },
-    { key: "date", label: "Date" },
-    { key: "status", label: "Status" },
-    { key: "amount", label: "Amount" },
-    { key: "purchase", label: "Purchase" },
-  ];
+  function calculateSavingsProgress(totalSavingGoal, payments) {
+    // Initialize chart data for all 12 months
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const chartData = monthNames.map((month) => ({
+      month,
+      orange: 0,
+      blue: 0,
+      gray: 0,
+    }));
 
-  const chartData = [
-    { month: "Jan", orange: 0, blue: 0, gray: 10000 },
-    { month: "Feb", orange: 0, blue: 0, gray: 0 },
-    { month: "Mar", orange: 0, blue: 0, gray: 0 },
-    { month: "Apr", orange: 0, blue: 0, gray: 0 },
-    { month: "May", orange: 0, blue: 0, gray: 0 },
-    { month: "Jun", orange: 0, blue: 0, gray: 0 },
-    { month: "Jul", orange: 0, blue: 0, gray: 0 },
-    { month: "Aug", orange: 0, blue: 0, gray: 0 },
-    { month: "Sep", orange: 0, blue: 0, gray: 0 },
-    { month: "Oct", orange: 0, blue: 0, gray: 0 },
-    { month: "Nov", orange: 0, blue: 0, gray: 0 },
-    { month: "Dec", orange: 0, blue: 0, gray: 0 },
-  ];
+    // Filter only "Clear" status payments and group by month
+    const clearPayments = payments.filter(
+      (payment) => payment.status === "Clear"
+    );
+
+    // Calculate savings per month (not cumulative)
+    const monthlySavings = {};
+
+    clearPayments.forEach((payment) => {
+      const date = new Date(payment.payment_date);
+      const monthIndex = date.getMonth(); // 0-11
+
+      if (!monthlySavings[monthIndex]) {
+        monthlySavings[monthIndex] = 0;
+      }
+      monthlySavings[monthIndex] += payment.amount;
+    });
+
+    // Build chart data with monthly totals only
+    for (let i = 0; i < 12; i++) {
+      if (monthlySavings[i]) {
+        chartData[i].blue = monthlySavings[i];
+      }
+    }
+
+    // Calculate total saved across all months
+    const totalSaved = clearPayments.reduce(
+      (sum, payment) => sum + payment.amount,
+      0
+    );
+
+    // Calculate percentage
+    const saving_goal_percentage = Math.min(
+      Math.round((totalSaved / totalSavingGoal) * 100),
+      100
+    );
+
+    return {
+      chartData,
+      saving_goal_percentage,
+    };
+  }
+
+  const result = calculateSavingsProgress(savingsGoal, transactions);
+
   return (
     <AuthGuard>
       <div className="min-h-screen bg-white flex">
@@ -207,9 +171,8 @@ const Dashboard = () => {
             setIsModalOpen(false);
             setHasUserDismissedModal(true);
           }}
-          customerId={customer || "JR0001"}
+          customerId={customer}
           onSave={async (amount) => {
-            console.log("Savings goal saved:", amount);
             // Refetch profile data to get updated savings goal
             await refetch();
             setIsModalOpen(false);
@@ -278,7 +241,7 @@ const Dashboard = () => {
                   {/* Chart Area */}
                   <div className="overflow-x-auto">
                     <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 mb-6 px-2 sm:px-4 min-w-[600px]">
-                      {chartData.map((item, index) => (
+                      {result.chartData.map((item, index) => (
                         <div
                           key={index}
                           className="flex flex-col items-center flex-1 min-w-[40px]"
@@ -349,16 +312,16 @@ const Dashboard = () => {
                   {/* Dynamic Circular Progress */}
                   <div className="flex items-center justify-center mb-6">
                     <CircularProgress
-                      percentage={savingsProgress}
+                      percentage={result.saving_goal_percentage}
                       size={400}
                       strokeWidth={16}
                       className="h-64 w-full"
                       color={
-                        savingsProgress >= 100
+                        result.saving_goal_percentage >= 100
                           ? "green"
-                          : savingsProgress >= 75
+                          : result.saving_goal_percentage >= 75
                           ? "blue"
-                          : savingsProgress >= 50
+                          : result.saving_goal_percentage >= 50
                           ? "yellow"
                           : "red"
                       }
@@ -368,7 +331,7 @@ const Dashboard = () => {
                           Savings goal
                         </div>
                         <div className="text-3xl font-semibold text-[#181D27]">
-                          {savingsProgress}%
+                          {result.saving_goal_percentage}%
                         </div>
                       </div>
                     </CircularProgress>
@@ -376,46 +339,22 @@ const Dashboard = () => {
 
                   <div className="mb-6 pb-6 border-b border-gray-200">
                     <h3 className="text-base font-semibold text-gray-900 mb-2">
-                      {savingsProgress >= 100
+                      {result.saving_goal_percentage >= 100
                         ? "Congratulations! You've reached your goal!"
                         : "The best way to win is to keep going."}
                     </h3>
                     <p className="text-sm text-gray-600 leading-relaxed">
-                      {savingsProgress >= 100
+                      {result.saving_goal_percentage >= 100
                         ? "You've successfully achieved your savings target. Consider setting a new goal to continue your financial journey."
-                        : `You're ${savingsProgress}% of the way there, you're more likely to meet your savings goal by December if you don't stop now.`}
+                        : `You're ${result.saving_goal_percentage}% of the way there, you're more likely to meet your savings goal by December if you don't stop now.`}
                     </p>
                   </div>
 
-                  <div className="flex justify-between items-center">
-                    {/* Demo controls - remove these in production */}
-                    {/* <div className="flex gap-2">
-                      <Button
-                        color="secondary"
-                        size="sm"
-                        onClick={() =>
-                          updateSavingsProgress(savingsProgress - 10)
-                        }
-                        disabled={savingsProgress <= 0}
-                      >
-                        -10%
-                      </Button>
-                      <Button
-                        color="secondary"
-                        size="sm"
-                        onClick={() =>
-                          updateSavingsProgress(savingsProgress + 10)
-                        }
-                        disabled={savingsProgress >= 100}
-                      >
-                        +10%
-                      </Button>
-                    </div> */}
-
+                  <div className="flex justify-between items-end">
                     <Button
                       color="secondary"
                       size="md"
-                      className="justify-center"
+                      className="justify-center ml-auto"
                       // iconLeading={<Zap data-icon />}
                     >
                       <span>Beat the first deposit slump</span>
@@ -467,35 +406,23 @@ const Dashboard = () => {
                   <Table.Head id="date" label="Date" />
                   <Table.Head id="status" label="Status" />
                   <Table.Head id="amount" label="Amount" />
-                  <Table.Head id="purchase" label="Purchase" className="" />
+                  <Table.Head id="gateway" label="Gateway" className="" />
                 </Table.Header>
 
                 <Table.Body items={currentTransactions}>
                   {(item) => (
-                    <Table.Row id={item.id}>
+                    <Table.Row id={item.transaction_ref}>
                       <Table.Cell>
                         <span className="font-medium text-sm text-[#181D27]">
-                          {item.id}
+                          {item.transaction_ref}
                         </span>
                       </Table.Cell>
                       <Table.Cell>
                         <span className="text-sm text-[#535862]">
-                          {item.date}
+                          {item.payment_date}
                         </span>
                       </Table.Cell>
                       <Table.Cell>
-                        {/* <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                            item.status === "Paid"
-                              ? "bg-green-50 text-green-700 border border-green-200"
-                              : "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                          }`}
-                        >
-                          <span className="text-base leading-none">
-                            {item.status === "Paid" ? "✓" : "⏳"}
-                          </span>
-                          {item.status}
-                        </span> */}
                         <BadgeWithIcon
                           type="pill-color"
                           color="success"
@@ -512,7 +439,7 @@ const Dashboard = () => {
                       </Table.Cell>
                       <Table.Cell className="">
                         <span className="text-sm text-[#535862]">
-                          {item.type}
+                          {item.gateway}
                         </span>
                       </Table.Cell>
                     </Table.Row>
