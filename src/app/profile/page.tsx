@@ -694,7 +694,7 @@ export default function ProfileBeneficiaryScreen() {
             <div className="px-0 sm:px-6 lg:px-8 py-4 mb-6">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-                  <div className="relative -mt-8 sm:-mt-12 self-center sm:self-auto">
+                  <div className="relative -mt-8 sm:-mt-12">
                     <Avatar
                       size="2xl"
                       src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
@@ -705,7 +705,7 @@ export default function ProfileBeneficiaryScreen() {
                     />
                   </div>
 
-                  <div className="text-center sm:text-left">
+                  <div className="text-left">
                     <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
                       {profileData?.message?.data?.basic_info?.customer_name ||
                         "Loading..."}
