@@ -38,8 +38,8 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 left-0 right-0 w-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
+          isOpen ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
         {/* Header */}
@@ -58,13 +58,26 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
           </Button>
         </div>
 
+        {/* User Profile */}
+        <div className="flex items-center space-x-3 px-4 py-4 border-b border-gray-200 bg-gray-50">
+          <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+          <div className="flex-1">
+            <div className="text-sm font-medium text-gray-900">
+              {fullName ||
+                (typeof user === "string"
+                  ? user
+                  : (user as any)?.name || (user as any)?.email || "User")}
+            </div>
+          </div>
+        </div>
+
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 overflow-y-auto">
-          <div className="space-y-2">
+        <nav className="px-4 py-4">
+          <div className="grid grid-cols-2 gap-2">
             <a
               href="/dashboard"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-3 py-3 text-[#535862] text-sm bg-gray-100 hover:bg-gray-100 rounded-lg"
+              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
             >
               <Home className="w-5 h-5" />
               <span>Dashboard</span>
@@ -72,7 +85,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
             <a
               href="#"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-3 py-3 text-[#535862] text-sm hover:bg-gray-100 rounded-lg"
+              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
             >
               <BarChart3 className="w-5 h-5" />
               <span>Analytics</span>
@@ -80,7 +93,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
             <a
               href="/profile"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-3 py-3 text-[#535862] text-sm hover:bg-gray-100 rounded-lg"
+              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Users className="w-5 h-5" />
               <span>Community</span>
@@ -88,64 +101,47 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
             <a
               href="#"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-3 py-3 text-[#535862] text-sm hover:bg-gray-100 rounded-lg"
+              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Clock className="w-5 h-5" />
               <span>History</span>
             </a>
+            <a
+              href="/profile"
+              onClick={handleLinkClick}
+              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <HelpCircle className="w-5 h-5" />
+              <span>Profile</span>
+            </a>
+            <a
+              href="#"
+              onClick={handleLinkClick}
+              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <HelpCircle className="w-5 h-5" />
+              <span>Support</span>
+            </a>
+            <a
+              href="#"
+              onClick={handleLinkClick}
+              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <Settings className="w-5 h-5" />
+              <span>Settings</span>
+            </a>
+            <button
+              onClick={() => {
+                handleLogout()
+                handleLinkClick()
+              }}
+              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors text-left"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Logout</span>
+            </button>
           </div>
         </nav>
-
-        {/* Bottom Navigation */}
-        <div className="p-4 space-y-2 border-t border-gray-200 bg-white">
-          <a
-            href="/profile"
-            onClick={handleLinkClick}
-            className="flex items-center space-x-3 px-3 py-3 text-[#535862] text-sm hover:bg-gray-100 rounded-lg"
-          >
-            <HelpCircle className="w-5 h-5" />
-            <span>Profile</span>
-          </a>
-          <a
-            href="#"
-            onClick={handleLinkClick}
-            className="flex items-center space-x-3 px-3 py-3 text-[#535862] text-sm hover:bg-gray-100 rounded-lg"
-          >
-            <HelpCircle className="w-5 h-5" />
-            <span>Support</span>
-          </a>
-          <a
-            href="#"
-            onClick={handleLinkClick}
-            className="flex items-center space-x-3 px-3 py-3 text-[#535862] text-sm hover:bg-gray-100 rounded-lg"
-          >
-            <Settings className="w-5 h-5" />
-            <span>Settings</span>
-          </a>
-          <button
-            onClick={() => {
-              handleLogout()
-              handleLinkClick()
-            }}
-            className="flex items-center space-x-3 px-3 py-3 text-[#535862] text-sm hover:bg-gray-100 rounded-lg w-full text-left"
-          >
-            <LogOut className="w-5 h-5" />
-            <span>Logout</span>
-          </button>
-
-          {/* User Profile */}
-          <div className="flex items-center space-x-3 px-3 py-3 mt-4">
-            <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-            <div className="flex-1">
-              <div className="text-sm font-medium">
-                {fullName ||
-                  (typeof user === "string"
-                    ? user
-                    : (user as any)?.name || (user as any)?.email || "User")}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </>
   )
