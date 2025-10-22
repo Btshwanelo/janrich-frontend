@@ -7,6 +7,10 @@ export const useSavingsCalculation = (
   transactions: Transaction[]
 ): SavingsProgressResult => {
   return useMemo(() => {
+    // Validate inputs to prevent NaN values
+    const safeSavingsGoal = isNaN(savingsGoal) || !isFinite(savingsGoal) ? 0 : Math.max(0, savingsGoal);
+    const safeTransactions = Array.isArray(transactions) ? transactions : [];
+    
     // Initialize chart data for all 12 months
     const chartData: ChartDataItem[] = MONTH_NAMES.map((month) => ({
       month,
@@ -16,8 +20,8 @@ export const useSavingsCalculation = (
     }));
 
     // Filter only "Clear" status payments and group by month
-    const clearPayments = transactions.filter(
-      (payment) => payment.status === "Clear"
+    const clearPayments = safeTransactions.filter(
+      (payment) => payment && payment.status === "Clear" && typeof payment.amount === 'number' && !isNaN(payment.amount)
     );
 
     // Calculate savings per month (not cumulative)
@@ -46,11 +50,10 @@ export const useSavingsCalculation = (
       0
     );
 
-    // Calculate percentage
-    const saving_goal_percentage = Math.min(
-      Math.round((totalSaved / savingsGoal) * 100),
-      100
-    );
+    // Calculate percentage with safe division
+    const saving_goal_percentage = safeSavingsGoal > 0 
+      ? Math.min(Math.round((totalSaved / safeSavingsGoal) * 100), 100)
+      : 0;
 
     return {
       chartData,

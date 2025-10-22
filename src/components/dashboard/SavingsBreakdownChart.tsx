@@ -44,7 +44,7 @@ export const SavingsBreakdownChart: React.FC<SavingsBreakdownChartProps> = memo(
           >
             {chartData.map((item, index) => (
               <div
-                key={index}
+                key={`chart-item-${item.month}-${index}`}
                 className="flex flex-col items-center flex-1 min-w-[40px]"
                 role="img"
                 aria-label={`${item.month}: ${item.blue} saved, ${item.orange} interest, ${item.gray} other`}

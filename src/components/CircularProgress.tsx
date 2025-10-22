@@ -20,6 +20,9 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
   children,
   color = "blue",
 }) => {
+  // Validate and sanitize percentage to prevent NaN values
+  const safePercentage = isNaN(percentage) || !isFinite(percentage) ? 0 : Math.max(0, Math.min(100, percentage));
+  
   const radius = (size - strokeWidth) / 2;
   const centerX = size / 2;
   const centerY = size / 2 + 60; // Move center down more to hug the text better
@@ -31,7 +34,7 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
   const totalAngle = endAngle - startAngle; // 180 degrees (semi-circle)
   
   // Calculate current angle based on percentage
-  const currentAngle = startAngle + (percentage / 100) * totalAngle;
+  const currentAngle = startAngle + (safePercentage / 100) * totalAngle;
   
   // Convert angles to radians
   const startAngleRad = (startAngle * Math.PI) / 180;

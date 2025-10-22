@@ -17,23 +17,26 @@ interface SavingsGoalCardProps {
 export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(({
   savingsGoalPercentage,
 }) => {
+  // Validate and sanitize percentage to prevent NaN values
+  const safePercentage = isNaN(savingsGoalPercentage) || !isFinite(savingsGoalPercentage) ? 0 : Math.max(0, Math.min(100, savingsGoalPercentage));
+  
   const progressColor = useMemo(() => {
-    if (savingsGoalPercentage >= DASHBOARD_CONSTANTS.SAVINGS_PROGRESS_THRESHOLDS.EXCELLENT) {
+    if (safePercentage >= DASHBOARD_CONSTANTS.SAVINGS_PROGRESS_THRESHOLDS.EXCELLENT) {
       return "green";
     }
-    if (savingsGoalPercentage >= DASHBOARD_CONSTANTS.SAVINGS_PROGRESS_THRESHOLDS.GOOD) {
+    if (safePercentage >= DASHBOARD_CONSTANTS.SAVINGS_PROGRESS_THRESHOLDS.GOOD) {
       return "blue";
     }
-    if (savingsGoalPercentage >= DASHBOARD_CONSTANTS.SAVINGS_PROGRESS_THRESHOLDS.FAIR) {
+    if (safePercentage >= DASHBOARD_CONSTANTS.SAVINGS_PROGRESS_THRESHOLDS.FAIR) {
       return "yellow";
     }
     return "red";
-  }, [savingsGoalPercentage]);
+  }, [safePercentage]);
 
   const message = useMemo(() => {
-    const isGoalReached = savingsGoalPercentage >= DASHBOARD_CONSTANTS.SAVINGS_PROGRESS_THRESHOLDS.EXCELLENT;
+    const isGoalReached = safePercentage >= DASHBOARD_CONSTANTS.SAVINGS_PROGRESS_THRESHOLDS.EXCELLENT;
     return isGoalReached ? SAVINGS_MESSAGES.CONGRATULATIONS : SAVINGS_MESSAGES.KEEP_GOING;
-  }, [savingsGoalPercentage]);
+  }, [safePercentage]);
 
   return (
     <Card className="border-2 border-blue-600 shadow-sm">
@@ -51,19 +54,19 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(({
         {/* Dynamic Circular Progress */}
         <div className="flex items-center justify-center mb-6">
           <CircularProgress
-            percentage={savingsGoalPercentage}
+            percentage={safePercentage}
             size={DASHBOARD_CONSTANTS.CIRCULAR_PROGRESS_SIZE}
             strokeWidth={DASHBOARD_CONSTANTS.CIRCULAR_PROGRESS_STROKE_WIDTH}
             className="h-64 w-full"
             color={progressColor}
-            aria-label={`Savings goal progress: ${savingsGoalPercentage}% complete`}
+            aria-label={`Savings goal progress: ${safePercentage}% complete`}
           >
             <div className="flex flex-col items-center justify-center">
               <div className="text-3xl font-semibold text-[#535862] mb-1">
                 Savings goal
               </div>
               <div className="text-3xl font-semibold text-[#181D27]">
-                {savingsGoalPercentage}%
+                {safePercentage}%
               </div>
             </div>
           </CircularProgress>
@@ -75,7 +78,7 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(({
           </h3>
           <p className="text-sm text-gray-600 leading-relaxed">
             {typeof message.description === 'function' 
-              ? message.description(savingsGoalPercentage)
+              ? message.description(safePercentage)
               : message.description}
           </p>
         </div>
