@@ -67,23 +67,38 @@ export const SavingsBreakdownChart: React.FC<SavingsBreakdownChartProps> = memo(
         {/* Chart Area */}
         <div className="overflow-x-auto">
           <div className="flex gap-4 min-w-[600px]">
-            {/* Y-Axis Labels */}
-            <div className="flex flex-col justify-between h-64 pb-6 shrink-0">
-              {yAxisTicks.reverse().map((tick, index) => (
-                <div
-                  key={`y-axis-tick-${index}`}
-                  className="text-xs text-gray-600 font-medium"
-                  style={{
-                    height: `${DASHBOARD_CONSTANTS.CHART_HEIGHT / (yAxisTicks.length - 1)}px`,
-                  }}
-                >
-                  {formatValue(tick)}
-                </div>
-              ))}
+            {/* Y-Axis Title and Labels */}
+            <div className="flex items-center gap-2 shrink-0">
+              <div
+                className="text-xs text-[#535862] whitespace-nowrap"
+                style={{ 
+                  writingMode: "vertical-rl", 
+                  textOrientation: "mixed",
+                  // transform: "scaleY(-1)"
+                }}
+              >
+                Savings
+              </div>
+              <div className="flex flex-col justify-between h-64 pb-6">
+                {yAxisTicks.reverse().map((tick, index) => (
+                  <div
+                    key={`y-axis-tick-${index}`}
+                    className="text-xs text-gray-600 font-medium"
+                    style={{
+                      height: `${
+                        DASHBOARD_CONSTANTS.CHART_HEIGHT /
+                        (yAxisTicks.length - 1)
+                      }px`,
+                    }}
+                  >
+                    {formatValue(tick)}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Chart Bars */}
-            <div 
+            <div
               className="flex items-end justify-between gap-2 sm:gap-4 mb-6 px-2 sm:px-4 flex-1"
               role="img"
               aria-label="Monthly savings breakdown chart"
@@ -103,19 +118,28 @@ export const SavingsBreakdownChart: React.FC<SavingsBreakdownChartProps> = memo(
                       <div
                         className="w-8 sm:w-12 bg-gray-200 rounded-t"
                         style={{
-                          height: `${(item.gray / maxValue) * DASHBOARD_CONSTANTS.CHART_HEIGHT}px`,
+                          height: `${
+                            (item.gray / maxValue) *
+                            DASHBOARD_CONSTANTS.CHART_HEIGHT
+                          }px`,
                         }}
                       />
                       <div
                         className="w-8 sm:w-12 bg-blue-600 rounded-t"
                         style={{
-                          height: `${(item.blue / maxValue) * DASHBOARD_CONSTANTS.CHART_HEIGHT}px`,
+                          height: `${
+                            (item.blue / maxValue) *
+                            DASHBOARD_CONSTANTS.CHART_HEIGHT
+                          }px`,
                         }}
                       />
                       <div
                         className="w-8 sm:w-12 bg-orange-500"
                         style={{
-                          height: `${(item.orange / maxValue) * DASHBOARD_CONSTANTS.CHART_HEIGHT}px`,
+                          height: `${
+                            (item.orange / maxValue) *
+                            DASHBOARD_CONSTANTS.CHART_HEIGHT
+                          }px`,
                         }}
                       />
                     </div>
@@ -129,7 +153,7 @@ export const SavingsBreakdownChart: React.FC<SavingsBreakdownChartProps> = memo(
           </div>
         </div>
 
-        <div className="text-sm text-gray-500 justify-center align-middle items-center flex mb-4 px-4">
+        <div className="text-xs text-[#535862] justify-center align-middle items-center flex mb-4 px-4">
           Month
         </div>
 
