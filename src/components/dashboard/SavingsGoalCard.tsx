@@ -69,7 +69,12 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
           {/* Dynamic Circular Progress */}
           <div className="flex justify-center">
             <h2 className="text-[181D27] font-bold text-xl">
-              R {totalSaved} OF R{savingGoal}
+              {totalSaved > 0 ? (
+                <span className="text-[#34C759]"> R {totalSaved}</span>
+              ) : (
+                <span className=""> R {totalSaved}</span>
+              )}{" "}
+              of R{savingGoal}
             </h2>
           </div>
           <div className="flex items-center justify-center">
@@ -82,10 +87,10 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
               aria-label={`Savings goal progress: ${safePercentage}% complete`}
             >
               <div className="flex flex-col items-center justify-center">
-                <div className="text-3xl font-semibold text-[#535862] mb-1">
+                <div className="text-xl font-semibold text-[#535862] mb-1">
                   Savings goal
                 </div>
-                <div className="text-3xl font-semibold text-[#181D27]">
+                <div className="text-2xl font-semibold text-[#181D27]">
                   {safePercentage}%
                 </div>
               </div>

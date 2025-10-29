@@ -21,53 +21,52 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
   color = "blue",
 }) => {
   // Validate and sanitize percentage to prevent NaN values
-  const safePercentage = isNaN(percentage) || !isFinite(percentage) ? 0 : Math.max(0, Math.min(100, percentage));
-  
+  const safePercentage =
+    isNaN(percentage) || !isFinite(percentage)
+      ? 0
+      : Math.max(0, Math.min(100, percentage));
+
   const radius = (size - strokeWidth) / 2;
   const centerX = size / 2;
   const centerY = size / 2 + 60; // Move center down more to hug the text better
-  
+
   // For speedometer: much larger arc from bottom-left to bottom-right
   // Start angle: 180° (bottom-left), End angle: 360° (bottom-right)
   const startAngle = 180; // bottom-left (stretched much more)
-  const endAngle = 360;   // bottom-right (stretched much more)
+  const endAngle = 360; // bottom-right (stretched much more)
   const totalAngle = endAngle - startAngle; // 180 degrees (semi-circle)
-  
+
   // Calculate current angle based on percentage
   const currentAngle = startAngle + (safePercentage / 100) * totalAngle;
-  
+
   // Convert angles to radians
   const startAngleRad = (startAngle * Math.PI) / 180;
   const currentAngleRad = (currentAngle * Math.PI) / 180;
-  
+
   // Calculate arc path
   const createArcPath = (startRad: number, endRad: number) => {
     const x1 = centerX + radius * Math.cos(startRad);
     const y1 = centerY + radius * Math.sin(startRad);
     const x2 = centerX + radius * Math.cos(endRad);
     const y2 = centerY + radius * Math.sin(endRad);
-    
+
     const largeArcFlag = endRad - startRad <= Math.PI ? "0" : "1";
-    
+
     return `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`;
   };
-  
+
   // Color mapping
   const colorClasses = {
-    blue: "text-blue-600",
-    green: "text-green-600",
-    yellow: "text-yellow-500",
-    red: "text-red-600",
-    gray: "text-gray-600",
+    blue: "text-[#2563eb]",
+    green: "text-[#2563eb]",
+    yellow: "text-[#2563eb]",
+    red: "text-[#2563eb]",
+    gray: "text-[#2563eb]",
   };
 
   return (
     <div className={cx("relative flex items-center justify-center", className)}>
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-      >
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         {/* Background arc (speedometer track) */}
         <path
           d={createArcPath(startAngleRad, (endAngle * Math.PI) / 180)}
