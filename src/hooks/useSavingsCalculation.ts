@@ -58,6 +58,7 @@ export const useSavingsCalculation = (
     return {
       chartData,
       saving_goal_percentage,
+      totalSaved,
     };
   }, [savingsGoal, transactions]);
 };

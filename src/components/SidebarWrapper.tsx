@@ -67,7 +67,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
             <Home className="w-5 h-5" />
             {!isSidebarCollapsed && <span>Dashboard</span>}
           </a>
-          <a
+          {/* <a
             href="#"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
@@ -76,7 +76,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
           >
             <BarChart3 className="w-5 h-5" />
             {!isSidebarCollapsed && <span>Analytics</span>}
-          </a>
+          </a> */}
           <a
             href="/profile"
             className={`flex items-center ${
@@ -87,7 +87,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
             <Users className="w-5 h-5" />
             {!isSidebarCollapsed && <span>Community</span>}
           </a>
-          <a
+          {/* <a
             href="#"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
@@ -96,7 +96,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({ onCollapseChange }) => 
           >
             <Clock className="w-5 h-5" />
             {!isSidebarCollapsed && <span>History</span>}
-          </a>
+          </a> */}
         </div>
       </nav>
 

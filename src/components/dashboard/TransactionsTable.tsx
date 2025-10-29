@@ -32,7 +32,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
           (transaction) =>
             transaction &&
             typeof transaction === "object" &&
-            transaction.transaction_ref !== undefined
+            transaction.payment_date !== undefined
         ),
       [transactions]
     );
@@ -49,6 +49,28 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
         }`,
       [validTransactions.length]
     );
+
+    // Ensure each transaction has a unique id for react-aria-components
+    // Always include index to guarantee uniqueness even if transaction_ref is duplicated
+    const transactionsWithIds = useMemo(
+      () =>
+        currentTransactions.map((transaction, index) => ({
+          ...transaction,
+          id: transaction.transaction_ref
+            ? `transaction-${transaction.transaction_ref}-${index}`
+            : `transaction-${transaction.payment_date || 'no-date'}-${transaction.amount || 'no-amount'}-${transaction.customer_id || 'no-customer'}-${index}`,
+        })),
+      [currentTransactions]
+    );
+
+    console.log("Rendering TransactionsTable", {
+      transactions,
+      validTransactions,
+      currentTransactions,
+      transactionsWithIds,
+      currentPage,
+      totalPages
+    });
 
     return (
       <TableCard.Root className="max-w-[calc(100vw-2rem)] bg-white sm:max-w-full">
@@ -96,18 +118,13 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
                 <Table.Head id="gateway" label="Gateway" />
               </Table.Header>
 
-              <Table.Body items={currentTransactions}>
+              <Table.Body items={transactionsWithIds}>
                 {(item) => {
-                  // Create a unique key using multiple fields and a fallback
-                  const uniqueKey = `transaction-${
-                    item.transaction_ref || "unknown"
-                  }-${item.payment_date || "no-date"}-${
-                    item.amount || "no-amount"
-                  }`;
+                  // Use the unique id we already generated for the key
                   return (
                     <Table.Row
-                      key={uniqueKey}
-                      id={item.transaction_ref || `transaction-${Date.now()}`}
+                      key={item.id}
+                      id={item.id}
                       aria-label={`Transaction ${
                         item.transaction_ref || "Unknown"
                       } for ${item.amount} on ${item.payment_date}`}

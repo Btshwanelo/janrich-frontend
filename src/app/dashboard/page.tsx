@@ -116,6 +116,8 @@ const Dashboard = () => {
                   {/* Savings Goal Card */}
                   <SavingsGoalCard
                     savingsGoalPercentage={savingsResult.saving_goal_percentage}
+                    totalSaved={savingsResult.totalSaved}
+                    savingGoal={savingsGoal}
                   />
                 </div>
 

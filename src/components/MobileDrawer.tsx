@@ -82,14 +82,14 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
               <Home className="w-5 h-5" />
               <span>Dashboard</span>
             </a>
-            <a
+            {/* <a
               href="#"
               onClick={handleLinkClick}
               className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
             >
               <BarChart3 className="w-5 h-5" />
               <span>Analytics</span>
-            </a>
+            </a> */}
             <a
               href="/profile"
               onClick={handleLinkClick}
@@ -98,14 +98,14 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
               <Users className="w-5 h-5" />
               <span>Community</span>
             </a>
-            <a
+            {/* <a
               href="#"
               onClick={handleLinkClick}
               className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Clock className="w-5 h-5" />
               <span>History</span>
-            </a>
+            </a> */}
             <a
               href="/profile"
               onClick={handleLinkClick}

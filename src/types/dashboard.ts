@@ -20,6 +20,7 @@ export interface ChartDataItem {
 export interface SavingsProgressResult {
   chartData: ChartDataItem[];
   saving_goal_percentage: number;
+  totalSaved: number;
 }
 
 export interface DashboardState {
