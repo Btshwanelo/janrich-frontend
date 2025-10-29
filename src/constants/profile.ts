@@ -6,7 +6,7 @@ export const PROFILE_CONSTANTS = {
   },
   HEADER_HEIGHT: {
     MOBILE: "h-32",
-    SM: "h-40", 
+    SM: "h-40",
     LG: "h-56",
   },
 } as const;
@@ -68,11 +68,10 @@ export const EMPLOYMENT_STATUS_OPTIONS: Array<{ id: string; label: string }> = [
 ] as const;
 
 export const DEPOSIT_FREQUENCY_OPTIONS: Array<{ id: string; label: string }> = [
-  { id: "weekly", label: "Weekly" },
-  { id: "bi-weekly", label: "Bi-weekly" },
-  { id: "monthly", label: "Monthly" },
-  { id: "quarterly", label: "Quarterly" },
-  { id: "annually", label: "Annually" },
+  { id: "Ad hoc", label: "Ad hoc" },
+  { id: "Lump Sum", label: "Lump Sum" },
+  { id: "Monthly", label: "Monthly" },
+  { id: "Quarterly", label: "Quarterly" },
 ] as const;
 
 export const BANK_OPTIONS: Array<{ id: string; label: string }> = [
@@ -98,22 +97,23 @@ export const RELATION_OPTIONS: Array<{ id: string; label: string }> = [
 ] as const;
 
 export const SAVING_FOR_OPTIONS: Array<{ id: string; label: string }> = [
-  { id: "house", label: "House" },
-  { id: "car", label: "Car" },
-  { id: "education", label: "Education" },
-  { id: "retirement", label: "Retirement" },
-  { id: "emergency", label: "Emergency Fund" },
-  { id: "vacation", label: "Vacation" },
-  { id: "other", label: "Other" },
+  { id: "Develop Savings Habit", label: "Develop Savings Habit" },
+  { id: "Januworry blues", label: "Januworry blues" },
+  { id: "Pay School Fees", label: "Pay School Fees" },
+  { id: "Pay off Debt", label: "Pay off Debt" },
+  { id: "Plan for the Year", label: "Plan for the Year Fund" },
+  { id: "Other", label: "Other" },
 ] as const;
 
 export const FUND_SOURCE_OPTIONS: Array<{ id: string; label: string }> = [
-  { id: "salary", label: "Salary" },
-  { id: "business", label: "Business Income" },
-  { id: "investment", label: "Investment Returns" },
-  { id: "inheritance", label: "Inheritance" },
-  { id: "gift", label: "Gift" },
-  { id: "other", label: "Other" },
+  { id: "Allowance", label: "Allowance" },
+  { id: "Business Profit", label: "Business Profit" },
+  { id: "Employment Income", label: "Employment Income" },
+  { id: "Inheritance", label: "Inheritance" },
+  { id: "Investments", label: "Investments" },
+  { id: "Pension", label: "Pension" },
+  { id: "Social Welfare Grant", label: "Social Welfare Grant" },
+  { id: "Other", label: "Other" },
 ] as const;
 
 export const PROFILE_MESSAGES = {

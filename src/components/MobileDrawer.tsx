@@ -38,8 +38,8 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 left-0 right-0 w-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
-          isOpen ? 'translate-y-0' : '-translate-y-full'
+        className={`fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden flex flex-col overflow-hidden ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Header */}
@@ -72,8 +72,8 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="px-4 py-4">
-          <div className="grid grid-cols-2 gap-2">
+        <nav className="px-4 py-4 overflow-y-auto flex-1">
+          <div className="flex flex-col gap-2">
             <a
               href="/dashboard"
               onClick={handleLinkClick}
