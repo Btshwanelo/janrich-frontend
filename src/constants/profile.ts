@@ -13,7 +13,7 @@ export const PROFILE_CONSTANTS = {
 
 export const PROFILE_TABS: Array<{ id: string; label: string }> = [
   { id: "details", label: "My details" },
-  { id: "beneficiary", label: "Beneficiary" },
+  { id: "beneficiary", label: "Beneficiary Details" },
   { id: "financial", label: "Financial details" },
 ] as const;
 
@@ -45,9 +45,10 @@ export const COUNTRY_OPTIONS: Array<{ id: string; label: string }> = [
 export const RACE_OPTIONS: Array<{ id: string; label: string }> = [
   { id: "african", label: "African" },
   { id: "coloured", label: "Coloured" },
-  { id: "indian", label: "Indian" },
+  { id: "indian", label: "Indian/Asian" },
   { id: "white", label: "White" },
   { id: "other", label: "Other" },
+  { id: "prefer-not-to-say", label: "Prefer not to say" },
 ] as const;
 
 export const COMMUNICATION_OPTIONS: Array<{ id: string; label: string }> = [
@@ -68,10 +69,10 @@ export const EMPLOYMENT_STATUS_OPTIONS: Array<{ id: string; label: string }> = [
 
 export const DEPOSIT_FREQUENCY_OPTIONS: Array<{ id: string; label: string }> = [
   { id: "weekly", label: "Weekly" },
+  { id: "bi-weekly", label: "Bi-weekly" },
   { id: "monthly", label: "Monthly" },
   { id: "quarterly", label: "Quarterly" },
   { id: "annually", label: "Annually" },
-  { id: "other", label: "Other" },
 ] as const;
 
 export const BANK_OPTIONS: Array<{ id: string; label: string }> = [
@@ -84,8 +85,8 @@ export const BANK_OPTIONS: Array<{ id: string; label: string }> = [
 ] as const;
 
 export const BENEFICIARY_TYPE_OPTIONS: Array<{ id: string; label: string }> = [
-  { id: "individual", label: "Individual" },
-  { id: "organization", label: "Organization" },
+  { id: "My Estate", label: "My Estate" },
+  { id: "My Beneficiary", label: "My Beneficiary" },
 ] as const;
 
 export const RELATION_OPTIONS: Array<{ id: string; label: string }> = [
@@ -93,7 +94,25 @@ export const RELATION_OPTIONS: Array<{ id: string; label: string }> = [
   { id: "child", label: "Child" },
   { id: "parent", label: "Parent" },
   { id: "sibling", label: "Sibling" },
-  { id: "friend", label: "Friend" },
+  { id: "other", label: "Other" },
+] as const;
+
+export const SAVING_FOR_OPTIONS: Array<{ id: string; label: string }> = [
+  { id: "house", label: "House" },
+  { id: "car", label: "Car" },
+  { id: "education", label: "Education" },
+  { id: "retirement", label: "Retirement" },
+  { id: "emergency", label: "Emergency Fund" },
+  { id: "vacation", label: "Vacation" },
+  { id: "other", label: "Other" },
+] as const;
+
+export const FUND_SOURCE_OPTIONS: Array<{ id: string; label: string }> = [
+  { id: "salary", label: "Salary" },
+  { id: "business", label: "Business Income" },
+  { id: "investment", label: "Investment Returns" },
+  { id: "inheritance", label: "Inheritance" },
+  { id: "gift", label: "Gift" },
   { id: "other", label: "Other" },
 ] as const;
 

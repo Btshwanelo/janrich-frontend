@@ -48,6 +48,18 @@ import {
 } from "@/lib/slices/authSlice";
 import { useAppSelector } from "@/lib/hooks";
 import { Input } from "@/components/base/input/input";
+import {
+  TITLE_OPTIONS,
+  GENDER_OPTIONS,
+  RACE_OPTIONS,
+  BENEFICIARY_TYPE_OPTIONS,
+  RELATION_OPTIONS,
+  EMPLOYMENT_STATUS_OPTIONS,
+  DEPOSIT_FREQUENCY_OPTIONS,
+  SAVING_FOR_OPTIONS,
+  FUND_SOURCE_OPTIONS,
+  PROFILE_TABS,
+} from "@/constants/profile";
 
 export default function ProfileBeneficiaryScreen() {
   const [selectedTab, setSelectedTab] = useState("details");
@@ -297,62 +309,29 @@ export default function ProfileBeneficiaryScreen() {
   // Handle financial details form submission
   const handleFinancialDetailsSubmit = async () => {
     try {
-      const employmentStatusOptions = [
-        { id: "employed", label: "Employed" },
-        { id: "self-employed", label: "Self-employed" },
-        { id: "unemployed", label: "Unemployed" },
-        { id: "student", label: "Student" },
-        { id: "retired", label: "Retired" },
-        { id: "other", label: "Other" },
-      ];
-
-      const depositFrequencyOptions = [
-        { id: "weekly", label: "Weekly" },
-        { id: "bi-weekly", label: "Bi-weekly" },
-        { id: "monthly", label: "Monthly" },
-        { id: "quarterly", label: "Quarterly" },
-        { id: "annually", label: "Annually" },
-      ];
-
-      const fundSourceOptions = [
-        { id: "salary", label: "Salary" },
-        { id: "business", label: "Business Income" },
-        { id: "investment", label: "Investment Returns" },
-        { id: "inheritance", label: "Inheritance" },
-        { id: "gift", label: "Gift" },
-        { id: "other", label: "Other" },
-      ];
-
-      const savingForOptions = [
-        { id: "house", label: "House" },
-        { id: "car", label: "Car" },
-        { id: "education", label: "Education" },
-        { id: "retirement", label: "Retirement" },
-        { id: "emergency", label: "Emergency Fund" },
-        { id: "vacation", label: "Vacation" },
-        { id: "other", label: "Other" },
-      ];
-
       const financialData = {
         customer_id: "JR0020",
         custom_employment_status: mapSelectKeyToApiValue(
           employmentStatus,
-          employmentStatusOptions
+          EMPLOYMENT_STATUS_OPTIONS
         ),
         custom_employee_status_other: employmentStatusOther,
         custom_deposit_frequency: mapSelectKeyToApiValue(
           depositFrequency,
-          depositFrequencyOptions
+          DEPOSIT_FREQUENCY_OPTIONS
         ),
         custom_deposit_frequency_other: depositFrequencyOther,
         custom_customer_bank: customerBank,
         custom_bank_other: bankOther,
         custom_fund_source: mapSelectKeyToApiValue(
           fundSource,
-          fundSourceOptions
+          FUND_SOURCE_OPTIONS
         ),
         custom_fund_source_other: fundSourceOther,
-        custom_saving_for: mapSelectKeyToApiValue(savingFor, savingForOptions),
+        custom_saving_for: mapSelectKeyToApiValue(
+          savingFor,
+          SAVING_FOR_OPTIONS
+        ),
         custom_saving_for_other: savingForOther,
         custom_account_holder: accountHolder,
         custom_branch_code: branchCode,
@@ -394,31 +373,18 @@ export default function ProfileBeneficiaryScreen() {
   // Handle beneficiary form submission
   const handleBeneficiarySubmit = async () => {
     try {
-      const beneficiaryTypeOptions = [
-        { id: "My Estate", label: "My Estate" },
-        { id: "My Beneficiary", label: "My Beneficiary" },
-      ];
-
-      const beneficiaryRelationOptions = [
-        { id: "spouse", label: "Spouse" },
-        { id: "child", label: "Child" },
-        { id: "parent", label: "Parent" },
-        { id: "sibling", label: "Sibling" },
-        { id: "other", label: "Other" },
-      ];
-
       const beneficiaryData = {
         customer_id: customer || "",
         beneficiary_type: mapSelectKeyToApiValue(
           beneficiaryType,
-          beneficiaryTypeOptions
+          BENEFICIARY_TYPE_OPTIONS
         ),
         beneficiary_name: beneficiaryName,
         beneficiary_title: beneficiaryTitle,
         beneficiary_cell: beneficiaryCell,
         beneficiary_relation: mapSelectKeyToApiValue(
           beneficiaryRelation,
-          beneficiaryRelationOptions
+          RELATION_OPTIONS
         ),
       };
 
@@ -453,21 +419,6 @@ export default function ProfileBeneficiaryScreen() {
   // Handle My Details form submission (Customer Update)
   const handleCustomerUpdate = async () => {
     try {
-      const titleOptions = [
-        { id: "mr", label: "Mr" },
-        { id: "mrs", label: "Mrs" },
-        { id: "ms", label: "Ms" },
-        { id: "dr", label: "Dr" },
-        { id: "prof", label: "Prof" },
-      ];
-
-      const genderOptions = [
-        { id: "male", label: "Male" },
-        { id: "female", label: "Female" },
-        { id: "other", label: "Other" },
-        { id: "prefer-not-to-say", label: "Prefer not to say" },
-      ];
-
       const customerData = {
         customer_id: "JR0020",
         customer_name: `${firstName} ${lastName}`,
@@ -478,8 +429,8 @@ export default function ProfileBeneficiaryScreen() {
         phone: detailsPhoneNumber,
         whatsapp_number: whatsappNumber,
         country_code: countryCode,
-        title: mapSelectKeyToApiValue(title, titleOptions),
-        gender: mapSelectKeyToApiValue(gender, genderOptions),
+        title: mapSelectKeyToApiValue(title, TITLE_OPTIONS),
+        gender: mapSelectKeyToApiValue(gender, GENDER_OPTIONS),
         agree_to_terms: 1,
       };
 
@@ -537,29 +488,13 @@ export default function ProfileBeneficiaryScreen() {
         return `${day}/${month}/${year}`;
       };
 
-      const genderOptions = [
-        { id: "male", label: "Male" },
-        { id: "female", label: "Female" },
-        { id: "other", label: "Other" },
-        { id: "prefer-not-to-say", label: "Prefer not to say" },
-      ];
-
-      const raceOptions = [
-        { id: "african", label: "African" },
-        { id: "coloured", label: "Coloured" },
-        { id: "indian", label: "Indian/Asian" },
-        { id: "white", label: "White" },
-        { id: "other", label: "Other" },
-        { id: "prefer-not-to-say", label: "Prefer not to say" },
-      ];
-
       const profileData = {
         customer_id: "JR0020",
         birth_date: formatBirthDate(birthdate),
-        gender: mapSelectKeyToApiValue(gender, genderOptions),
+        gender: mapSelectKeyToApiValue(gender, GENDER_OPTIONS),
         nationality: nationality,
         country_of_residence: countryOfResidence,
-        race: mapSelectKeyToApiValue(race, raceOptions),
+        race: mapSelectKeyToApiValue(race, RACE_OPTIONS),
         race_other: raceOther,
         communication_preference: communicationPreference,
       };
@@ -745,11 +680,7 @@ export default function ProfileBeneficiaryScreen() {
                     <Tabs.List
                       type="button-gray"
                       size="sm"
-                      items={[
-                        { id: "details", label: "My details" },
-                        { id: "beneficiary", label: "Beneficiary Details" },
-                        { id: "financial", label: "Financial details" },
-                      ]}
+                      items={PROFILE_TABS}
                       className="flex-nowrap"
                     >
                       {(tab) => <Tabs.Item {...tab} />}
@@ -777,23 +708,11 @@ export default function ProfileBeneficiaryScreen() {
                               <Select
                                 label="Beneficiary Type"
                                 placeholder="Select an option"
-                                items={[
-                                  { id: "My Estate", label: "My Estate" },
-                                  {
-                                    id: "My Beneficiary",
-                                    label: "My Beneficiary",
-                                  },
-                                ]}
+                                items={BENEFICIARY_TYPE_OPTIONS}
                                 className="w-full"
                                 defaultSelectedKey={mapApiValueToSelectKey(
                                   beneficiaryType,
-                                  [
-                                    { id: "My Estate", label: "My Estate" },
-                                    {
-                                      id: "My Beneficiary",
-                                      label: "My Beneficiary",
-                                    },
-                                  ]
+                                  BENEFICIARY_TYPE_OPTIONS
                                 )}
                                 onSelectionChange={(key) =>
                                   setBeneficiaryType(key as string)
@@ -858,23 +777,11 @@ export default function ProfileBeneficiaryScreen() {
                               <Select
                                 label="Relation"
                                 placeholder="Select an option"
-                                items={[
-                                  { id: "spouse", label: "Spouse" },
-                                  { id: "child", label: "Child" },
-                                  { id: "parent", label: "Parent" },
-                                  { id: "sibling", label: "Sibling" },
-                                  { id: "other", label: "Other" },
-                                ]}
+                                items={RELATION_OPTIONS}
                                 className="w-full"
                                 defaultSelectedKey={mapApiValueToSelectKey(
                                   beneficiaryRelation,
-                                  [
-                                    { id: "spouse", label: "Spouse" },
-                                    { id: "child", label: "Child" },
-                                    { id: "parent", label: "Parent" },
-                                    { id: "sibling", label: "Sibling" },
-                                    { id: "other", label: "Other" },
-                                  ]
+                                  RELATION_OPTIONS
                                 )}
                                 onSelectionChange={(key) =>
                                   setBeneficiaryRelation(key as string)
@@ -1033,23 +940,11 @@ export default function ProfileBeneficiaryScreen() {
                                 <Select
                                   label="What do we call you"
                                   placeholder="Select title"
-                                  items={[
-                                    { id: "mr", label: "Mr" },
-                                    { id: "mrs", label: "Mrs" },
-                                    { id: "ms", label: "Ms" },
-                                    { id: "dr", label: "Dr" },
-                                    { id: "prof", label: "Prof" },
-                                  ]}
+                                  items={TITLE_OPTIONS}
                                   className="w-full"
                                   defaultSelectedKey={mapApiValueToSelectKey(
                                     title,
-                                    [
-                                      { id: "mr", label: "Mr" },
-                                      { id: "mrs", label: "Mrs" },
-                                      { id: "ms", label: "Ms" },
-                                      { id: "dr", label: "Dr" },
-                                      { id: "prof", label: "Prof" },
-                                    ]
+                                    TITLE_OPTIONS
                                   )}
                                   onSelectionChange={(key) =>
                                     setTitle(key as string)
@@ -1077,27 +972,11 @@ export default function ProfileBeneficiaryScreen() {
                                   <Select
                                     label="Gender"
                                     placeholder="Select gender"
-                                    items={[
-                                      { id: "male", label: "Male" },
-                                      { id: "female", label: "Female" },
-                                      { id: "other", label: "Other" },
-                                      {
-                                        id: "prefer-not-to-say",
-                                        label: "Prefer not to say",
-                                      },
-                                    ]}
+                                    items={GENDER_OPTIONS}
                                     className="w-full"
                                     defaultSelectedKey={mapApiValueToSelectKey(
                                       gender,
-                                      [
-                                        { id: "male", label: "Male" },
-                                        { id: "female", label: "Female" },
-                                        { id: "other", label: "Other" },
-                                        {
-                                          id: "prefer-not-to-say",
-                                          label: "Prefer not to say",
-                                        },
-                                      ]
+                                      GENDER_OPTIONS
                                     )}
                                     onSelectionChange={(key) =>
                                       setGender(key as string)
@@ -1139,31 +1018,11 @@ export default function ProfileBeneficiaryScreen() {
                                 <Select
                                   label="Race"
                                   placeholder="Select race"
-                                  items={[
-                                    { id: "african", label: "African" },
-                                    { id: "coloured", label: "Coloured" },
-                                    { id: "indian", label: "Indian/Asian" },
-                                    { id: "white", label: "White" },
-                                    { id: "other", label: "Other" },
-                                    {
-                                      id: "prefer-not-to-say",
-                                      label: "Prefer not to say",
-                                    },
-                                  ]}
+                                  items={RACE_OPTIONS}
                                   className="w-full"
                                   defaultSelectedKey={mapApiValueToSelectKey(
                                     race,
-                                    [
-                                      { id: "african", label: "African" },
-                                      { id: "coloured", label: "Coloured" },
-                                      { id: "indian", label: "Indian/Asian" },
-                                      { id: "white", label: "White" },
-                                      { id: "other", label: "Other" },
-                                      {
-                                        id: "prefer-not-to-say",
-                                        label: "Prefer not to say",
-                                      },
-                                    ]
+                                    RACE_OPTIONS
                                   )}
                                   onSelectionChange={(key) =>
                                     setRace(key as string)
@@ -1332,30 +1191,11 @@ export default function ProfileBeneficiaryScreen() {
                               <Select
                                 label="What are you saving for"
                                 placeholder="Select an option"
-                                items={[
-                                  { id: "house", label: "House" },
-                                  { id: "car", label: "Car" },
-                                  { id: "education", label: "Education" },
-                                  { id: "retirement", label: "Retirement" },
-                                  { id: "emergency", label: "Emergency Fund" },
-                                  { id: "vacation", label: "Vacation" },
-                                  { id: "other", label: "Other" },
-                                ]}
+                                items={SAVING_FOR_OPTIONS}
                                 className="w-full"
                                 defaultSelectedKey={mapApiValueToSelectKey(
                                   savingFor,
-                                  [
-                                    { id: "house", label: "House" },
-                                    { id: "car", label: "Car" },
-                                    { id: "education", label: "Education" },
-                                    { id: "retirement", label: "Retirement" },
-                                    {
-                                      id: "emergency",
-                                      label: "Emergency Fund",
-                                    },
-                                    { id: "vacation", label: "Vacation" },
-                                    { id: "other", label: "Other" },
-                                  ]
+                                  SAVING_FOR_OPTIONS
                                 )}
                                 onSelectionChange={(key) =>
                                   setSavingFor(key as string)
@@ -1375,31 +1215,11 @@ export default function ProfileBeneficiaryScreen() {
                                 <Select
                                   label="Employment status"
                                   placeholder="Select an option"
-                                  items={[
-                                    { id: "employed", label: "Employed" },
-                                    {
-                                      id: "self-employed",
-                                      label: "Self-employed",
-                                    },
-                                    { id: "unemployed", label: "Unemployed" },
-                                    { id: "student", label: "Student" },
-                                    { id: "retired", label: "Retired" },
-                                    { id: "other", label: "Other" },
-                                  ]}
+                                  items={EMPLOYMENT_STATUS_OPTIONS}
                                   className="w-full"
                                   defaultSelectedKey={mapApiValueToSelectKey(
                                     employmentStatus,
-                                    [
-                                      { id: "employed", label: "Employed" },
-                                      {
-                                        id: "self-employed",
-                                        label: "Self-employed",
-                                      },
-                                      { id: "unemployed", label: "Unemployed" },
-                                      { id: "student", label: "Student" },
-                                      { id: "retired", label: "Retired" },
-                                      { id: "other", label: "Other" },
-                                    ]
+                                    EMPLOYMENT_STATUS_OPTIONS
                                   )}
                                   onSelectionChange={(key) =>
                                     setEmploymentStatus(key as string)
@@ -1417,23 +1237,11 @@ export default function ProfileBeneficiaryScreen() {
                                 <Select
                                   label="Deposit frequency"
                                   placeholder="Select an option"
-                                  items={[
-                                    { id: "weekly", label: "Weekly" },
-                                    { id: "bi-weekly", label: "Bi-weekly" },
-                                    { id: "monthly", label: "Monthly" },
-                                    { id: "quarterly", label: "Quarterly" },
-                                    { id: "annually", label: "Annually" },
-                                  ]}
+                                  items={DEPOSIT_FREQUENCY_OPTIONS}
                                   className="w-full"
                                   defaultSelectedKey={mapApiValueToSelectKey(
                                     depositFrequency,
-                                    [
-                                      { id: "weekly", label: "Weekly" },
-                                      { id: "bi-weekly", label: "Bi-weekly" },
-                                      { id: "monthly", label: "Monthly" },
-                                      { id: "quarterly", label: "Quarterly" },
-                                      { id: "annually", label: "Annually" },
-                                    ]
+                                    DEPOSIT_FREQUENCY_OPTIONS
                                   )}
                                   onSelectionChange={(key) =>
                                     setDepositFrequency(key as string)
@@ -1475,40 +1283,11 @@ export default function ProfileBeneficiaryScreen() {
                                 <Select
                                   label="Source of funds"
                                   placeholder="Select an option"
-                                  items={[
-                                    { id: "salary", label: "Salary" },
-                                    {
-                                      id: "business",
-                                      label: "Business Income",
-                                    },
-                                    {
-                                      id: "investment",
-                                      label: "Investment Returns",
-                                    },
-                                    { id: "inheritance", label: "Inheritance" },
-                                    { id: "gift", label: "Gift" },
-                                    { id: "other", label: "Other" },
-                                  ]}
+                                  items={FUND_SOURCE_OPTIONS}
                                   className="w-full"
                                   defaultSelectedKey={mapApiValueToSelectKey(
                                     fundSource,
-                                    [
-                                      { id: "salary", label: "Salary" },
-                                      {
-                                        id: "business",
-                                        label: "Business Income",
-                                      },
-                                      {
-                                        id: "investment",
-                                        label: "Investment Returns",
-                                      },
-                                      {
-                                        id: "inheritance",
-                                        label: "Inheritance",
-                                      },
-                                      { id: "gift", label: "Gift" },
-                                      { id: "other", label: "Other" },
-                                    ]
+                                    FUND_SOURCE_OPTIONS
                                   )}
                                   onSelectionChange={(key) =>
                                     setFundSource(key as string)

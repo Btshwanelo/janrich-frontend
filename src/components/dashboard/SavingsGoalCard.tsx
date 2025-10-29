@@ -68,16 +68,16 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
         <CardContent>
           {/* Dynamic Circular Progress */}
           <div className="flex justify-center">
-            <h2 className="text-[181D27] font-bold text-xl mb-6">
+            <h2 className="text-[181D27] font-bold text-xl">
               R {totalSaved} OF R{savingGoal}
             </h2>
           </div>
-          <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-center">
             <CircularProgress
               percentage={safePercentage}
               size={DASHBOARD_CONSTANTS.CIRCULAR_PROGRESS_SIZE}
               strokeWidth={DASHBOARD_CONSTANTS.CIRCULAR_PROGRESS_STROKE_WIDTH}
-              className="h-64 w-full"
+              className="h-52 w-full"
               color={progressColor}
               aria-label={`Savings goal progress: ${safePercentage}% complete`}
             >
@@ -92,7 +92,7 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
             </CircularProgress>
           </div>
 
-          <div className="mb-6 pb-6 border-b border-gray-200">
+          <div className="mb-2 pb-2 border-b border-gray-200">
             <h3 className="text-base font-semibold text-gray-900 mb-2">
               {message.title}
             </h3>
