@@ -151,6 +151,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
                       </Table.Cell>
                       <Table.Cell>
                         <span className="font-medium text-sm text-[#535862]">
+                          {item.currency} {" "}
                           {typeof item.amount === "number"
                             ? item.amount
                             : "N/A"}
