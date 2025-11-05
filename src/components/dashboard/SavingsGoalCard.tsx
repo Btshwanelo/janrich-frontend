@@ -1,6 +1,10 @@
 import React, { memo, useMemo } from "react";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, FileText, Wallet } from "lucide-react";
+import { User01, HelpCircle as HelpCircleIcon } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
+import { Dropdown } from "@/components/base/dropdown/dropdown";
+import { Button as AriaButton } from "react-aria-components";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -18,6 +22,8 @@ interface SavingsGoalCardProps {
 
 export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
   ({ savingsGoalPercentage, savingGoal, totalSaved }) => {
+    const router = useRouter();
+    
     // Validate and sanitize percentage to prevent NaN values
     const safePercentage =
       isNaN(savingsGoalPercentage) || !isFinite(savingsGoalPercentage)
@@ -60,9 +66,52 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
             <CardTitle className="text-lg font-semibold text-gray-900">
               Lets get going
             </CardTitle>
-            <Button color="tertiary" size="sm" aria-label="More options">
-              <MoreHorizontal className="w-5 h-5" />
-            </Button>
+            <Dropdown.Root>
+              <AriaButton
+                className="cursor-pointer rounded-md text-fg-quaternary outline-focus-ring transition duration-100 ease-linear hover:text-fg-quaternary_hover focus-visible:outline-2 focus-visible:outline-offset-2"
+                aria-label="More options"
+              >
+                <MoreHorizontal className="w-5 h-5" />
+              </AriaButton>
+              <Dropdown.Popover className="w-56 bg-white border !border-gray-200 !ring-0 !outline-none [&_*]:outline-none [&_*]:ring-0 [&_*:focus]:outline-none [&_*:focus-visible]:outline-none [&_*:focus-visible]:ring-0">
+                <Dropdown.Menu className="!outline-none">
+                  <Dropdown.Item
+                    icon={Wallet}
+                    onAction={() => {
+                      // Handle request payout action
+                      // You can add a route or modal here
+                    }}
+                  >
+                    Request Payout
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    icon={FileText}
+                    onAction={() => {
+                      // Handle get statement action
+                      // You can add a route or modal here
+                    }}
+                  >
+                    Get Statement
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    icon={HelpCircleIcon}
+                    onAction={() => {
+                      // Handle help and support action
+                      // You can add a route or modal here
+                    }}
+                  >
+                    Help and Support
+                  </Dropdown.Item>
+                  <Dropdown.Separator />
+                  <Dropdown.Item
+                    icon={User01}
+                    onAction={() => router.push("/profile")}
+                  >
+                    Profile
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown.Popover>
+            </Dropdown.Root>
           </div>
         </CardHeader>
         <CardContent>

@@ -90,13 +90,13 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
                     aria-label="Search transactions"
                   />
                 </div>
-                <Button
+                {/* <Button
                   color="secondary"
                   size="md"
                   iconTrailing={<Filter className="w-4 h-4" />}
                 >
                   <span>Filters</span>
-                </Button>
+                </Button> */}
               </div>
             )
           }

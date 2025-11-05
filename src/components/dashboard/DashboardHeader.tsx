@@ -25,13 +25,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({
           Welcome back, {displayName}
         </h1>
         <div className="flex items-center gap-2 lg:gap-3">
-          <Button
+          {/* <Button
             color="link-gray"
             size="md"
             className="gap-2"
             iconLeading={<Search data-icon />}
             aria-label="Search"
-          />
+          /> */}
           <Button
             color="secondary"
             size="md"
