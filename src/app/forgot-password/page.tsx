@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/base/input/label";
 import { Formik, Form, Field } from "formik";
@@ -23,6 +23,7 @@ const ForgotPasswordScreen = () => {
   const [sendOTP, { isLoading: isSendingOTP }] = useSendRegistrationOTPMutation();
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
+  const [error, setError] = useState<string | null>(null);
 
   // Refs for field highlighting
   const emailRef = useRef<HTMLInputElement>(null);
@@ -33,12 +34,14 @@ const ForgotPasswordScreen = () => {
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     try {
+      setError(null); // Clear any previous errors
       const response = await sendOTP({ email: values.email }).unwrap();
       
       // Check if the response indicates success or failure
       if (response?.message?.result === "failed") {
         const errorMessage = response?.message?.message || "Failed to send OTP. Please try again.";
-        showErrorToast(errorMessage);
+        setError(errorMessage);
+        // showErrorToast(errorMessage);
         setSubmitting(false);
         return;
       }
@@ -55,7 +58,8 @@ const ForgotPasswordScreen = () => {
       } else {
         // Fallback for any other result
         const errorMessage = response?.message?.message || "Failed to send OTP. Please try again.";
-        showErrorToast(errorMessage);
+        setError(errorMessage);
+        // showErrorToast(errorMessage);
         setSubmitting(false);
       }
     } catch (error: any) {
@@ -65,7 +69,8 @@ const ForgotPasswordScreen = () => {
         error?.data?.message || 
         error?.message || 
         "Failed to send OTP. Please try again.";
-      showErrorToast(errorMessage);
+      setError(errorMessage);
+      // showErrorToast(errorMessage);
       setSubmitting(false);
     }
   };
@@ -100,6 +105,7 @@ const ForgotPasswordScreen = () => {
                       value={field.value}
                       onChange={(value: string) => {
                         setFieldValue("email", value);
+                        setError(null); // Clear error when user types
                       }}
                       onBlur={field.onBlur}
                       type="email"
@@ -123,6 +129,13 @@ const ForgotPasswordScreen = () => {
                   )}
                 </Field>
               </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="bg-error-50 border border-error-200 rounded-lg p-3">
+                  <p className="text-error-600 text-sm">{error}</p>
+                </div>
+              )}
 
               {/* Submit Button */}
               <Button

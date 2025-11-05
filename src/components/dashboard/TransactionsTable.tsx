@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useMemo, useState, useCallback } from "react";
 import { Search, Filter, Check, PiggyBank } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
@@ -25,6 +25,9 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
     totalPages,
     onPageChange,
   }) => {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filteredPage, setFilteredPage] = useState(1);
+
     // Filter out any invalid transactions to prevent rendering issues
     const validTransactions = useMemo(
       () =>
@@ -37,40 +40,109 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
       [transactions]
     );
 
+    // Filter transactions based on search query
+    const filteredTransactions = useMemo(() => {
+      if (!searchQuery.trim()) {
+        return validTransactions;
+      }
+
+      const query = searchQuery.toLowerCase().trim();
+      return validTransactions.filter((transaction) => {
+        const searchableFields = [
+          transaction.transaction_ref || "",
+          transaction.customer_name || "",
+          transaction.gateway || "",
+          transaction.status || "",
+          transaction.payment_date || "",
+          transaction.amount?.toString() || "",
+          transaction.currency || "",
+        ];
+
+        return searchableFields.some((field) =>
+          field.toLowerCase().includes(query)
+        );
+      });
+    }, [validTransactions, searchQuery]);
+
+    // Calculate pagination for filtered results
+    const filteredTotalPages = useMemo(
+      () => Math.ceil(filteredTransactions.length / DASHBOARD_CONSTANTS.ITEMS_PER_PAGE),
+      [filteredTransactions.length]
+    );
+
+    const paginatedFilteredTransactions = useMemo(() => {
+      if (!searchQuery.trim()) {
+        return [];
+      }
+      const startIndex = (filteredPage - 1) * DASHBOARD_CONSTANTS.ITEMS_PER_PAGE;
+      const endIndex = startIndex + DASHBOARD_CONSTANTS.ITEMS_PER_PAGE;
+      return filteredTransactions.slice(startIndex, endIndex);
+    }, [filteredTransactions, filteredPage, searchQuery]);
+
+    // Use filtered transactions if search is active, otherwise use props
+    const displayTransactions = searchQuery.trim()
+      ? paginatedFilteredTransactions
+      : currentTransactions;
+
+    const displayTotalPages = searchQuery.trim()
+      ? filteredTotalPages
+      : totalPages;
+
+    const displayCurrentPage = searchQuery.trim()
+      ? filteredPage
+      : currentPage;
+
+    const handleSearchChange = useCallback(
+      (value: string) => {
+        setSearchQuery(value);
+        // Reset to page 1 when search changes
+        setFilteredPage(1);
+      },
+      []
+    );
+
+    const handlePageChangeInternal = useCallback(
+      (page: number) => {
+        if (searchQuery.trim()) {
+          setFilteredPage(page);
+        } else {
+          onPageChange(page);
+        }
+      },
+      [searchQuery, onPageChange]
+    );
+
     const hasTransactions = useMemo(
       () => validTransactions.length > 0,
       [validTransactions.length]
     );
 
+    // Use filtered transactions count for badge if search is active
+    const transactionsForBadge = searchQuery.trim()
+      ? filteredTransactions
+      : validTransactions;
+
     const transactionBadgeText = useMemo(
       () =>
-        `${validTransactions.length} Transaction${
-          validTransactions.length !== 1 ? "s" : ""
+        `${transactionsForBadge.length} Transaction${
+          transactionsForBadge.length !== 1 ? "s" : ""
         }`,
-      [validTransactions.length]
+      [transactionsForBadge.length]
     );
 
     // Ensure each transaction has a unique id for react-aria-components
     // Always include index to guarantee uniqueness even if transaction_ref is duplicated
     const transactionsWithIds = useMemo(
       () =>
-        currentTransactions.map((transaction, index) => ({
+        displayTransactions.map((transaction, index) => ({
           ...transaction,
           id: transaction.transaction_ref
             ? `transaction-${transaction.transaction_ref}-${index}`
             : `transaction-${transaction.payment_date || 'no-date'}-${transaction.amount || 'no-amount'}-${transaction.customer_id || 'no-customer'}-${index}`,
         })),
-      [currentTransactions]
+      [displayTransactions]
     );
 
-    console.log("Rendering TransactionsTable", {
-      transactions,
-      validTransactions,
-      currentTransactions,
-      transactionsWithIds,
-      currentPage,
-      totalPages
-    });
 
     return (
       <TableCard.Root className="max-w-[calc(100vw-2rem)] bg-white sm:max-w-full">
@@ -79,24 +151,19 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
           badge={transactionBadgeText}
           description="Keep track of your transactions."
           contentTrailing={
-            currentTransactions.length > 0 && (
+            hasTransactions && (
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <Input
                     icon={Search}
-                    placeholder="Search"
+                    placeholder="Search transactions..."
                     className=""
-                    shortcut="⌘K"
+                    // shortcut="⌘K"
                     aria-label="Search transactions"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
                   />
                 </div>
-                {/* <Button
-                  color="secondary"
-                  size="md"
-                  iconTrailing={<Filter className="w-4 h-4" />}
-                >
-                  <span>Filters</span>
-                </Button> */}
               </div>
             )
           }
@@ -169,11 +236,13 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
             </Table>
 
             {/* Pagination */}
-            {validTransactions.length > DASHBOARD_CONSTANTS.ITEMS_PER_PAGE && (
+            {(searchQuery.trim()
+              ? filteredTransactions.length > DASHBOARD_CONSTANTS.ITEMS_PER_PAGE
+              : validTransactions.length > DASHBOARD_CONSTANTS.ITEMS_PER_PAGE) && (
               <PaginationPageMinimalCenter
-                page={currentPage}
-                total={totalPages}
-                onPageChange={onPageChange}
+                page={displayCurrentPage}
+                total={displayTotalPages}
+                onPageChange={handlePageChangeInternal}
                 className="px-4 py-3 md:px-6 md:pt-3 md:pb-4"
               />
             )}
