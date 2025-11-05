@@ -171,7 +171,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
         <Dropdown.Root>
           <AriaButton
             className={`flex items-center ${
-              isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
+              isSidebarCollapsed ? "justify-center " : "space-x-3 px-3"
             } py-2 mt-4 w-full rounded-lg hover:bg-gray-100 transition-colors cursor-pointer outline-none`}
             aria-label="User menu"
           >

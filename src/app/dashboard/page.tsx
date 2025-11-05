@@ -118,6 +118,14 @@ const Dashboard = () => {
                     savingsGoalPercentage={savingsResult.saving_goal_percentage}
                     totalSaved={savingsResult.totalSaved}
                     savingGoal={savingsGoal}
+                    profileData={{
+                      customer_name: data?.message?.data?.basic_info?.customer_name,
+                      email: data?.message?.data?.basic_info?.email,
+                      account_holder: data?.message?.data?.financials?.account_holder,
+                      branch_code: data?.message?.data?.financials?.branch_code,
+                      iban_account: data?.message?.data?.financials?.iban_account,
+                      customer_bank: data?.message?.data?.financials?.customer_bank,
+                    }}
                   />
                 </div>
 
