@@ -263,20 +263,25 @@ export interface SendOTPRequest {
 
 export interface SendOTPResponse {
   message: {
-    status: string;
-    otp_id: string;
+    result?: "success" | "failed";
+    message?: string;
+    status?: string;
+    otp_id?: string;
   };
 }
 
 export interface VerifyOTPRequest {
   email: string;
   otp_input: string;
+  password?: string; // Optional for password reset
 }
 
 export interface VerifyOTPResponse {
   message: {
-    status: string;
-    user: string;
+    result?: "success" | "failed";
+    message?: string;
+    status?: string;
+    user?: string;
   };
 }
 
