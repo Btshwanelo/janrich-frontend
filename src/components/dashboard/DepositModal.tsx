@@ -77,7 +77,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
       <Modal>
         <Dialog className="!flex !flex-col !items-stretch bg-white rounded-2xl w-full max-w-2xl mx-auto relative overflow-hidden shadow-xl">
           {/* Header Banner */}
-          <div className="h-12 sm:h-40 lg:h-32 relative w-full flex-shrink-0 p-1">
+          <div className="h-24 sm:h-40 lg:h-32 relative w-full flex-shrink-0 p-1">
             <img
               src="/Image-bg.png"
               alt="User banner"
@@ -160,12 +160,12 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                   {formatCurrency(goalAmount)}
                 </p>
               </div>
-              <div className="flex-1 bg-blue-50 rounded-xl p-3">
+              {/* <div className="flex-1 bg-blue-50 rounded-xl p-3">
                 <p className="text-xs text-gray-500 mb-1">Payments to go</p>
                 <p className="text-lg font-bold text-gray-900">
                   {paymentsToGo}
                 </p>
-              </div>
+              </div> */}
             </div>
 
             {/* Divider */}
@@ -212,7 +212,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
             <div className="border-t border-gray-200 mb-6" />
 
             {/* Footer Actions */}
-            <div className="flex items-center justify-between">
+            {/* <div className="flex items-center justify-between">
               <div className="flex items-center gap-6">
                 <Checkbox
                   isSelected={dontShowAgain}
@@ -259,7 +259,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                   Confirm
                 </Button>
               </div>
-            </div>
+            </div> */}
           </div>
         </Dialog>
       </Modal>
