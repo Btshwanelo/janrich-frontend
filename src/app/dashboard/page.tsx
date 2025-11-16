@@ -3,7 +3,10 @@ import React, { useState, useEffect } from "react";
 import AuthGuard from "@/components/AuthGuard";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { useGetProfileQuery, useGetLedgerQuery } from "@/lib/slices/authSlice";
-import { setTransactions, setCurrentTransaction } from "@/lib/slices/ledgerSlice";
+import {
+  setTransactions,
+  setCurrentTransaction,
+} from "@/lib/slices/ledgerSlice";
 import SavingsGoalModal from "@/components/SavingsGoalModal";
 import SidebarWrapper from "@/components/SidebarWrapper";
 import MobileTopNav from "@/components/MobileTopNav";
@@ -31,12 +34,12 @@ const Dashboard = () => {
     refetch,
     isLoading: isProfileLoading,
     error: profileError,
-  } = useGetProfileQuery(customer || "JR0027");
+  } = useGetProfileQuery(customer);
   const {
     data: dataLedger,
     isLoading: isLedgerLoading,
     error: ledgerError,
-  } = useGetLedgerQuery(customer || "JR0027");
+  } = useGetLedgerQuery(customer);
 
   // Store transactions in ledger slice on successful API response
   useEffect(() => {

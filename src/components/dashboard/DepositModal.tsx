@@ -10,6 +10,7 @@ import {
   Dialog,
 } from "@/components/application/modals/modal";
 import { Avatar } from "@/components/base/avatar/avatar";
+import { amountConversion } from "@/utils/amountConversion";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -41,13 +42,13 @@ export const DepositModal: React.FC<DepositModalProps> = ({
   if (!isOpen) return null;
 
   const formatCurrency = (value: number): string => {
-    return `R ${value.toLocaleString("en-ZA", { minimumFractionDigits: 0 })}`;
+    return `R ${amountConversion(value)}`;
   };
 
   const customerName = profileData?.customer_name || "Kat Vilane";
   const customerHandle = customerName.toLowerCase().replace(/\s+/g, "");
-  const totalPaid = savingsData?.totalSaved || 332086;
-  const goalAmount = savingsData?.savingGoal || 511000;
+  const totalPaid = savingsData?.totalSaved ;
+  const goalAmount = savingsData?.savingGoal;
   const paymentsToGo = savingsData?.paymentsToGo || 4;
 
   // Extract account details

@@ -8,6 +8,7 @@ import { PaginationPageMinimalCenter } from "@/components/application/pagination
 import { BadgeWithIcon } from "@/components/base/badges/badges";
 import { Transaction } from "@/types/dashboard";
 import { EMPTY_STATE_CONFIG, DASHBOARD_CONSTANTS } from "@/constants/dashboard";
+import { amountConversion } from "@/utils/amountConversion";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -210,7 +211,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
                     >
                       <Table.Cell>
                         <a href="/transactions">
-                          <span className="font-medium text-sm text-[#181D27]">
+                          <span className="font-medium hover:underline text-sm text-[#181D27]">
                             {item.customer_id || "N/A"}
                           </span>
                         </a>
@@ -234,7 +235,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
                         <span className="font-medium text-sm text-[#535862]">
                           {item.currency}{" "}
                           {typeof item.amount === "number"
-                            ? item.amount
+                            ? amountConversion(item.amount)
                             : "N/A"}
                         </span>
                       </Table.Cell>

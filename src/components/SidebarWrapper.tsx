@@ -14,7 +14,7 @@ import {
 import { User01, HelpCircle as HelpCircleIcon } from "@untitledui/icons";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { clearAuthCookie, clearCredentials } from "@/lib/slices/authSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Button } from "./base/buttons/button";
 import { Dropdown } from "./base/dropdown/dropdown";
 import { Button as AriaButton } from "react-aria-components";
@@ -31,6 +31,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleToggle = () => {
     const newState = !isSidebarCollapsed;
@@ -48,7 +49,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
     <div
       className={`${
         isSidebarCollapsed ? "w-16" : "w-64"
-      } bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out fixed left-0 top-0 h-screen z-10 hidden lg:flex`}
+      } bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out fixed left-0 top-0 h-screen z-10  lg:flex`}
     >
       {/* Logo and Toggle */}
       <div
@@ -84,89 +85,51 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
             href="/dashboard"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-            } py-2 text-[#535862] text-sm bg-gray-100 hover:bg-gray-100 rounded-lg`}
+            } py-2 text-sm rounded-lg transition-colors ${
+              pathname === "/dashboard"
+                ? "bg-primary-50 text-primary-600 font-medium"
+                : "text-[#535862] hover:bg-gray-100"
+            }`}
             title={isSidebarCollapsed ? "Dashboard" : ""}
           >
             <Home className="w-5 h-5" />
             {!isSidebarCollapsed && <span>Dashboard</span>}
           </a>
+
           {/* <a
-            href="#"
+            href="/transactions"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-            } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
-            title={isSidebarCollapsed ? "Analytics" : ""}
+            } py-2 text-sm rounded-lg transition-colors ${
+              pathname === "/transactions"
+                ? "bg-primary-50 text-primary-600 font-medium"
+                : "text-[#535862] hover:bg-gray-100"
+            }`}
+            title={isSidebarCollapsed ? "Transactions" : ""}
           >
-            <BarChart3 className="w-5 h-5" />
-            {!isSidebarCollapsed && <span>Analytics</span>}
+            <Clock className="w-5 h-5" />
+            {!isSidebarCollapsed && <span>Transactions</span>}
           </a> */}
+
           <a
-            href="/profile"
+            href="/community"
             className={`flex items-center ${
               isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-            } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
+            } py-2 text-sm rounded-lg transition-colors ${
+              pathname === "/community"
+                ? "bg-primary-50 text-primary-600 font-medium"
+                : "text-[#535862] hover:bg-gray-100"
+            }`}
             title={isSidebarCollapsed ? "Community" : ""}
           >
             <Users className="w-5 h-5" />
             {!isSidebarCollapsed && <span>Community</span>}
           </a>
-          {/* <a
-            href="#"
-            className={`flex items-center ${
-              isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-            } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
-            title={isSidebarCollapsed ? "History" : ""}
-          >
-            <Clock className="w-5 h-5" />
-            {!isSidebarCollapsed && <span>History</span>}
-          </a> */}
         </div>
       </nav>
 
       {/* Bottom Navigation */}
       <div className="p-4 space-y-2 border-t border-gray-200 bg-white">
-        {/* <a
-          href="/profile"
-          className={`flex items-center ${
-            isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-          } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
-          title={isSidebarCollapsed ? "Support" : ""}
-        >
-          <HelpCircle className="w-5 h-5" />
-          {!isSidebarCollapsed && <span>Profile</span>}
-        </a> */}
-        {/* <a
-          href="#"
-          className={`flex items-center ${
-            isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-          } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
-          title={isSidebarCollapsed ? "Support" : ""}
-        >
-          <HelpCircle className="w-5 h-5" />
-          {!isSidebarCollapsed && <span>Support</span>}
-        </a> */}
-        {/* <a
-          href="#"
-          onClick={() => setIsModalOpen(true)}
-          className={`flex items-center ${
-            isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-          } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg`}
-          title={isSidebarCollapsed ? "Settings" : ""}
-        >
-          <Settings className="w-5 h-5" />
-          {!isSidebarCollapsed && <span>Settings</span>}
-        </a> */}
-        {/* <button
-          onClick={handleLogout}
-          className={`flex items-center ${
-            isSidebarCollapsed ? "justify-center px-2" : "space-x-3 px-3"
-          } py-2 text-[#535862] text-sm hover:bg-gray-100 rounded-lg w-full text-left`}
-          title={isSidebarCollapsed ? "Logout" : ""}
-        >
-          <LogOut className="w-5 h-5" />
-          {!isSidebarCollapsed && <span>Logout</span>}
-        </button> */}
-
         {/* User Profile */}
         <Dropdown.Root>
           <AriaButton
@@ -206,10 +169,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
                 Help and Support
               </Dropdown.Item>
               <Dropdown.Separator />
-              <Dropdown.Item 
-                icon={LogOut} 
-                onAction={handleLogout}
-              >
+              <Dropdown.Item icon={LogOut} onAction={handleLogout}>
                 Logout
               </Dropdown.Item>
             </Dropdown.Menu>

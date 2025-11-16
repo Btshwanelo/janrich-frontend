@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -24,36 +24,57 @@ import {
 import AuthGuard from "@/components/AuthGuard";
 import SidebarWrapper from "@/components/SidebarWrapper";
 import MobileTopNav from "@/components/MobileTopNav";
+import { useAppSelector, useAppDispatch } from "@/lib/hooks";
+import { setCurrentTransaction } from "@/lib/slices/ledgerSlice";
+import { LedgerEntry } from "@/lib/slices/ledgerSlice";
+import { amountConversion } from "@/utils/amountConversion";
 
 const TransactionDetailPage = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  const [currentTransactionIndex, setCurrentTransactionIndex] = useState(0);
+  // Get transactions and current transaction from Redux
+  const { transactions, currentTransaction } = useAppSelector(
+    (state) => state.ledger
+  );
 
-  // Mock transaction data - in a real app, this would come from props or API
-  const transactions = [
-    {
-      reference: "JRO001",
-      status: "Paid",
-      date: "Jan 6, 2025",
-      amount: "R3500.90",
-    },
-  ];
+  // Find current transaction index
+  const currentTransactionIndex = useMemo(() => {
+    if (!currentTransaction || transactions.length === 0) return 0;
+    return transactions.findIndex(
+      (t) => t.transaction_ref === currentTransaction.transaction_ref
+    );
+  }, [currentTransaction, transactions]);
 
-  const currentTransaction = transactions[currentTransactionIndex];
+  // Use current transaction from Redux, or fallback to first transaction
+  const displayTransaction: LedgerEntry | null = useMemo(() => {
+    if (currentTransaction) return currentTransaction;
+    if (transactions.length > 0) return transactions[0];
+    return null;
+  }, [currentTransaction, transactions]);
 
+  // Update current transaction in Redux when navigating
   const handlePrevious = () => {
     if (currentTransactionIndex > 0) {
-      setCurrentTransactionIndex(currentTransactionIndex - 1);
+      const prevTransaction = transactions[currentTransactionIndex - 1];
+      dispatch(setCurrentTransaction(prevTransaction));
     }
   };
 
   const handleNext = () => {
     if (currentTransactionIndex < transactions.length - 1) {
-      setCurrentTransactionIndex(currentTransactionIndex + 1);
+      const nextTransaction = transactions[currentTransactionIndex + 1];
+      dispatch(setCurrentTransaction(nextTransaction));
     }
   };
+
+  // Set first transaction as current if none is selected
+  useEffect(() => {
+    if (!currentTransaction && transactions.length > 0) {
+      dispatch(setCurrentTransaction(transactions[0]));
+    }
+  }, [currentTransaction, transactions, dispatch]);
 
   const handleDownloadPDF = () => {
     // Handle PDF download
@@ -82,7 +103,7 @@ const TransactionDetailPage = () => {
             color="secondary"
             size="sm"
             iconLeading={ArrowLeft}
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push("/dashboard")}
             className="mb-4"
           >
             Back
@@ -106,7 +127,9 @@ const TransactionDetailPage = () => {
                     color="secondary"
                     size="sm"
                     iconLeading={ChevronLeft}
-                    isDisabled={currentTransactionIndex === 0}
+                    isDisabled={
+                      currentTransactionIndex === 0 || transactions.length === 0
+                    }
                     onClick={handlePrevious}
                     className="data-icon-only text-[#A4A7AE]"
                   />
@@ -115,7 +138,8 @@ const TransactionDetailPage = () => {
                     size="sm"
                     iconLeading={ChevronRight}
                     isDisabled={
-                      currentTransactionIndex === transactions.length - 1
+                      currentTransactionIndex === transactions.length - 1 ||
+                      transactions.length === 0
                     }
                     onClick={handleNext}
                     className="data-icon-only text-[#A4A7AE]"
@@ -125,53 +149,104 @@ const TransactionDetailPage = () => {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              {/* Transaction Details */}
-              <div className="grid grid-cols-1 px-8 md:grid-cols-2 gap-6">
-                {/* Left Column */}
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                      Reference
-                    </p>
-                    <p className="text-base font-semibold text-gray-900">
-                      {currentTransaction.reference}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                      Status
-                    </p>
-                    <BadgeWithIcon
-                      type="pill-color"
-                      color="success"
-                      size="md"
-                      iconLeading={Check}
-                    >
-                      {currentTransaction.status}
-                    </BadgeWithIcon>
-                  </div>
-                </div>
+              {displayTransaction ? (
+                <>
+                  {/* Transaction Details */}
+                  <div className="grid grid-cols-1 px-8 md:grid-cols-2 gap-6">
+                    {/* Left Column */}
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">
+                          Reference
+                        </p>
+                        <p className="text-base font-semibold text-gray-900">
+                          {displayTransaction.customer_id || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">
+                          Customer ID
+                        </p>
+                        <p className="text-base font-semibold text-gray-900">
+                          {displayTransaction.customer_id || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">
+                          Customer Name
+                        </p>
+                        <p className="text-base font-semibold text-gray-900">
+                          {displayTransaction.customer_name || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">
+                          Status
+                        </p>
+                        <BadgeWithIcon
+                          type="pill-color"
+                          color="success"
+                          size="md"
+                          iconLeading={Check}
+                        >
+                          {displayTransaction.status || "N/A"}
+                        </BadgeWithIcon>
+                      </div>
+                    </div>
 
-                {/* Right Column */}
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                      Date
-                    </p>
-                    <p className="text-base font-semibold text-gray-900">
-                      {currentTransaction.date}
-                    </p>
+                    {/* Right Column */}
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">
+                          Date
+                        </p>
+                        <p className="text-base font-semibold text-gray-900">
+                          {displayTransaction.payment_date
+                            ? new Date(
+                                displayTransaction.payment_date
+                              ).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })
+                            : "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">
+                          Amount
+                        </p>
+                        <p className="text-base font-semibold text-gray-900">
+                          {displayTransaction.currency || ""}{" "}
+                          {typeof displayTransaction.amount === "number"
+                            ? amountConversion(displayTransaction.amount)
+                            : "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">
+                          Gateway
+                        </p>
+                        <p className="text-base font-semibold text-gray-900">
+                          {displayTransaction.gateway || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">
+                          Payment Type
+                        </p>
+                        <p className="text-base font-semibold text-gray-900">
+                          {displayTransaction.payment_type || "N/A"}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                      Amount
-                    </p>
-                    <p className="text-base font-semibold text-gray-900">
-                      {currentTransaction.amount}
-                    </p>
-                  </div>
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No transaction selected</p>
                 </div>
-              </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex flex-col justify-between sm:flex-row gap-3 pt-2 border-t border-gray-200">

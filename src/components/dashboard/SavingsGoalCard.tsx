@@ -14,6 +14,7 @@ import {
 import { CircularProgress } from "@/components/CircularProgress";
 import { DASHBOARD_CONSTANTS, SAVINGS_MESSAGES } from "@/constants/dashboard";
 import { DepositModal } from "./DepositModal";
+import { amountConversion } from "@/utils/amountConversion";
 
 interface SavingsGoalCardProps {
   savingsGoalPercentage: number;
@@ -34,7 +35,7 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
   ({ savingsGoalPercentage, savingGoal, totalSaved, profileData }) => {
     const router = useRouter();
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-    
+
     // Validate and sanitize percentage to prevent NaN values
     const safePercentage =
       isNaN(savingsGoalPercentage) || !isFinite(savingsGoalPercentage)
@@ -133,11 +134,13 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
             <div className="flex justify-center">
               <h2 className="text-[181D27] font-bold text-xl">
                 {totalSaved > 0 ? (
-                  <span className="text-[#34C759]"> R {totalSaved}</span>
+                  <span className="text-[#34C759]">
+                    R {amountConversion(totalSaved)}
+                  </span>
                 ) : (
-                  <span className=""> R {totalSaved}</span>
+                  <span className=""> R {amountConversion(totalSaved)}</span>
                 )}{" "}
-                of R{savingGoal}
+                of R{amountConversion(savingGoal)}
               </h2>
             </div>
             <div className="flex items-center justify-center">

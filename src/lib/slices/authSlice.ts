@@ -402,7 +402,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
     sendRegistrationOTP: builder.mutation<SendOTPResponse, SendOTPRequest>({
       query: (otpData) => ({
-        url: "janriches.api.otp.send_registration_otp",
+        url: "jan.sendotp",
         method: "POST",
         body: otpData,
       }),

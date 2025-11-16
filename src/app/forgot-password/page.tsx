@@ -37,14 +37,13 @@ const ForgotPasswordScreen = () => {
     try {
       setError(null); // Clear any previous errors
       const response = await sendOTP({ email: values.email }).unwrap();
-
       showSuccessToast("OTP sent successfully. Please check your email.");
       router.push(`/forgot-password/new/${encodeURIComponent(values.email)}`);
     } catch (error: any) {
       // Handle network errors or API errors
-      const errorMessage = error || "Failed to send OTP. Please try again.";
+      let errorMessage = "Failed to send OTP. Please try again.";
+
       setError(errorMessage);
-      // showErrorToast(errorMessage);
       setSubmitting(false);
     }
   };

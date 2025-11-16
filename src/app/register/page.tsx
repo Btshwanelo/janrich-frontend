@@ -125,6 +125,8 @@ const RegistrationScreen = () => {
       // Call register API
       const result = await register(registrationPayload).unwrap();
       // Store registration data in Redux store
+
+      console.log("1212",result)
       dispatch(
         setRegistrationData({
           customer: result.message.customer,
@@ -205,7 +207,7 @@ const RegistrationScreen = () => {
                 onClose={() => setShowOTPModal(false)}
                 contactInfo={values.phoneNumber}
                 onSuccess={handleOTPSuccess}
-                otpLength={4}
+                otpLength={5}
                 validOtp="2135"
                 verificationMethod="whatsapp"
               />
