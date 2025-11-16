@@ -10,7 +10,7 @@ export interface LoginRequest {
 export interface RegisterRequest {
   customer_name: string;
   customer_type: string;
-  title: string;
+  // title: string;
   first_name: string;
   last_name: string;
   last_nameemail: string;

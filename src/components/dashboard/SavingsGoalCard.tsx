@@ -26,6 +26,7 @@ interface SavingsGoalCardProps {
     branch_code?: string;
     iban_account?: string;
     customer_bank?: string;
+    customer_id?: string;
   };
 }
 

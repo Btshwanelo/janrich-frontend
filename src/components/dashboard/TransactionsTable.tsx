@@ -15,6 +15,7 @@ interface TransactionsTableProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onTransactionSelect?: (transaction: Transaction) => void;
 }
 
 export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
@@ -24,6 +25,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
     currentPage,
     totalPages,
     onPageChange,
+    onTransactionSelect,
   }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredPage, setFilteredPage] = useState(1);
@@ -66,7 +68,10 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
 
     // Calculate pagination for filtered results
     const filteredTotalPages = useMemo(
-      () => Math.ceil(filteredTransactions.length / DASHBOARD_CONSTANTS.ITEMS_PER_PAGE),
+      () =>
+        Math.ceil(
+          filteredTransactions.length / DASHBOARD_CONSTANTS.ITEMS_PER_PAGE
+        ),
       [filteredTransactions.length]
     );
 
@@ -74,7 +79,8 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
       if (!searchQuery.trim()) {
         return [];
       }
-      const startIndex = (filteredPage - 1) * DASHBOARD_CONSTANTS.ITEMS_PER_PAGE;
+      const startIndex =
+        (filteredPage - 1) * DASHBOARD_CONSTANTS.ITEMS_PER_PAGE;
       const endIndex = startIndex + DASHBOARD_CONSTANTS.ITEMS_PER_PAGE;
       return filteredTransactions.slice(startIndex, endIndex);
     }, [filteredTransactions, filteredPage, searchQuery]);
@@ -88,18 +94,13 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
       ? filteredTotalPages
       : totalPages;
 
-    const displayCurrentPage = searchQuery.trim()
-      ? filteredPage
-      : currentPage;
+    const displayCurrentPage = searchQuery.trim() ? filteredPage : currentPage;
 
-    const handleSearchChange = useCallback(
-      (value: string) => {
-        setSearchQuery(value);
-        // Reset to page 1 when search changes
-        setFilteredPage(1);
-      },
-      []
-    );
+    const handleSearchChange = useCallback((value: string) => {
+      setSearchQuery(value);
+      // Reset to page 1 when search changes
+      setFilteredPage(1);
+    }, []);
 
     const handlePageChangeInternal = useCallback(
       (page: number) => {
@@ -138,11 +139,12 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
           ...transaction,
           id: transaction.transaction_ref
             ? `transaction-${transaction.transaction_ref}-${index}`
-            : `transaction-${transaction.payment_date || 'no-date'}-${transaction.amount || 'no-amount'}-${transaction.customer_id || 'no-customer'}-${index}`,
+            : `transaction-${transaction.payment_date || "no-date"}-${
+                transaction.amount || "no-amount"
+              }-${transaction.customer_id || "no-customer"}-${index}`,
         })),
       [displayTransactions]
     );
-
 
     return (
       <TableCard.Root className="max-w-[calc(100vw-2rem)] bg-white sm:max-w-full">
@@ -188,6 +190,14 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
               <Table.Body items={transactionsWithIds}>
                 {(item) => {
                   // Use the unique id we already generated for the key
+                  // Remove the id property before passing to onTransactionSelect
+                  const handleRowClick = () => {
+                    if (onTransactionSelect) {
+                      const { id, ...transaction } = item;
+                      onTransactionSelect(transaction as Transaction);
+                    }
+                  };
+
                   return (
                     <Table.Row
                       key={item.id}
@@ -195,11 +205,15 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
                       aria-label={`Transaction ${
                         item.transaction_ref || "Unknown"
                       } for ${item.amount} on ${item.payment_date}`}
+                      onClick={handleRowClick}
+                      className="cursor-pointer hover:bg-gray-50 transition-colors"
                     >
                       <Table.Cell>
-                        <span className="font-medium text-sm text-[#181D27]">
-                          {item.transaction_ref || "N/A"}
-                        </span>
+                        <a href="/transactions">
+                          <span className="font-medium text-sm text-[#181D27]">
+                            {item.customer_id || "N/A"}
+                          </span>
+                        </a>
                       </Table.Cell>
                       <Table.Cell>
                         <span className="text-sm text-[#535862]">
@@ -218,7 +232,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
                       </Table.Cell>
                       <Table.Cell>
                         <span className="font-medium text-sm text-[#535862]">
-                          {item.currency} {" "}
+                          {item.currency}{" "}
                           {typeof item.amount === "number"
                             ? item.amount
                             : "N/A"}
@@ -238,7 +252,8 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = memo(
             {/* Pagination */}
             {(searchQuery.trim()
               ? filteredTransactions.length > DASHBOARD_CONSTANTS.ITEMS_PER_PAGE
-              : validTransactions.length > DASHBOARD_CONSTANTS.ITEMS_PER_PAGE) && (
+              : validTransactions.length >
+                DASHBOARD_CONSTANTS.ITEMS_PER_PAGE) && (
               <PaginationPageMinimalCenter
                 page={displayCurrentPage}
                 total={displayTotalPages}

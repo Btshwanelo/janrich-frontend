@@ -4,7 +4,11 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Slider } from "@/components/base/slider/slider";
-import { ModalOverlay, Modal, Dialog } from "@/components/application/modals/modal";
+import {
+  ModalOverlay,
+  Modal,
+  Dialog,
+} from "@/components/application/modals/modal";
 import { useUpdateSavingsGoalMutation } from "@/lib/slices/authSlice";
 import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 
@@ -23,12 +27,13 @@ export default function SavingsGoalModal({
 }: SavingsGoalModalProps) {
   const [amount, setAmount] = useState([15000]);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   const minAmount = 5000;
   const maxAmount = 100000;
   const step = 1000;
 
-  const [updateSavingsGoal, { isLoading: isUpdatingGoal }] = useUpdateSavingsGoalMutation();
+  const [updateSavingsGoal, { isLoading: isUpdatingGoal }] =
+    useUpdateSavingsGoalMutation();
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
 
@@ -38,7 +43,8 @@ export default function SavingsGoalModal({
   };
 
   const cardTitle = "Great Start! You don't need a million to change your life";
-  const cardImage = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=300&fit=crop";
+  const cardImage =
+    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=300&fit=crop";
   const cardImageAlt = "Professional woman";
   const buttonText = "Start Paying yourself first";
 
@@ -60,12 +66,12 @@ export default function SavingsGoalModal({
         annual_savings_goal: amount[0],
       }).unwrap();
 
-      console.log("Savings goal updated successfully:", response);
-
       // Show success toast
       showSuccessToast(
         "Savings Goal Set!",
-        `Your annual savings goal of ${formatCurrency(amount[0])} has been saved successfully.`,
+        `Your annual savings goal of ${formatCurrency(
+          amount[0]
+        )} has been saved successfully.`,
         {
           duration: 4000,
         }
@@ -79,18 +85,13 @@ export default function SavingsGoalModal({
       // Close the modal
       onClose();
     } catch (error: any) {
-      console.error("Failed to update savings goal:", error);
-      
+
       // Show error toast
       showErrorToast(
         "Save Failed",
-        error?.data?.message || "Unable to save your savings goal. Please try again.",
+        error || "Unable to save your savings goal. Please try again.",
         {
-          duration: 0, // Don't auto-dismiss
-          action: {
-            label: "Retry",
-            onClick: () => handleSubmit(),
-          },
+          duration: 4000,
         }
       );
     } finally {

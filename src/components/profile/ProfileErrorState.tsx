@@ -6,12 +6,13 @@ import { PROFILE_MESSAGES } from '@/constants/profile';
 
 interface ProfileErrorStateProps {
   onRetry?: () => void;
+  error?: string;
 }
 
-export const ProfileErrorState: React.FC<ProfileErrorStateProps> = ({ onRetry }) => {
+export const ProfileErrorState: React.FC<ProfileErrorStateProps> = ({ onRetry,error }) => {
   return (
-    <div className="flex items-center justify-center h-full mt-16 lg:mt-0">
-      <Card className="max-w-md mx-auto shadow-sm">
+<div className="flex-1 p-4 lg:p-8">
+      <Card className=" mx-auto border-none">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <AlertCircle className="h-12 w-12 text-red-500" />
@@ -22,7 +23,7 @@ export const ProfileErrorState: React.FC<ProfileErrorStateProps> = ({ onRetry })
         </CardHeader>
         <CardContent className="text-center">
           <p className="text-sm text-gray-600 mb-6">
-            {PROFILE_MESSAGES.ERROR_DESCRIPTION}
+            {error}
           </p>
           {onRetry && (
             <Button

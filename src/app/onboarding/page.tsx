@@ -40,12 +40,13 @@ const Onboarding = () => {
   const { user, customer } = useSelector((state: RootState) => state.auth);
   const [completeOnboarding, { isLoading, error }] =
     useCompleteOnboardingMutation();
-  const [sendOTP, { isLoading: isSendingOTP }] = useSendRegistrationOTPMutation();
+  const [sendOTP, { isLoading: isSendingOTP }] =
+    useSendRegistrationOTPMutation();
 
   const [open, setOpen] = React.useState(false);
   const [showOTPModal, setShowOTPModal] = React.useState(false);
   const [userEmail, setUserEmail] = React.useState("");
-  
+
   // Toast hooks
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
@@ -64,7 +65,6 @@ const Onboarding = () => {
   // Handle form submission
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     if (!customer) {
-      console.error("No user found");
       setSubmitting(false);
       return;
     }
@@ -85,56 +85,40 @@ const Onboarding = () => {
 
       const response = await completeOnboarding(onboardingData).unwrap();
 
-      if (response.message.ok) {
-        // Show success toast
-        showSuccessToast(
-          "Profile Updated!",
-          "Your profile has been saved successfully. Now let's verify your email.",
+      // Show success toast
+      showSuccessToast(
+        "Profile Updated!",
+        "Your profile has been saved successfully. Now let's verify your email.",
+        {
+          duration: 4000,
+        }
+      );
+
+      // Get user email from the response or user data
+      const email = user; // You might need to get this from the response
+      setUserEmail(email);
+
+      // Send OTP for email verification
+      try {
+        await sendOTP({ email }).unwrap();
+        setShowOTPModal(true);
+      } catch (otpError: any) {
+        showErrorToast(
+          "OTP Send Failed",
+          otpError || "Unable to send verification email. Please try again.",
           {
             duration: 4000,
           }
         );
-        
-        // Get user email from the response or user data
-        const email = user || "user@example.com"; // You might need to get this from the response
-        setUserEmail(email);
-        
-        // Send OTP for email verification
-        try {
-          await sendOTP({ email }).unwrap();
-          setShowOTPModal(true);
-        } catch (otpError) {
-          console.error("Failed to send OTP:", otpError);
-          showErrorToast(
-            "OTP Send Failed",
-            "Unable to send verification email. Please try again.",
-            {
-              duration: 0,
-              action: {
-                label: "Retry",
-                onClick: () => {
-                  sendOTP({ email }).unwrap().then(() => setShowOTPModal(true));
-                },
-              },
-            }
-          );
-        }
-      } else {
-        console.error("Onboarding failed:", response.message.message);
-        showErrorToast(
-          "Update Failed",
-          response.message.message || "Unable to save your profile. Please try again.",
-          {
-            duration: 0,
-            action: {
-              label: "Retry",
-              onClick: () => handleSubmit(values, { setSubmitting }),
-            },
-          }
-        );
       }
-    } catch (err) {
-      console.error("Error completing onboarding:", err);
+    } catch (error: any) {
+      showErrorToast(
+        "Update Failed",
+        error || "Unable to save your profile. Please try again.",
+        {
+          duration: 4000,
+        }
+      );
     } finally {
       setSubmitting(false);
     }

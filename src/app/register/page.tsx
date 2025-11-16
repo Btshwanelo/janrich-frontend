@@ -104,13 +104,11 @@ const RegistrationScreen = () => {
       dispatch(setError(null));
       setIsSubmitting(true);
 
-      console.log("Form submitted:", values);
-
       // Prepare registration data
       const registrationPayload = {
         customer_name: `${values.name} ${values.surname}`,
         customer_type: "Individual",
-        title: "Mr", // You might want to make this dynamic
+        // title: "Mr", // You might want to make this dynamic
         first_name: values.name,
         last_name: values.surname,
         last_nameemail: values.surname,
@@ -126,9 +124,6 @@ const RegistrationScreen = () => {
 
       // Call register API
       const result = await register(registrationPayload).unwrap();
-
-      console.log("Registration successful:", result);
-
       // Store registration data in Redux store
       dispatch(
         setRegistrationData({
@@ -145,39 +140,9 @@ const RegistrationScreen = () => {
 
       // Show OTP modal
       setShowOTPModal(true);
-    } catch (error: unknown) {
-      console.error("Registration failed:", error);
-
+    } catch (error: any) {
       // Handle different error types
-      let errorMessage = "Registration failed. Please try again.";
-
-      if (
-        error &&
-        typeof error === "object" &&
-        "data" in error &&
-        error.data &&
-        typeof error.data === "object" &&
-        "message" in error.data
-      ) {
-        errorMessage = String(error.data.message);
-      } else if (error && typeof error === "object" && "message" in error) {
-        errorMessage = String(error.message);
-      } else if (
-        error &&
-        typeof error === "object" &&
-        "status" in error &&
-        error.status === 400
-      ) {
-        errorMessage =
-          "Invalid registration data. Please check your information.";
-      } else if (
-        error &&
-        typeof error === "object" &&
-        "status" in error &&
-        error.status === 500
-      ) {
-        errorMessage = "Server error. Please try again later.";
-      }
+      let errorMessage = error || "Registration failed. Please try again.";
 
       dispatch(setError(errorMessage));
     } finally {

@@ -22,7 +22,7 @@ export const LoadingState: React.FC = () => {
         </Card>
 
         {/* Loading Goal Card */}
-        <Card className="border-2 border-blue-600 shadow-sm">
+        <Card className="border-2  shadow-sm">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="h-6 bg-gray-200 rounded w-32 animate-pulse" aria-hidden="true" />

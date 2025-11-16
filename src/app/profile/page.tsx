@@ -68,7 +68,6 @@ export default function ProfileBeneficiaryScreen() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { user, customer } = useAppSelector((state) => state.auth);
-
   const {
     data: profileData,
     isLoading: isProfileLoading,
@@ -310,7 +309,7 @@ export default function ProfileBeneficiaryScreen() {
   const handleFinancialDetailsSubmit = async () => {
     try {
       const financialData = {
-        customer_id: "JR0020",
+        customer_id: customer,
         custom_employment_status: mapSelectKeyToApiValue(
           employmentStatus,
           EMPLOYMENT_STATUS_OPTIONS
@@ -342,7 +341,6 @@ export default function ProfileBeneficiaryScreen() {
       };
 
       const result = await updateFinancialDetails(financialData).unwrap();
-      console.log("Financial details updated successfully:", result);
 
       // Show success toast
       showSuccessToast(
@@ -352,21 +350,13 @@ export default function ProfileBeneficiaryScreen() {
           duration: 4000,
         }
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to update financial details:", error);
 
       // Show error toast
-      showErrorToast(
-        "Update Failed",
-        "Unable to save your financial details. Please try again.",
-        {
-          duration: 0, // Don't auto-dismiss
-          action: {
-            label: "Retry",
-            onClick: () => handleFinancialDetailsSubmit(),
-          },
-        }
-      );
+      showErrorToast("Update Failed", error, {
+        duration: 4000,
+      });
     }
   };
 
@@ -374,7 +364,7 @@ export default function ProfileBeneficiaryScreen() {
   const handleBeneficiarySubmit = async () => {
     try {
       const beneficiaryData = {
-        customer_id: customer || "",
+        customer_id: customer,
         beneficiary_type: mapSelectKeyToApiValue(
           beneficiaryType,
           BENEFICIARY_TYPE_OPTIONS
@@ -398,19 +388,14 @@ export default function ProfileBeneficiaryScreen() {
           duration: 4000,
         }
       );
-    } catch (error) {
-      console.error("Failed to update beneficiary:", error);
-
+    } catch (error: any) {
       // Show error toast
       showErrorToast(
         "Update Failed",
-        "Unable to save your beneficiary information. Please try again.",
+        error ||
+          "Unable to save your beneficiary information. Please try again.",
         {
-          duration: 0, // Don't auto-dismiss
-          action: {
-            label: "Retry",
-            onClick: () => handleBeneficiarySubmit(),
-          },
+          duration: 4000, // Don't auto-dismiss
         }
       );
     }
@@ -420,7 +405,7 @@ export default function ProfileBeneficiaryScreen() {
   const handleCustomerUpdate = async () => {
     try {
       const customerData = {
-        customer_id: "JR0020",
+        customer_id: customer,
         customer_name: `${firstName} ${lastName}`,
         first_name: firstName,
         last_name: lastName,
@@ -435,41 +420,20 @@ export default function ProfileBeneficiaryScreen() {
       };
 
       const result = await updateCustomer(customerData).unwrap();
-      console.log("Customer updated successfully:", result);
 
-      if (result.message.result === "failed") {
-        showErrorToast(
-          "Update Failed",
-          result.message.message || "Unable to update customer information.",
-          {
-            duration: 0, // Don't auto-dismiss
-            action: {
-              label: "Retry",
-              onClick: () => handleCustomerUpdate(),
-            },
-          }
-        );
-      } else {
-        showSuccessToast(
-          "Customer Updated!",
-          "Your basic information has been saved successfully.",
-          {
-            duration: 4000,
-          }
-        );
-      }
-    } catch (error) {
-      console.error("Failed to update customer:", error);
-
+      showSuccessToast(
+        "Customer Updated!",
+        "Your basic information has been saved successfully.",
+        {
+          duration: 4000,
+        }
+      );
+    } catch (error: any) {
       showErrorToast(
         "Update Failed",
-        "Unable to save your customer information. Please try again.",
+        error || "Unable to save your customer information. Please try again.",
         {
-          duration: 0, // Don't auto-dismiss
-          action: {
-            label: "Retry",
-            onClick: () => handleCustomerUpdate(),
-          },
+          duration: 4000,
         }
       );
     }
@@ -489,7 +453,7 @@ export default function ProfileBeneficiaryScreen() {
       };
 
       const profileData = {
-        customer_id: "JR0020",
+        customer_id: customer,
         birth_date: formatBirthDate(birthdate),
         gender: mapSelectKeyToApiValue(gender, GENDER_OPTIONS),
         nationality: nationality,
@@ -500,41 +464,20 @@ export default function ProfileBeneficiaryScreen() {
       };
 
       const result = await updateProfile(profileData).unwrap();
-      console.log("Profile updated successfully:", result);
 
-      if (result.message.ok) {
-        showSuccessToast(
-          "Profile Updated!",
-          "Your profile information has been saved successfully.",
-          {
-            duration: 4000,
-          }
-        );
-      } else {
-        showErrorToast(
-          "Update Failed",
-          "Unable to update your profile information. Please try again.",
-          {
-            duration: 0, // Don't auto-dismiss
-            action: {
-              label: "Retry",
-              onClick: () => handleProfileUpdate(),
-            },
-          }
-        );
-      }
-    } catch (error) {
-      console.error("Failed to update profile:", error);
-
+      showSuccessToast(
+        "Profile Updated!",
+        "Your profile information has been saved successfully.",
+        {
+          duration: 4000,
+        }
+      );
+    } catch (error: any) {
       showErrorToast(
         "Update Failed",
-        "Unable to save your profile information. Please try again.",
+        error || "Unable to save your profile information. Please try again.",
         {
-          duration: 0, // Don't auto-dismiss
-          action: {
-            label: "Retry",
-            onClick: () => handleProfileUpdate(),
-          },
+          duration: 4000,
         }
       );
     }
@@ -587,7 +530,7 @@ export default function ProfileBeneficiaryScreen() {
               isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
             }`}
           >
-            <ProfileErrorState />
+            <ProfileErrorState error={profileError} />
           </div>
         </div>
       </AuthGuard>
@@ -643,8 +586,9 @@ export default function ProfileBeneficiaryScreen() {
                           ?.customer_name || "Loading..."}
                       </h1>
                       <p className="text-sm sm:text-base text-gray-600">
-                        {profileData?.message?.data?.basic_info?.email ||
-                          "Loading..."}
+                        {profileData?.message?.data?.basic_info?.email}
+                        {" • "}
+                        {customer}
                       </p>
                     </div>
                   </div>

@@ -65,14 +65,10 @@ const LoginScreen = () => {
       dispatch(setLoading(true));
       dispatch(setError(null));
 
-      console.log("Login submitted:", values);
-
       const result = await login({
         email: values.email,
         password: values.password,
       }).unwrap();
-
-      console.log("Login successful:", result.message.customer.name);
 
       // Dispatch credentials to Redux store
       dispatch(
@@ -90,38 +86,8 @@ const LoginScreen = () => {
 
       // Redirect to dashboard
       router.push("/dashboard");
-    } catch (error: unknown) {
-      console.log("Login failed:", error);
-
-      // Handle different error types
-      let errorMessage = "Login failed. Please try again.";
-
-      if (
-        error &&
-        typeof error === "object" &&
-        "data" in error &&
-        error.data &&
-        typeof error.data === "object" &&
-        "message" in error.data
-      ) {
-        errorMessage = String(error.data.message);
-      } else if (error && typeof error === "object" && "message" in error) {
-        errorMessage = String(error.message);
-      } else if (
-        error &&
-        typeof error === "object" &&
-        "status" in error &&
-        error.status === 401
-      ) {
-        errorMessage = "Invalid email or password.";
-      } else if (
-        error &&
-        typeof error === "object" &&
-        "status" in error &&
-        error.status === 500
-      ) {
-        errorMessage = "Server error. Please try again later.";
-      }
+    } catch (error: any) {
+      let errorMessage = error || "Login failed. Please try again.";
 
       dispatch(setError(errorMessage));
     } finally {

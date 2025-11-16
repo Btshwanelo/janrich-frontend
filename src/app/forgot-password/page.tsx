@@ -20,7 +20,8 @@ const validationSchema = Yup.object({
 
 const ForgotPasswordScreen = () => {
   const router = useRouter();
-  const [sendOTP, { isLoading: isSendingOTP }] = useSendRegistrationOTPMutation();
+  const [sendOTP, { isLoading: isSendingOTP }] =
+    useSendRegistrationOTPMutation();
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
   const [error, setError] = useState<string | null>(null);
@@ -36,39 +37,12 @@ const ForgotPasswordScreen = () => {
     try {
       setError(null); // Clear any previous errors
       const response = await sendOTP({ email: values.email }).unwrap();
-      
-      // Check if the response indicates success or failure
-      if (response?.message?.result === "failed") {
-        const errorMessage = response?.message?.message || "Failed to send OTP. Please try again.";
-        setError(errorMessage);
-        // showErrorToast(errorMessage);
-        setSubmitting(false);
-        return;
-      }
-      
-      // If result is "success" or response has status/otp_id (legacy format), treat as success
-      if (
-        response?.message?.result === "success" || 
-        response?.message?.status ||
-        response?.message?.otp_id ||
-        !response?.message?.result
-      ) {
-        showSuccessToast("OTP sent successfully. Please check your email.");
-        router.push(`/forgot-password/new/${encodeURIComponent(values.email)}`);
-      } else {
-        // Fallback for any other result
-        const errorMessage = response?.message?.message || "Failed to send OTP. Please try again.";
-        setError(errorMessage);
-        // showErrorToast(errorMessage);
-        setSubmitting(false);
-      }
+
+      showSuccessToast("OTP sent successfully. Please check your email.");
+      router.push(`/forgot-password/new/${encodeURIComponent(values.email)}`);
     } catch (error: any) {
       // Handle network errors or API errors
-      const errorMessage = 
-        error?.data?.message?.message || 
-        error?.data?.message || 
-        error?.message || 
-        "Failed to send OTP. Please try again.";
+      const errorMessage = error || "Failed to send OTP. Please try again.";
       setError(errorMessage);
       // showErrorToast(errorMessage);
       setSubmitting(false);

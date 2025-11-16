@@ -14,12 +14,13 @@ import { combineReducers } from "@reduxjs/toolkit";
 import { apiSlice } from "./api/apiSlice";
 import authReducer from "./slices/authSlice";
 import onboardingReducer from "./slices/onboardingSlice";
+import ledgerReducer from "./slices/ledgerSlice";
 
 // Persist configuration
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "onboarding"], // Only persist auth and onboarding slices
+  whitelist: ["auth", "onboarding", "ledger"], // Only persist auth and onboarding slices
   blacklist: [apiSlice.reducerPath], // Don't persist API cache
 };
 
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
   auth: authReducer,
   onboarding: onboardingReducer,
+  ledger: ledgerReducer,
 });
 
 // Create persisted reducer

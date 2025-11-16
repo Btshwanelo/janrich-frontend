@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/untitled-card';
 import { ChartDataItem } from '@/types/dashboard';
-import { DASHBOARD_CONSTANTS } from '@/constants/dashboard';
+import { DASHBOARD_CONSTANTS, MONTH_NAMES } from '@/constants/dashboard';
 
 interface SavingsBreakdownChartProps {
   chartData: ChartDataItem[];
@@ -17,6 +17,10 @@ interface SavingsBreakdownChartProps {
 export const SavingsBreakdownChart: React.FC<SavingsBreakdownChartProps> = memo(({
   chartData,
 }) => {
+  // Get current month name (e.g., "Jan", "Feb")
+  const currentMonthIndex = new Date().getMonth();
+  const currentMonthName = MONTH_NAMES[currentMonthIndex];
+
   // Calculate maximum value for y-axis scale
   const maxValue = Math.max(
     ...chartData.map((item) => item.blue + item.orange + item.gray),
@@ -99,56 +103,69 @@ export const SavingsBreakdownChart: React.FC<SavingsBreakdownChartProps> = memo(
 
             {/* Chart Bars */}
             <div
-              className="flex items-end justify-between gap-2 sm:gap-4 mb-6 px-2 sm:px-4 flex-1"
+              className="flex items-end justify-between gap-2 sm:gap-4 mb-6 px-2 sm:px-4 pt-10 flex-1 relative"
               role="img"
               aria-label="Monthly savings breakdown chart"
             >
-              {chartData.map((item, index) => (
-                <div
-                  key={`chart-item-${item.month}-${index}`}
-                  className="flex flex-col items-center flex-1 min-w-[40px]"
-                  role="img"
-                  aria-label={`${item.month}: ${item.blue} saved, ${item.orange} interest, ${item.gray} other`}
-                >
+              {chartData.map((item, index) => {
+                const isCurrentMonth = item.month === currentMonthName;
+                return (
                   <div
-                    className="w-full flex flex-col items-center relative"
-                    style={{ height: `${DASHBOARD_CONSTANTS.CHART_HEIGHT}px` }}
+                    key={`chart-item-${item.month}-${index}`}
+                    className="flex flex-col items-center flex-1 min-w-[40px] relative"
+                    role="img"
+                    aria-label={`${item.month}: ${item.blue} saved, ${item.orange} interest, ${item.gray} other`}
                   >
-                    <div className="w-full flex flex-col justify-end items-center h-full gap-0.5">
-                      <div
-                        className="w-8 sm:w-12 bg-gray-200 rounded-t"
-                        style={{
-                          height: `${
-                            (item.gray / maxValue) *
-                            DASHBOARD_CONSTANTS.CHART_HEIGHT
-                          }px`,
-                        }}
-                      />
-                      <div
-                        className="w-8 sm:w-12 bg-blue-600 rounded-t"
-                        style={{
-                          height: `${
-                            (item.blue / maxValue) *
-                            DASHBOARD_CONSTANTS.CHART_HEIGHT
-                          }px`,
-                        }}
-                      />
-                      <div
-                        className="w-8 sm:w-12 bg-orange-500"
-                        style={{
-                          height: `${
-                            (item.orange / maxValue) *
-                            DASHBOARD_CONSTANTS.CHART_HEIGHT
-                          }px`,
-                        }}
-                      />
+                    {/* Icon above current month bar - positioned absolutely to not affect layout */}
+                    {isCurrentMonth && (
+                      <div className="absolute bottom-[25px] left-1/2 -translate-x-1/2 flex items-center justify-center z-10">
+                        <img
+                          src="/Component 6.svg"
+                          alt="Current month indicator"
+                          className="w-6 h-6 sm:w-8 sm:h-8"
+                        />
+                      </div>
+                    )}
+                    <div
+                      className="w-full flex flex-col items-center relative"
+                      style={{ height: `${DASHBOARD_CONSTANTS.CHART_HEIGHT}px` }}
+                    >
+                      <div className="w-full flex flex-col justify-end items-center h-full gap-0.5">
+                        <div
+                          className="w-8 sm:w-12 bg-gray-200 rounded-t"
+                          style={{
+                            height: `${
+                              (item.gray / maxValue) *
+                              DASHBOARD_CONSTANTS.CHART_HEIGHT
+                            }px`,
+                          }}
+                        />
+                        <div
+                          className="w-8 sm:w-12 bg-blue-600 rounded-t"
+                          style={{
+                            height: `${
+                              (item.blue / maxValue) *
+                              DASHBOARD_CONSTANTS.CHART_HEIGHT
+                            }px`,
+                          }}
+                        />
+                        <div
+                          className="w-8 sm:w-12 bg-orange-500"
+                          style={{
+                            height: `${
+                              (item.orange / maxValue) *
+                              DASHBOARD_CONSTANTS.CHART_HEIGHT
+                            }px`,
+                            }}
+                        />
+                      </div>
                     </div>
+                    <span className="text-xs text-gray-600 mt-3 font-medium">
+                      {item.month}
+                    </span>
                   </div>
-                  <span className="text-xs text-gray-600 mt-3 font-medium">
-                    {item.month}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

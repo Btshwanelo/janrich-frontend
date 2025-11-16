@@ -13,8 +13,8 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   onRetry 
 }) => {
   return (
-    <div className="flex-1 p-4 lg:p-8 bg-gray-50">
-      <Card className="max-w-md mx-auto shadow-sm">
+    <div className="flex-1 p-4 lg:p-8">
+      <Card className=" mx-auto border-none">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <AlertCircle className="h-12 w-12 text-red-500" />
@@ -27,7 +27,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           <p className="text-sm text-gray-600 mb-6">
             {error}
           </p>
-          {onRetry && (
+          {/* {onRetry && (
             <Button
               color="primary"
               size="md"
@@ -37,7 +37,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             >
               Try Again
             </Button>
-          )}
+          )} */}
         </CardContent>
       </Card>
     </div>

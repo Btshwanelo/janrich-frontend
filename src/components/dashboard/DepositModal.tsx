@@ -16,6 +16,7 @@ interface DepositModalProps {
   onClose: () => void;
   profileData?: {
     customer_name?: string;
+    customer_id?: string;
     email?: string;
     account_holder?: string;
     branch_code?: string;
@@ -36,7 +37,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
   savingsData,
 }) => {
   const [dontShowAgain, setDontShowAgain] = useState(false);
-
+  console.log("prof", profileData);
   if (!isOpen) return null;
 
   const formatCurrency = (value: number): string => {
@@ -50,13 +51,11 @@ export const DepositModal: React.FC<DepositModalProps> = ({
   const paymentsToGo = savingsData?.paymentsToGo || 4;
 
   // Extract account details
-  const accountName = profileData?.account_holder || "Ikhwezi Daystar";
-  const accountNumber = profileData?.iban_account || "1266050434";
-  const bank = profileData?.customer_bank || "Nedbank";
-  const branchCode = profileData?.branch_code || "198765";
-  const reference = `JR${Math.floor(Math.random() * 10000)
-    .toString()
-    .padStart(4, "0")}`;
+  const accountName = "Ikhwezi Daystar";
+  const accountNumber = "1266050434";
+  const bank = "Nedbank";
+  const branchCode = "198765";
+  const reference = profileData?.customer_id;
 
   const handleSaveDraft = () => {
     console.log("Saved as draft");
@@ -96,7 +95,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
           {/* Content */}
           <div className="px-5 pb-6">
             {/* Profile Section */}
-            <div className="flex items-start gap-4 -mt-8 mb-6">
+            <div className="flex items-start gap-4 -mt-8 ">
               <Avatar
                 size="2xl"
                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
@@ -105,47 +104,52 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                 contrastBorder={true}
                 className="shadow-lg border-4 border-white w-14 h-14 sm:w-20 sm:h-20"
               />
-              <div className="flex-1 mt-14">
+            </div>
+            <div className="flex items-start gap-4 mb-2">
+              {/* <Avatar
+                size="2xl"
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
+                alt="Profile"
+                verified={true}
+                contrastBorder={true}
+                className="shadow-lg border-4 border-white w-14 h-14 sm:w-20 sm:h-20"
+              /> */}
+              <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h2 className="text-xl font-bold text-gray-900">
                     {customerName}
                   </h2>
-                  <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-2.5 h-2.5 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
                 </div>
                 <p className="text-sm text-gray-500">@{customerHandle}</p>
               </div>
 
               {/* Edit/Delete Actions - Repositioned */}
-              <div className="flex gap-2 mt-14">
-                <button
-                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors hover:bg-gray-50 rounded"
-                  aria-label="Delete"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors hover:bg-gray-50 rounded"
-                  aria-label="Edit"
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
+              <div className="flex gap-2">
+                <div className="flex-1 bg-gray-50 rounded-xl p-2 min-w-fit">
+                  <p className="text-xs text-gray-500 mb-1">
+                    You've Paid yourself
+                  </p>
+                  <p className="text-lg font-semibold text-gray-900">
+                    {formatCurrency(totalPaid)}
+                  </p>
+                </div>
+                <div className="flex-1 bg-gray-50 rounded-xl p-2 min-w-fit">
+                  <p className="text-xs text-gray-500 mb-1">Your Goal</p>
+                  <p className="text-lg font-bold text-gray-900">
+                    {formatCurrency(goalAmount)}
+                  </p>
+                </div>
+                <div className="flex-1 bg-[#D1E9FF] rounded-xl p-2 min-w-fit">
+                  <p className="text-xs text-gray-500 mb-1">Payments to go</p>
+                  <p className="text-lg font-bold text-gray-900">
+                    {paymentsToGo}
+                  </p>
+                </div>
               </div>
             </div>
 
             {/* Summary Cards */}
-            <div className="flex gap-3 mb-8">
+            {/* <div className="flex gap-3 mb-8">
               <div className="flex-1 bg-gray-50 rounded-xl p-3">
                 <p className="text-xs text-gray-500 mb-1">
                   You've Paid yourself
@@ -160,19 +164,19 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                   {formatCurrency(goalAmount)}
                 </p>
               </div>
-              {/* <div className="flex-1 bg-blue-50 rounded-xl p-3">
+              <div className="flex-1 bg-blue-50 rounded-xl p-3">
                 <p className="text-xs text-gray-500 mb-1">Payments to go</p>
                 <p className="text-lg font-bold text-gray-900">
                   {paymentsToGo}
                 </p>
-              </div> */}
-            </div>
+              </div>
+            </div> */}
 
             {/* Divider */}
-            <div className="border-t border-gray-200 mb-6" />
+            <div className="border-t border-dashed border-gray-200 mb-6" />
 
             {/* Payment Details Section */}
-            <div className="mb-6">
+            <div className="">
               <h3 className="text-2xl font-bold text-black mb-4">
                 Pay yourself a bit more.
               </h3>
@@ -209,7 +213,6 @@ export const DepositModal: React.FC<DepositModalProps> = ({
             </div>
 
             {/* Divider */}
-            <div className="border-t border-gray-200 mb-6" />
 
             {/* Footer Actions */}
             {/* <div className="flex items-center justify-between">

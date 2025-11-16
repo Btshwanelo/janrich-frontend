@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AuthGuard from "@/components/AuthGuard";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { useGetProfileQuery, useGetLedgerQuery } from "@/lib/slices/authSlice";
+import { setTransactions, setCurrentTransaction } from "@/lib/slices/ledgerSlice";
 import SavingsGoalModal from "@/components/SavingsGoalModal";
 import SidebarWrapper from "@/components/SidebarWrapper";
 import MobileTopNav from "@/components/MobileTopNav";
@@ -22,6 +23,7 @@ import { DASHBOARD_CONSTANTS } from "@/constants/dashboard";
 
 const Dashboard = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const dispatch = useAppDispatch();
 
   const { user, fullName, customer } = useAppSelector((state) => state.auth);
   const {
@@ -29,12 +31,27 @@ const Dashboard = () => {
     refetch,
     isLoading: isProfileLoading,
     error: profileError,
-  } = useGetProfileQuery(customer || "");
+  } = useGetProfileQuery(customer || "JR0027");
   const {
     data: dataLedger,
     isLoading: isLedgerLoading,
     error: ledgerError,
-  } = useGetLedgerQuery(customer || "");
+  } = useGetLedgerQuery(customer || "JR0027");
+
+  // Store transactions in ledger slice on successful API response
+  useEffect(() => {
+    if (dataLedger?.message?.result === "success" && dataLedger.message.data) {
+      dispatch(
+        setTransactions({
+          transactions: dataLedger.message.data,
+          totalRecords: dataLedger.message.total_records,
+          customerId: dataLedger.message.customer_id,
+        })
+      );
+    }
+  }, [dataLedger, dispatch]);
+
+  console.log("dataLedger", dataLedger);
 
   const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
   const transactions: Transaction[] = dataLedger?.message?.data || [];
@@ -42,7 +59,6 @@ const Dashboard = () => {
   // Loading and error states
   const isLoading = isProfileLoading || isLedgerLoading;
   const hasError = profileError || ledgerError;
-
   // Custom hooks
   const savingsResult = useSavingsCalculation(savingsGoal, transactions);
   const {
@@ -61,9 +77,14 @@ const Dashboard = () => {
 
   // Handle retry function
   const handleRetry = () => {
-    if (profileError) refetch();
+    refetch();
     // Note: RTK Query doesn't expose a direct refetch for useGetLedgerQuery
     // You might need to implement a manual refetch mechanism
+  };
+
+  // Handle transaction selection
+  const handleTransactionSelect = (transaction: Transaction) => {
+    dispatch(setCurrentTransaction(transaction));
   };
 
   return (
@@ -96,15 +117,7 @@ const Dashboard = () => {
               <LoadingState />
             ) : hasError ? (
               <ErrorState
-                error={
-                  (profileError && "message" in profileError
-                    ? profileError.message
-                    : "") ||
-                  (ledgerError && "message" in ledgerError
-                    ? ledgerError.message
-                    : "") ||
-                  "Failed to load dashboard data"
-                }
+                error={profileError || "Failed to load dashboard data"}
                 onRetry={handleRetry}
               />
             ) : (
@@ -119,12 +132,17 @@ const Dashboard = () => {
                     totalSaved={savingsResult.totalSaved}
                     savingGoal={savingsGoal}
                     profileData={{
-                      customer_name: data?.message?.data?.basic_info?.customer_name,
+                      customer_name:
+                        data?.message?.data?.basic_info?.customer_name,
                       email: data?.message?.data?.basic_info?.email,
-                      account_holder: data?.message?.data?.financials?.account_holder,
+                      account_holder:
+                        data?.message?.data?.financials?.account_holder,
                       branch_code: data?.message?.data?.financials?.branch_code,
-                      iban_account: data?.message?.data?.financials?.iban_account,
-                      customer_bank: data?.message?.data?.financials?.customer_bank,
+                      iban_account:
+                        data?.message?.data?.financials?.iban_account,
+                      customer_bank:
+                        data?.message?.data?.financials?.customer_bank,
+                      customer_id: data?.message?.data?.basic_info?.customer_id,
                     }}
                   />
                 </div>
@@ -136,6 +154,7 @@ const Dashboard = () => {
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
+                  onTransactionSelect={handleTransactionSelect}
                 />
               </div>
             )}
