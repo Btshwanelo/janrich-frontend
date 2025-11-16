@@ -72,7 +72,7 @@ export default function ProfileBeneficiaryScreen() {
     data: profileData,
     isLoading: isProfileLoading,
     error: profileError,
-  } = useGetProfileQuery(customer || "");
+  } = useGetProfileQuery(customer || "JR0027");
 
   // Financial details update mutation
   const [updateFinancialDetails, { isLoading: isUpdatingFinancials }] =
@@ -1119,6 +1119,7 @@ export default function ProfileBeneficiaryScreen() {
                                         Array.isArray(value) ? value : [value]
                                       )
                                     }
+                                    isDisabled={(amount?.[0] ?? 0) > 0}
                                     minValue={5000}
                                     maxValue={1000000}
                                     step={500}

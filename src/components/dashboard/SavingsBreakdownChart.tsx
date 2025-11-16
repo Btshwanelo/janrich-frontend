@@ -24,7 +24,7 @@ export const SavingsBreakdownChart: React.FC<SavingsBreakdownChartProps> = memo(
 
     // Calculate maximum value for y-axis scale
     const maxValue = Math.max(
-      ...chartData.map((item) => item.blue + item.orange + item.gray),
+      ...chartData.map((item) => item.blue),
       1
     );
 
@@ -110,16 +110,18 @@ export const SavingsBreakdownChart: React.FC<SavingsBreakdownChartProps> = memo(
               >
                 {chartData.map((item, index) => {
                   const isCurrentMonth = item.month === currentMonthName;
-                  const totalValue = item.blue + item.orange + item.gray;
-                  const barHeight =
+                  const totalValue = item.blue;
+                  // Calculate bar height - 0 for zero values, minimum 6px for non-zero values
+                  const calculatedHeight =
                     (totalValue / maxValue) * DASHBOARD_CONSTANTS.CHART_HEIGHT;
+                  const barHeight = totalValue === 0 ? 0 : Math.max(calculatedHeight, 6);
                   const isHovered = hoveredIndex === index;
                   return (
                     <div
                       key={`chart-item-${item.month}-${index}`}
                       className="flex flex-col items-center flex-1 min-w-[40px] relative"
                       role="img"
-                      aria-label={`${item.month}: ${item.blue} saved, ${item.orange} interest, ${item.gray} other`}
+                      aria-label={`${item.month}: ${item.blue} saved`}
                     >
                       {/* Icon above current month bar - positioned absolutely to not affect layout */}
                       {isCurrentMonth && (
@@ -138,46 +140,27 @@ export const SavingsBreakdownChart: React.FC<SavingsBreakdownChartProps> = memo(
                         }}
                       >
                         <div className="w-full flex flex-col justify-end items-center h-full">
-                          <div
-                            className="flex flex-col items-center gap-0.5 relative cursor-pointer"
-                            style={{ height: `${barHeight}px` }}
-                            onMouseEnter={() => setHoveredIndex(index)}
-                            onMouseLeave={() => setHoveredIndex(null)}
-                          >
-                            {/* Hover number display - positioned at the top of the bar */}
-                            {isHovered && (
-                              <div className="absolute left-1/2 -translate-x-1/2 top-0 -translate-y-full z-20  text-gray-20 text-xs font-semibold px-2 py-1 rounded whitespace-nowrap mb-1">
-                                {formatValue(totalValue)}
-                              </div>
-                            )}
+                          {barHeight > 0 && (
                             <div
-                              className="w-8 sm:w-12 bg-gray-200 rounded-t"
-                              style={{
-                                height: `${
-                                  (item.gray / maxValue) *
-                                  DASHBOARD_CONSTANTS.CHART_HEIGHT
-                                }px`,
-                              }}
-                            />
-                            <div
-                              className="w-8 sm:w-12 bg-blue-600 rounded-t"
-                              style={{
-                                height: `${
-                                  (item.blue / maxValue) *
-                                  DASHBOARD_CONSTANTS.CHART_HEIGHT
-                                }px`,
-                              }}
-                            />
-                            <div
-                              className="w-8 sm:w-12 bg-orange-500"
-                              style={{
-                                height: `${
-                                  (item.orange / maxValue) *
-                                  DASHBOARD_CONSTANTS.CHART_HEIGHT
-                                }px`,
-                              }}
-                            />
-                          </div>
+                              className="flex flex-col items-center relative cursor-pointer"
+                              style={{ height: `${barHeight}px` }}
+                              onMouseEnter={() => setHoveredIndex(index)}
+                              onMouseLeave={() => setHoveredIndex(null)}
+                            >
+                              {/* Hover number display - positioned at the top of the bar */}
+                              {isHovered && (
+                                <div className="absolute left-1/2 -translate-x-1/2 top-0 -translate-y-full z-20 text-gray-400 text-xs font-semibold px-2 py-1 rounded whitespace-nowrap mb-1">
+                                  {formatValue(totalValue)}
+                                </div>
+                              )}
+                              <div
+                                className="w-8 sm:w-12 bg-blue-600 rounded-t"
+                                style={{
+                                  height: `${barHeight}px`,
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                       <span className="text-xs text-gray-600 mt-3 font-medium">
