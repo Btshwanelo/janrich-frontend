@@ -34,12 +34,12 @@ const Dashboard = () => {
     refetch,
     isLoading: isProfileLoading,
     error: profileError,
-  } = useGetProfileQuery(customer);
+  } = useGetProfileQuery(customer || "JR0027");
   const {
     data: dataLedger,
     isLoading: isLedgerLoading,
     error: ledgerError,
-  } = useGetLedgerQuery(customer);
+  } = useGetLedgerQuery(customer || "JR0027");
 
   // Store transactions in ledger slice on successful API response
   useEffect(() => {

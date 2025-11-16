@@ -84,9 +84,7 @@ const ResetPasswordScreen = () => {
         response?.message?.user ||
         !response?.message?.result
       ) {
-        showSuccessToast(
-          "Password reset successfully! Redirecting..."
-        );
+        showSuccessToast("Password reset successfully! Redirecting...");
         setTimeout(() => {
           router.push("/new-password-success");
         }, 1500);
@@ -114,7 +112,7 @@ const ResetPasswordScreen = () => {
     <PublicRouteGuard>
       <AuthLayout
         title="Reset your password"
-        subtitle="Enter the OTP sent to your email and create a new password."
+        subtitle="Enter the OTP sent to your whatsapp and create a new password."
       >
         <Formik
           initialValues={initialValues}
@@ -196,11 +194,6 @@ const ResetPasswordScreen = () => {
                       />
                       <PinInput.Slot
                         index={4}
-                        className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                        style={{ color: "#155EEF !important" }}
-                      />
-                      <PinInput.Slot
-                        index={5}
                         className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
                         style={{ color: "#155EEF !important" }}
                       />
