@@ -1,9 +1,9 @@
 'use client'
 import React from 'react'
-import { BarChart3, Clock, HelpCircle, Home, LogOut, Settings, Users, X } from 'lucide-react'
+import { BarChart3, Clock, HelpCircle, Home, LogOut, Settings, User, Users, X } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 import { clearAuthCookie, clearCredentials } from '@/lib/slices/authSlice'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Button } from './base/buttons/button'
 
 interface MobileDrawerProps {
@@ -15,6 +15,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
   const { user, fullName } = useAppSelector((state) => state.auth)
   const dispatch = useAppDispatch()
   const router = useRouter()
+  const pathname = usePathname()
 
   const handleLogout = () => {
     dispatch(clearCredentials())
@@ -77,7 +78,11 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
             <a
               href="/dashboard"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className={`flex items-center space-x-3 px-4 py-4 text-sm rounded-lg transition-colors ${
+                pathname === "/dashboard"
+                  ? "bg-primary-50 text-primary-600 font-medium"
+                  : "text-[#535862] hover:bg-gray-100"
+              }`}
             >
               <Home className="w-5 h-5" />
               <span>Dashboard</span>
@@ -85,15 +90,23 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
             {/* <a
               href="#"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
+              className={`flex items-center space-x-3 px-4 py-4 text-sm rounded-lg transition-colors ${
+                pathname === "/transactions"
+                  ? "bg-primary-50 text-primary-600 font-medium"
+                  : "text-[#535862] hover:bg-gray-100"
+              }`}
             >
               <BarChart3 className="w-5 h-5" />
               <span>Analytics</span>
             </a> */}
             <a
-              href="/profile"
+              href="/community"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
+              className={`flex items-center space-x-3 px-4 py-4 text-sm rounded-lg transition-colors ${
+                pathname === "/community"
+                  ? "bg-primary-50 text-primary-600 font-medium"
+                  : "text-[#535862] hover:bg-gray-100"
+              }`}
             >
               <Users className="w-5 h-5" />
               <span>Community</span>
@@ -101,7 +114,11 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
             {/* <a
               href="#"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
+              className={`flex items-center space-x-3 px-4 py-4 text-sm rounded-lg transition-colors ${
+                pathname === "/history"
+                  ? "bg-primary-50 text-primary-600 font-medium"
+                  : "text-[#535862] hover:bg-gray-100"
+              }`}
             >
               <Clock className="w-5 h-5" />
               <span>History</span>
@@ -109,27 +126,31 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
             <a
               href="/profile"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
+              className={`flex items-center space-x-3 px-4 py-4 text-sm rounded-lg transition-colors ${
+                pathname === "/profile"
+                  ? "bg-primary-50 text-primary-600 font-medium"
+                  : "text-[#535862] hover:bg-gray-100"
+              }`}
             >
-              <HelpCircle className="w-5 h-5" />
+              <User className="w-5 h-5" />
               <span>Profile</span>
             </a>
-            <a
+            {/* <a
               href="#"
               onClick={handleLinkClick}
               className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
             >
               <HelpCircle className="w-5 h-5" />
               <span>Support</span>
-            </a>
-            <a
+            </a> */}
+            {/* <a
               href="#"
               onClick={handleLinkClick}
               className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Settings className="w-5 h-5" />
               <span>Settings</span>
-            </a>
+            </a> */}
             <button
               onClick={() => {
                 handleLogout()

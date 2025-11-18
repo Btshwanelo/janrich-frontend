@@ -49,7 +49,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
     <div
       className={`${
         isSidebarCollapsed ? "w-16" : "w-64"
-      } bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out fixed left-0 top-0 h-screen z-10  lg:flex`}
+      } bg-white border-r border-gray-200 hidden lg:flex flex-col transition-all duration-300 ease-in-out fixed left-0 top-0 h-screen z-10`}
     >
       {/* Logo and Toggle */}
       <div
