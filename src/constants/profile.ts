@@ -43,12 +43,13 @@ export const COUNTRY_OPTIONS: Array<{ id: string; label: string }> = [
 ] as const;
 
 export const RACE_OPTIONS: Array<{ id: string; label: string }> = [
-  { id: "african", label: "African" },
+  { id: "african", label: "Black African" },
   { id: "coloured", label: "Coloured" },
-  { id: "indian", label: "Indian/Asian" },
+  { id: "caucasian", label: "Caucasian" },
+  { id: "indian", label: "Indian" },
+  { id: "asian", label: "asian" },
   { id: "white", label: "White" },
   { id: "other", label: "Other" },
-  { id: "prefer-not-to-say", label: "Prefer not to say" },
 ] as const;
 
 export const COMMUNICATION_OPTIONS: Array<{ id: string; label: string }> = [
@@ -75,7 +76,7 @@ export const DEPOSIT_FREQUENCY_OPTIONS: Array<{ id: string; label: string }> = [
 ] as const;
 
 export const BANK_OPTIONS: Array<{ id: string; label: string }> = [
-  { id: "absa", label: "ABSA" },
+  { id: "ABSA", label: "ABSA" },
   { id: "fnb", label: "FNB" },
   { id: "standard-bank", label: "Standard Bank" },
   { id: "nedbank", label: "Nedbank" },

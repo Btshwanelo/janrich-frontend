@@ -60,6 +60,7 @@ import {
   FUND_SOURCE_OPTIONS,
   PROFILE_TABS,
 } from "@/constants/profile";
+import { amountConversion } from "@/utils/amountConversion";
 
 export default function ProfileBeneficiaryScreen() {
   const [selectedTab, setSelectedTab] = useState("details");
@@ -139,7 +140,8 @@ export default function ProfileBeneficiaryScreen() {
   React.useEffect(() => {
     if (profileData?.message?.data) {
       const data = profileData.message.data;
-
+      console.log("data", data);
+      console.log("data basic", data?.basic_info);
       // Basic info
       const customerName = data.basic_info?.customer_name || "";
       const nameParts = customerName.split(" ");
@@ -276,10 +278,6 @@ export default function ProfileBeneficiaryScreen() {
     </button>
   );
 
-  const formatCurrency = (value: number) => {
-    return `${"R"} ${value.toLocaleString()}`;
-  };
-
   // Helper functions to map API values to select options
   const mapApiValueToSelectKey = (
     apiValue: string,
@@ -409,14 +407,10 @@ export default function ProfileBeneficiaryScreen() {
         customer_name: `${firstName} ${lastName}`,
         first_name: firstName,
         last_name: lastName,
-        territory: "All Territories",
         email: email,
         phone: detailsPhoneNumber,
         whatsapp_number: whatsappNumber,
         country_code: countryCode,
-        title: mapSelectKeyToApiValue(title, TITLE_OPTIONS),
-        gender: mapSelectKeyToApiValue(gender, GENDER_OPTIONS),
-        agree_to_terms: 1,
       };
 
       const result = await updateCustomer(customerData).unwrap();
@@ -464,6 +458,8 @@ export default function ProfileBeneficiaryScreen() {
       };
 
       const result = await updateProfile(profileData).unwrap();
+
+      handleCustomerUpdate();
 
       showSuccessToast(
         "Profile Updated!",
@@ -537,6 +533,9 @@ export default function ProfileBeneficiaryScreen() {
     );
   }
 
+  console.log("race:", race, RACE_OPTIONS);
+  console.log("benefitiary:", beneficiaryType, BENEFICIARY_TYPE_OPTIONS);
+
   return (
     <AuthGuard>
       <div className="min-h-screen bg-white flex">
@@ -594,7 +593,7 @@ export default function ProfileBeneficiaryScreen() {
                   </div>
 
                   <div className="hidden sm:flex flex-col sm:flex-row gap-3 self-center sm:self-auto">
-                    <Button
+                    {/* <Button
                       color="secondary"
                       iconLeading={<Share size={14} data-icon />}
                       size="sm"
@@ -610,7 +609,7 @@ export default function ProfileBeneficiaryScreen() {
                     >
                       <span className="hidden sm:inline">View profile</span>
                       <span className="sm:hidden">View Profile</span>
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
 
@@ -886,7 +885,7 @@ export default function ProfileBeneficiaryScreen() {
                                   placeholder="Select title"
                                   items={TITLE_OPTIONS}
                                   className="w-full"
-                                  defaultSelectedKey={mapApiValueToSelectKey(
+                                  selectedKey={mapApiValueToSelectKey(
                                     title,
                                     TITLE_OPTIONS
                                   )}
@@ -918,7 +917,7 @@ export default function ProfileBeneficiaryScreen() {
                                     placeholder="Select gender"
                                     items={GENDER_OPTIONS}
                                     className="w-full"
-                                    defaultSelectedKey={mapApiValueToSelectKey(
+                                    selectedKey={mapApiValueToSelectKey(
                                       gender,
                                       GENDER_OPTIONS
                                     )}
@@ -964,7 +963,7 @@ export default function ProfileBeneficiaryScreen() {
                                   placeholder="Select race"
                                   items={RACE_OPTIONS}
                                   className="w-full"
-                                  defaultSelectedKey={mapApiValueToSelectKey(
+                                  selectedKey={mapApiValueToSelectKey(
                                     race,
                                     RACE_OPTIONS
                                   )}
@@ -1107,7 +1106,7 @@ export default function ProfileBeneficiaryScreen() {
                               </div>
                               <div className="flex text-center font-bold z-10 text-4xl sm:text-5xl lg:text-7xl justify-center text-white mb-4 px-1 relative">
                                 <span className="font-bold">
-                                  {formatCurrency(amount?.[0] || 0)}
+                                  R {amountConversion(amount?.[0] || 0)}
                                 </span>
                               </div>
                               <div className="relative z-10">
@@ -1124,7 +1123,7 @@ export default function ProfileBeneficiaryScreen() {
                                     maxValue={1000000}
                                     step={500}
                                     labelFormatter={(value) =>
-                                      formatCurrency(value)
+                                      amountConversion(value)
                                     }
                                   />
                                 </div>

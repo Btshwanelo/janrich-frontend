@@ -11,6 +11,7 @@ import {
 } from "@/components/application/modals/modal";
 import { useUpdateSavingsGoalMutation } from "@/lib/slices/authSlice";
 import { useSuccessToast, useErrorToast } from "@/components/base/toast";
+import { amountConversion } from "@/utils/amountConversion";
 
 interface SavingsGoalModalProps {
   isOpen: boolean;
@@ -36,11 +37,6 @@ export default function SavingsGoalModal({
     useUpdateSavingsGoalMutation();
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
-
-  const formatCurrency = (value: number): string => {
-    const currency = "R";
-    return `${currency} ${value.toLocaleString()}`;
-  };
 
   const cardTitle = "Great Start! You don't need a million to change your life";
   const cardImage =
@@ -69,7 +65,7 @@ export default function SavingsGoalModal({
       // Show success toast
       showSuccessToast(
         "Savings Goal Set!",
-        `Your annual savings goal of ${formatCurrency(
+        `Your annual savings goal of R ${amountConversion(
           amount[0]
         )} has been saved successfully.`,
         {
@@ -85,7 +81,6 @@ export default function SavingsGoalModal({
       // Close the modal
       onClose();
     } catch (error: any) {
-
       // Show error toast
       showErrorToast(
         "Save Failed",
@@ -123,12 +118,12 @@ export default function SavingsGoalModal({
           <div className="space-y-6 mx-4">
             <div className="text-center">
               <div className="text-4xl font-bold text-primary-500 mb-6">
-                {formatCurrency(amount[0])}
+                R {amountConversion(amount[0])}
               </div>
 
               <div className="flex justify-between text-sm text-text mb-4 px-1">
-                <span>{formatCurrency(minAmount)}</span>
-                <span>{formatCurrency(maxAmount)}</span>
+                <span>R {amountConversion(minAmount)}</span>
+                <span>R {amountConversion(maxAmount)}</span>
               </div>
 
               <div className="w-full px-1 mb-6 overflow-hidden max-w-full">
@@ -141,7 +136,7 @@ export default function SavingsGoalModal({
                     minValue={5000}
                     maxValue={1000000}
                     step={500}
-                    labelFormatter={(value) => formatCurrency(value)}
+                    labelFormatter={(value) => amountConversion(value)}
                     // labelPosition="bottom"
                     // className="w-full max-w-full"
                   />
