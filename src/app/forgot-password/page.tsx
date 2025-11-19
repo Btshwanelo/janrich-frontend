@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 import AuthLayout from "@/components/layouts/AuthLayout";
 import { Button } from "@/components/base/buttons/button";
+import { Input } from "@/components/base/input/input";
 import { useSendRegistrationOTPMutation } from "@/lib/slices/authSlice";
 import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 import PhoneInput from "react-phone-number-input";
@@ -15,8 +16,14 @@ import "react-phone-number-input/style.css";
 // Validation schema
 const validationSchema = Yup.object({
   whatsapp: Yup.string()
-    .matches(/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number (e.g., +923332184595)")
+    .matches(
+      /^\+?[1-9]\d{1,14}$/,
+      "Please enter a valid phone number (e.g., +923332184595)"
+    )
     .required("Phone number is required"),
+  username: Yup.string()
+    .email("Please enter a valid email address")
+    .required("Email is required"),
 });
 
 const ForgotPasswordScreen = () => {
@@ -29,44 +36,34 @@ const ForgotPasswordScreen = () => {
 
   // Refs for field highlighting
   const whatsappRef = useRef<HTMLInputElement>(null);
+  const usernameRef = useRef<HTMLInputElement>(null);
 
   const initialValues = {
     whatsapp: "",
+    username: "",
   };
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     try {
       setError(null); // Clear any previous errors
-      const response = await sendOTP({ whatsapp: values.whatsapp }).unwrap();
+      const response = await sendOTP({
+        whatsapp: values.whatsapp,
+        username: values.username,
+      }).unwrap();
       showSuccessToast("OTP sent successfully. Please check your WhatsApp.");
-      router.push(`/forgot-password/new/${encodeURIComponent(values.whatsapp)}`);
+      router.push(
+        `/forgot-password/new/${encodeURIComponent(values.username)}`
+      );
     } catch (error: any) {
       // Handle network errors or API errors
-      let errorMessage = "Failed to send OTP. Please try again.";
+      let errorMessage =
+        error?.data?.message?.message ||
+        error?.data?.message ||
+        error?.message ||
+        "Failed to send OTP. Please try again.";
 
-      if (error) {
-        // RTK Query error structure: {status, data, error, message}
-        // The apiSlice now adds a 'message' field to all errors
-        if (error.message) {
-          errorMessage = error.message;
-        } else if (typeof error === "string") {
-          errorMessage = error;
-        } else if (error.data) {
-          // Check if error.data is a string or has a message property
-          if (typeof error.data === "string") {
-            errorMessage = error.data;
-          } else if (error.data.message) {
-            errorMessage = error.data.message;
-          } else if (error.data.error) {
-            errorMessage = error.data.error;
-          }
-        } else if (error.error) {
-          errorMessage = error.error;
-        }
-      }
-
-      setError(errorMessage);
       showErrorToast(errorMessage);
+      setError(errorMessage);
       setSubmitting(false);
     }
   };
@@ -84,6 +81,51 @@ const ForgotPasswordScreen = () => {
         >
           {({ values, errors, touched, setFieldValue, isValid }) => (
             <Form className="space-y-6">
+              {/* Email/Username */}
+              <div>
+                <Label
+                  htmlFor="username"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Email <span className="text-error-500">*</span>
+                </Label>
+                <div className="mt-1">
+                  <Field name="username">
+                    {({ field }: any) => (
+                      <Input
+                        ref={usernameRef}
+                        id="username"
+                        name={field.name}
+                        value={field.value}
+                        onChange={(value: string) => {
+                          setFieldValue("username", value);
+                          setError(null); // Clear error when user types
+                        }}
+                        onBlur={field.onBlur}
+                        type="email"
+                        placeholder="Enter your email"
+                        isInvalid={!!(errors.username && touched.username)}
+                        hint={
+                          errors.username && touched.username
+                            ? errors.username
+                            : undefined
+                        }
+                        onKeyDown={(e: any) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            // Submit form on Enter
+                            const form = e.target?.form ?? e.target?.closest("form");
+                            if (form && isValid && values.username && values.whatsapp) {
+                              form.requestSubmit();
+                            }
+                          }
+                        }}
+                      />
+                    )}
+                  </Field>
+                </div>
+              </div>
+
               {/* Phone Number */}
               <div>
                 <Label
@@ -95,34 +137,40 @@ const ForgotPasswordScreen = () => {
                 <div className="mt-1">
                   <Field name="whatsapp">
                     {({ field }: any) => (
-                      <PhoneInput
-                        {...field}
-                        ref={whatsappRef}
-                        placeholder="Enter phone number"
-                        defaultCountry="ZA"
-                        className="phone-input"
-                        onChange={(value) => {
-                          setFieldValue("whatsapp", value);
-                          setError(null); // Clear error when user types
-                        }}
-                        onKeyDown={(e: any) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            // Submit form on Enter
-                            const form = e.target.form;
-                            if (form && isValid && values.whatsapp) {
-                              form.requestSubmit();
+                      <div>
+                        <PhoneInput
+                          {...field}
+                          ref={whatsappRef}
+                          placeholder="Enter phone number"
+                          defaultCountry="ZA"
+                          className={`phone-input ${
+                            errors.whatsapp && touched.whatsapp
+                              ? "border-error-500 ring-error-500"
+                              : ""
+                          }`}
+                          onChange={(value) => {
+                            setFieldValue("whatsapp", value);
+                            setError(null); // Clear error when user types
+                          }}
+                          onKeyDown={(e: any) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              // Submit form on Enter
+                              const form = e.target.form;
+                              if (form && isValid && values.username && values.whatsapp) {
+                                form.requestSubmit();
+                              }
                             }
-                          }
-                        }}
-                      />
+                          }}
+                        />
+                        {errors.whatsapp && touched.whatsapp && (
+                          <div className="text-error-500 text-xs mt-1">
+                            {errors.whatsapp}
+                          </div>
+                        )}
+                      </div>
                     )}
                   </Field>
-                  <ErrorMessage
-                    name="whatsapp"
-                    component="div"
-                    className="text-error-500 text-xs mt-1"
-                  />
                 </div>
               </div>
 
@@ -139,7 +187,9 @@ const ForgotPasswordScreen = () => {
                 color="primary"
                 size="md"
                 className="w-full"
-                disabled={!isValid || isSendingOTP || !values.whatsapp}
+                disabled={
+                  !isValid || isSendingOTP || !values.whatsapp || !values.username
+                }
               >
                 {isSendingOTP ? "Sending..." : "Reset password"}
               </Button>

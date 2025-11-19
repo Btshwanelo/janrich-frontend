@@ -67,42 +67,13 @@ const ResetPasswordScreen = () => {
         password: values.password,
       }).unwrap();
 
-      // Check if the response indicates success or failure
-      if (response?.message?.result === "failed") {
-        const errorMessage =
-          response?.message?.message ||
-          "Failed to reset password. Please try again.";
-        showErrorToast(errorMessage);
-        setSubmitting(false);
-        return;
-      }
-
       // If result is "success" or response has status/user (legacy format), treat as success
-      if (
-        response?.message?.result === "success" ||
-        response?.message?.status ||
-        response?.message?.user ||
-        !response?.message?.result
-      ) {
-        showSuccessToast("Password reset successfully! Redirecting...");
-        setTimeout(() => {
-          router.push("/new-password-success");
-        }, 1500);
-      } else {
-        // Fallback for any other result
-        const errorMessage =
-          response?.message?.message ||
-          "Failed to reset password. Please try again.";
-        showErrorToast(errorMessage);
-        setSubmitting(false);
-      }
+
+      router.push("/new-password-success");
     } catch (error: any) {
       // Handle network errors or API errors
       const errorMessage =
-        error?.data?.message?.message ||
-        error?.data?.message ||
-        error?.message ||
-        "Failed to reset password. Please try again.";
+        error || "Failed to reset password. Please try again.";
       showErrorToast(errorMessage);
       setSubmitting(false);
     }
@@ -159,15 +130,15 @@ const ResetPasswordScreen = () => {
                       maxLength={6}
                       containerClassName="gap-2 justify-center"
                     >
-                      {/* {Array.from({ length: 6 }, (_, index) => (
+                      {Array.from({ length: 6 }, (_, index) => (
                         <PinInput.Slot
                           key={index}
                           index={index}
                           className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
                           style={{ color: "#155EEF !important" }}
                         />
-                      ))} */}
-                      <PinInput.Slot
+                      ))}
+                      {/* <PinInput.Slot
                         index={0}
                         className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
                         style={{ color: "#155EEF !important" }}
@@ -196,7 +167,7 @@ const ResetPasswordScreen = () => {
                         index={4}
                         className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
                         style={{ color: "#155EEF !important" }}
-                      />
+                      /> */}
                     </PinInput.Group>
                   </PinInput>
                 </div>

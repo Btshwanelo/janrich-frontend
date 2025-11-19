@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Label } from "@/components/base/input/label";
@@ -15,7 +15,10 @@ import OTPVerificationModal from "@/components/OTPVerificationModal";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 import AuthLayout from "@/components/layouts/AuthLayout";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { useRegisterMutation } from "@/lib/slices/authSlice";
+import {
+  useRegisterMutation,
+  useSendRegistrationOTPMutation,
+} from "@/lib/slices/authSlice";
 import {
   setError,
   setLoading,
@@ -72,6 +75,8 @@ const RegistrationScreen = () => {
   const router = useRouter();
   const { error, isLoading } = useAppSelector((state) => state.auth);
   const [register, { isLoading: isRegisterLoading }] = useRegisterMutation();
+  const [sendRegisterOTP, { isLoading: isRegisterOtpLoading, isSuccess }] =
+    useSendRegistrationOTPMutation();
 
   // Refs for field highlighting
   const nameRef = useRef<HTMLInputElement>(null);
@@ -94,6 +99,21 @@ const RegistrationScreen = () => {
     agreeTerms: false,
     rememberMe: false,
   };
+
+  const handleSendRegisterOtp = (email: string, whatsappNumber: string) => {
+    sendRegisterOTP({
+      whatsapp: whatsappNumber,
+      username: email,
+    });
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      // Show OTP modal
+
+      setShowOTPModal(true);
+    }
+  }, [isSuccess]);
 
   const handleSubmit = async (
     values: any,
@@ -126,7 +146,6 @@ const RegistrationScreen = () => {
       const result = await register(registrationPayload).unwrap();
       // Store registration data in Redux store
 
-      console.log("1212",result)
       dispatch(
         setRegistrationData({
           customer: result.message.customer,
@@ -140,8 +159,12 @@ const RegistrationScreen = () => {
       // Store registration data for OTP verification
       setLocalRegistrationData(result);
 
-      // Show OTP modal
-      setShowOTPModal(true);
+      const whatsapp_number = values.whatsappSame
+        ? values.phoneNumber
+        : values.whatsappNumber;
+      const email = values.email;
+
+      handleSendRegisterOtp(email, whatsapp_number);
     } catch (error: any) {
       // Handle different error types
       let errorMessage = error || "Registration failed. Please try again.";
@@ -206,9 +229,9 @@ const RegistrationScreen = () => {
                 isOpen={showOTPModal}
                 onClose={() => setShowOTPModal(false)}
                 contactInfo={values.phoneNumber}
+                email={values.email}
                 onSuccess={handleOTPSuccess}
-                otpLength={5}
-                validOtp="2135"
+                otpLength={6}
                 verificationMethod="whatsapp"
               />
 

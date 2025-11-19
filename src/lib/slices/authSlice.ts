@@ -258,7 +258,8 @@ export interface ProfileUpdateResponse {
 
 // Email verification interfaces
 export interface SendOTPRequest {
-  email: string;
+  whatsapp: string;
+  username: string;
 }
 
 export interface SendOTPResponse {
@@ -401,6 +402,13 @@ export const authApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ["Auth"],
     }),
     sendRegistrationOTP: builder.mutation<SendOTPResponse, SendOTPRequest>({
+      query: (otpData) => ({
+        url: "jan.sendotp",
+        method: "POST",
+        body: otpData,
+      }),
+    }),
+    sendForgotPasswordOTP: builder.mutation<SendOTPResponse, SendOTPRequest>({
       query: (otpData) => ({
         url: "jan.sendotp",
         method: "POST",

@@ -28,13 +28,14 @@ const OTPVerificationModal = ({
   contactInfo,
   verificationMethod,
   onSuccess,
-  otpLength = 5,
-  validOtp = "2135",
+  otpLength = 6,
   email,
 }: OTPVerificationModalProps) => {
   const [otp, setOTP] = useState("");
   const [error, setError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+
+  console.log("error:", error);
 
   // API hooks
   const [verifyOTP, { isLoading: isVerifyingOTP }] =
@@ -55,6 +56,11 @@ const OTPVerificationModal = ({
         return "/whatsapp.svg";
     }
   };
+
+  useEffect(() => {
+    setError("")
+  }, [])
+  
 
   const getVerificationTitle = () => {
     switch (verificationMethod) {
@@ -126,12 +132,32 @@ const OTPVerificationModal = ({
         }
       } else {
         // Fallback to hardcoded verification for other methods
-        if (otp === validOtp) {
-          console.log("OTP verification successful");
-          if (onSuccess) {
-            onSuccess();
+        if (verificationMethod === "whatsapp" && email) {
+          // Use real API for email verification
+          const result = await verifyOTP({
+            email: email,
+            otp_input: otp,
+          }).unwrap();
+
+          console.log("OTP verification successful:", result);
+
+          if (result.message.status === "registered") {
+            showSuccessToast(
+              "Email Verified!",
+              "Your email has been successfully verified and you are now registered.",
+              {
+                duration: 5000,
+              }
+            );
+
+            if (onSuccess) {
+              onSuccess();
+            } else {
+              onClose();
+            }
           } else {
-            onClose();
+            setError("Verification failed. Please try again.");
+            setOTP("");
           }
         } else {
           setError("Invalid OTP code. Please try again.");
@@ -141,20 +167,7 @@ const OTPVerificationModal = ({
     } catch (error: any) {
       console.error("OTP verification failed:", error);
 
-      // Show error toast
-      showErrorToast(
-        "Verification Failed",
-        error?.data?.message || "Unable to verify OTP. Please try again.",
-        {
-          duration: 0, // Don't auto-dismiss
-          action: {
-            label: "Retry",
-            onClick: () => handleVerify(),
-          },
-        }
-      );
-
-      setError("Verification failed. Please try again.");
+      setError(error || "Verification failed. Please try again.");
       setOTP("");
     } finally {
       setIsVerifying(false);
@@ -217,17 +230,17 @@ const OTPVerificationModal = ({
                 ))} */}
                 <PinInput.Slot
                   index={0}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
+                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
                   style={{ color: "#155EEF !important" }}
                 />
                 <PinInput.Slot
                   index={1}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
+                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
                   style={{ color: "#155EEF !important" }}
                 />
                 <PinInput.Slot
                   index={2}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
+                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
                   style={{ color: "#155EEF !important" }}
                 />
                 <PinInput.Separator className="text-[60px] text-[#D5D7DA] font-semibold" />
@@ -241,12 +254,17 @@ const OTPVerificationModal = ({
                 ))} */}
                 <PinInput.Slot
                   index={3}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
+                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
                   style={{ color: "#155EEF !important" }}
                 />
                 <PinInput.Slot
                   index={4}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
+                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
+                  style={{ color: "#155EEF !important" }}
+                />
+                <PinInput.Slot
+                  index={4}
+                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
                   style={{ color: "#155EEF !important" }}
                 />
               </PinInput.Group>
