@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Wallet } from "lucide-react";
+import { X, Wallet, Plus } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import {
   ModalOverlay,
@@ -13,6 +13,7 @@ import { Select } from "@/components/base/select/select";
 import { Checkbox } from "@/components/base/checkbox/checkbox";
 import { amountConversion } from "@/utils/amountConversion";
 import {
+  useGetBalanceQuery,
   useGetProfileQuery,
   useRequestPayoutMutation,
 } from "@/lib/slices/authSlice";
@@ -48,9 +49,20 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
   const [accountHolder, setAccountHolder] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [fieldErrors, setFieldErrors] = useState<{
+    amount?: string;
+    bank?: string;
+    bankCode?: string;
+    bankAccount?: string;
+    accountHolder?: string;
+  }>({});
 
   const { user, customer } = useAppSelector((state) => state.auth);
-
+  const {
+    data: balanceData,
+    isLoading: isBalanceLoading,
+    error: balanceError,
+  } = useGetBalanceQuery(customer, { skip: !isOpen || !customer });
   const [requestPayout, { isLoading: isPayoutLoading, isSuccess }] =
     useRequestPayoutMutation();
   const {
@@ -58,8 +70,8 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
     isLoading: isProfileLoading,
     error: profileError,
   } = useGetProfileQuery(customer, { skip: !isOpen || !customer });
-
   const financials = profileData?.message?.data?.financials;
+  const totalBalance = balanceData?.message?.total_balance || 0;
 
   // Initialize form with existing banking details when profile data loads
   useEffect(() => {
@@ -76,7 +88,15 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
       setAccountHolder("");
     }
     setErrorMessage(""); // Clear error when changing banking option
+    setFieldErrors({}); // Clear field errors when changing banking option
   }, [financials, selectedBankingOption]);
+
+  // Update amount when balance loads and full withdrawal is selected
+  useEffect(() => {
+    if (payoutType === "full" && totalBalance > 0) {
+      setAmount(totalBalance.toString());
+    }
+  }, [totalBalance, payoutType]);
 
   // Reset form when modal closes
   useEffect(() => {
@@ -90,6 +110,7 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
       setAccountHolder("");
       setErrorMessage("");
       setSuccessMessage("");
+      setFieldErrors({});
     }
   }, [isOpen]);
 
@@ -98,8 +119,9 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
   const handlePayoutTypeChange = (type: PayoutType) => {
     setPayoutType(type);
     setErrorMessage(""); // Clear error when changing payout type
+    setFieldErrors({}); // Clear field errors
     if (type === "full") {
-      setAmount(totalSaved.toString());
+      setAmount(totalBalance.toString());
     } else {
       setAmount("");
     }
@@ -109,19 +131,75 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
     // Only allow numbers and decimal point
     const numericValue = value.replace(/[^0-9.]/g, "");
     setAmount(numericValue);
+    setErrorMessage(""); // Clear error when user types
+    // Clear field error when user types
+    if (fieldErrors.amount) {
+      setFieldErrors((prev) => ({ ...prev, amount: undefined }));
+    }
   };
 
   const handleRequestPayout = async () => {
-    // Clear previous messages
+    // Clear previous messages and errors
     setErrorMessage("");
     setSuccessMessage("");
+    const errors: { amount?: string; bank?: string; bankCode?: string; bankAccount?: string; accountHolder?: string } = {};
 
-    const payoutAmount =
-      payoutType === "full" ? totalSaved : parseFloat(amount);
+    // Validate balance is available
+    if (totalBalance <= 0) {
+      setErrorMessage("You have no available balance to withdraw.");
+      return;
+    }
 
-    // Validate required fields
-    if (selectedBankingOption === "new" && (!bank || !bankAccount)) {
-      setErrorMessage("Please provide bank name and account number.");
+    // Validate amount based on payout type
+    let payoutAmount: number = 0;
+    if (payoutType === "full") {
+      payoutAmount = totalBalance;
+    } else {
+      // Partial withdrawal validation
+      if (!amount || amount.trim() === "") {
+        errors.amount = "Please enter a withdrawal amount.";
+      } else {
+        const parsedAmount = parseFloat(amount);
+        
+        // Check for invalid number
+        if (isNaN(parsedAmount)) {
+          errors.amount = "Please enter a valid withdrawal amount.";
+        }
+        // Check for zero or negative amounts
+        else if (parsedAmount <= 0) {
+          errors.amount = "Withdrawal amount must be greater than zero.";
+        }
+        // Check if amount exceeds balance
+        else if (parsedAmount > totalBalance) {
+          errors.amount = `You cannot withdraw more than your available balance of ${amountConversion(totalBalance)}.`;
+        } else {
+          payoutAmount = parsedAmount;
+        }
+      }
+    }
+
+    // Validate required fields for new banking option
+    if (selectedBankingOption === "new") {
+      if (!bank || bank.trim() === "") {
+        errors.bank = "Bank name is required.";
+      }
+      
+      if (!bankCode || bankCode.trim() === "") {
+        errors.bankCode = "Branch code is required.";
+      }
+      
+      if (!bankAccount || bankAccount.trim() === "") {
+        errors.bankAccount = "Account number is required.";
+      }
+
+      if (!accountHolder || accountHolder.trim() === "") {
+        errors.accountHolder = "Account holder name is required.";
+      }
+    }
+
+    // If there are any field errors, show them and stop
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
@@ -171,11 +249,12 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
         `Your ${payoutType} withdrawal request of ${amountConversion(payoutAmount)} has been submitted successfully.`
       );
     } catch (error: any) {
-      console.log("err:",error)
-      setErrorMessage(
-        error ||
-          "Unable to submit payout request. Please try again."
-      );
+      console.log("err:", error);
+      const errorMsg =
+        error?.data?.message ||
+        error?.message ||
+        (typeof error === "string" ? error : "Unable to submit payout request. Please try again.");
+      setErrorMessage(errorMsg);
     }
   };
 
@@ -322,24 +401,31 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
 
             {/* Amount Input */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Amount
-              </label>
               <Input
+                label="Amount"
                 value={amount}
                 onChange={(value) => handleAmountChange(value)}
                 placeholder="Enter payout amount"
                 type="text"
                 inputMode="decimal"
-                isDisabled={payoutType === "full"}
+                isDisabled={payoutType === "full" || isBalanceLoading}
+                isRequired={payoutType === "partial"}
+                isInvalid={!!fieldErrors.amount}
+                hint={fieldErrors.amount}
                 size="md"
                 className="w-full"
               />
-              {payoutType === "full" && (
+              {!fieldErrors.amount && isBalanceLoading ? (
+                <p className="mt-2 text-sm text-gray-500">Loading balance...</p>
+              ) : !fieldErrors.amount && payoutType === "full" ? (
                 <p className="mt-2 text-sm text-gray-600">
-                  Full amount: {amountConversion(totalSaved)}
+                  Full amount: {amountConversion(totalBalance)}
                 </p>
-              )}
+              ) : !fieldErrors.amount && payoutType === "partial" ? (
+                <p className="mt-2 text-sm text-gray-600">
+                  Available balance: {amountConversion(totalBalance)}
+                </p>
+              ) : null}
             </div>
 
             {/* Banking Details Section */}
@@ -363,7 +449,7 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
                     "Current Account (No details)"
                   )}
                 </Select.Item>
-                <Select.Item id="new">Add new account</Select.Item>
+                <Select.Item id="new">+ Add new account</Select.Item>
               </Select>
 
               {selectedBankingOption === "existing" ? (
@@ -409,56 +495,70 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
-                      Bank Name
-                    </label>
-                    <Input
-                      value={bank}
-                      onChange={(value) => setBank(value)}
-                      placeholder="Enter bank name"
-                      size="md"
-                      className="w-full"
-                      isRequired
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
-                      Branch Code
-                    </label>
-                    <Input
-                      value={bankCode}
-                      onChange={(value) => setBankCode(value)}
-                      placeholder="Enter branch code"
-                      size="md"
-                      className="w-full"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
-                      Account Number
-                    </label>
-                    <Input
-                      value={bankAccount}
-                      onChange={(value) => setBankAccount(value)}
-                      placeholder="Enter account number"
-                      size="md"
-                      className="w-full"
-                      isRequired
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
-                      Account Holder Name
-                    </label>
-                    <Input
-                      value={accountHolder}
-                      onChange={(value) => setAccountHolder(value)}
-                      placeholder="Enter account holder name"
-                      size="md"
-                      className="w-full"
-                    />
-                  </div>
+                  <Input
+                    label="Bank Name"
+                    value={bank}
+                    onChange={(value) => {
+                      setBank(value);
+                      if (fieldErrors.bank) {
+                        setFieldErrors((prev) => ({ ...prev, bank: undefined }));
+                      }
+                    }}
+                    placeholder="Enter bank name"
+                    size="md"
+                    className="w-full"
+                    isRequired
+                    isInvalid={!!fieldErrors.bank}
+                    hint={fieldErrors.bank}
+                  />
+                  <Input
+                    label="Branch Code"
+                    value={bankCode}
+                    onChange={(value) => {
+                      setBankCode(value);
+                      if (fieldErrors.bankCode) {
+                        setFieldErrors((prev) => ({ ...prev, bankCode: undefined }));
+                      }
+                    }}
+                    placeholder="Enter branch code"
+                    size="md"
+                    className="w-full"
+                    isRequired
+                    isInvalid={!!fieldErrors.bankCode}
+                    hint={fieldErrors.bankCode}
+                  />
+                  <Input
+                    label="Account Number"
+                    value={bankAccount}
+                    onChange={(value) => {
+                      setBankAccount(value);
+                      if (fieldErrors.bankAccount) {
+                        setFieldErrors((prev) => ({ ...prev, bankAccount: undefined }));
+                      }
+                    }}
+                    placeholder="Enter account number"
+                    size="md"
+                    className="w-full"
+                    isRequired
+                    isInvalid={!!fieldErrors.bankAccount}
+                    hint={fieldErrors.bankAccount}
+                  />
+                  <Input
+                    label="Account Holder Name"
+                    value={accountHolder}
+                    onChange={(value) => {
+                      setAccountHolder(value);
+                      if (fieldErrors.accountHolder) {
+                        setFieldErrors((prev) => ({ ...prev, accountHolder: undefined }));
+                      }
+                    }}
+                    placeholder="Enter account holder name"
+                    size="md"
+                    className="w-full"
+                    isRequired
+                    isInvalid={!!fieldErrors.accountHolder}
+                    hint={fieldErrors.accountHolder}
+                  />
                 </div>
               )}
             </div>
@@ -485,12 +585,7 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
                 isDisabled={
                   isPayoutLoading ||
                   isProfileLoading ||
-                  (payoutType === "partial" &&
-                    (!amount ||
-                      parseFloat(amount) <= 0 ||
-                      parseFloat(amount) > totalSaved)) ||
-                  (selectedBankingOption === "new" && (!bank || !bankAccount)) ||
-                  (selectedBankingOption === "existing" && (!financials?.customer_bank || !financials?.iban_account))
+                  isBalanceLoading
                 }
               >
                 {isPayoutLoading ? "Submitting..." : "Request Payout"}

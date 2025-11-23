@@ -103,6 +103,13 @@ export interface ProfileResponse {
     };
   };
 }
+export interface BalanceResponse {
+  message: {
+    result: string;
+    message: string;
+    total_balance: number;
+  };
+}
 
 export interface FinancialDetailsRequest {
   customer_id: string;
@@ -373,6 +380,13 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ["Auth"],
     }),
+    getBalance: builder.query<BalanceResponse, string>({
+      query: (customerId) => ({
+        url: `jan.balance?customer_id=${customerId}`,
+        method: "GET",
+      }),
+      providesTags: ["Auth"],
+    }),
     updateFinancialDetails: builder.mutation<
       FinancialDetailsResponse,
       FinancialDetailsRequest
@@ -492,6 +506,7 @@ export const {
   useLoginMutation,
   useRegisterMutation,
   useGetProfileQuery,
+  useGetBalanceQuery,
   useUpdateFinancialDetailsMutation,
   useUpdateBeneficiaryMutation,
   useUpdateCustomerMutation,
