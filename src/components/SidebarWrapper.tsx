@@ -60,7 +60,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
         }`}
       >
         <img
-          src="/logo-svg.svg"
+          src="/JR-Logo.svg"
           alt="JanRich Logo"
           className={isSidebarCollapsed ? "w-8 h-auto" : "w-10 h-auto"}
         />

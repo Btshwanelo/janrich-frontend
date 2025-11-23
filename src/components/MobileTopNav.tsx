@@ -18,17 +18,13 @@ const MobileTopNav = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <img
-            src="/logo-svg.svg"
+            src="/jr-logo-black.svg"
             alt="JanRich Logo"
             className="w-10 h-auto"
           />
-          
+
           {/* Menu Button */}
-          <Button
-            color="tertiary"
-            size="sm"
-            onClick={toggleDrawer}
-          >
+          <Button color="tertiary" size="sm" onClick={toggleDrawer}>
             {isDrawerOpen ? (
               <X className="w-5 h-5" />
             ) : (
@@ -39,12 +35,12 @@ const MobileTopNav = () => {
       </div>
 
       {/* Mobile Drawer */}
-      <MobileDrawer 
-        isOpen={isDrawerOpen} 
-        onClose={() => setIsDrawerOpen(false)} 
+      <MobileDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
       />
     </>
-  )
+  );
 }
 
 export default MobileTopNav

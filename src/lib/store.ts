@@ -15,6 +15,7 @@ import { apiSlice } from "./api/apiSlice";
 import authReducer from "./slices/authSlice";
 import onboardingReducer from "./slices/onboardingSlice";
 import ledgerReducer from "./slices/ledgerSlice";
+import errorReducer from "./slices/errorSlice";
 
 // Persist configuration
 const persistConfig = {
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   onboarding: onboardingReducer,
   ledger: ledgerReducer,
+  error: errorReducer,
 });
 
 // Create persisted reducer

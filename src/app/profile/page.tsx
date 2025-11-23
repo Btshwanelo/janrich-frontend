@@ -73,7 +73,7 @@ export default function ProfileBeneficiaryScreen() {
     data: profileData,
     isLoading: isProfileLoading,
     error: profileError,
-  } = useGetProfileQuery(customer || "JR0027");
+  } = useGetProfileQuery(customer);
 
   // Financial details update mutation
   const [updateFinancialDetails, { isLoading: isUpdatingFinancials }] =
@@ -1106,7 +1106,7 @@ export default function ProfileBeneficiaryScreen() {
                               </div>
                               <div className="flex text-center font-bold z-10 text-4xl sm:text-5xl lg:text-7xl justify-center text-white mb-4 px-1 relative">
                                 <span className="font-bold">
-                                  R {amountConversion(amount?.[0] || 0)}
+                                  {amountConversion(amount?.[0] || 0)}
                                 </span>
                               </div>
                               <div className="relative z-10">

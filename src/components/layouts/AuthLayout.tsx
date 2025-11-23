@@ -29,7 +29,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             <div className="text-center relative mb-8">
               <div className="mb-6">
                 <img
-                  src="/logo-svg.svg"
+                  src="/jr-logo-black.svg"
                   alt="JanRich Logo"
                   className="mx-auto w-12 h-auto"
                 />

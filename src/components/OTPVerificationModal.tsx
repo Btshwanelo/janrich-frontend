@@ -58,9 +58,8 @@ const OTPVerificationModal = ({
   };
 
   useEffect(() => {
-    setError("")
-  }, [])
-  
+    setError("");
+  }, []);
 
   const getVerificationTitle = () => {
     switch (verificationMethod) {
@@ -112,7 +111,7 @@ const OTPVerificationModal = ({
 
         console.log("OTP verification successful:", result);
 
-        if (result.message.status === "registered") {
+        if (result.message.result === "success") {
           showSuccessToast(
             "Email Verified!",
             "Your email has been successfully verified and you are now registered.",
@@ -141,7 +140,7 @@ const OTPVerificationModal = ({
 
           console.log("OTP verification successful:", result);
 
-          if (result.message.status === "registered") {
+          if (result.message.result === "success") {
             showSuccessToast(
               "Email Verified!",
               "Your email has been successfully verified and you are now registered.",
@@ -263,7 +262,7 @@ const OTPVerificationModal = ({
                   style={{ color: "#155EEF !important" }}
                 />
                 <PinInput.Slot
-                  index={4}
+                  index={5}
                   className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
                   style={{ color: "#155EEF !important" }}
                 />

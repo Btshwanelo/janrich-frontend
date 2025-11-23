@@ -11,6 +11,7 @@ import {
 } from "@/components/application/modals/modal";
 import { Avatar } from "@/components/base/avatar/avatar";
 import { amountConversion } from "@/utils/amountConversion";
+import { getMonthsRemainingInYear } from "@/utils/dateUtils";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -38,18 +39,17 @@ export const DepositModal: React.FC<DepositModalProps> = ({
   savingsData,
 }) => {
   const [dontShowAgain, setDontShowAgain] = useState(false);
-  console.log("prof", profileData);
   if (!isOpen) return null;
 
   const formatCurrency = (value: number): string => {
-    return `R ${amountConversion(value)}`;
+    return amountConversion(value);
   };
 
   const customerName = profileData?.customer_name || "Kat Vilane";
   const customerHandle = customerName.toLowerCase().replace(/\s+/g, "");
-  const totalPaid = savingsData?.totalSaved ;
+  const totalPaid = savingsData?.totalSaved;
   const goalAmount = savingsData?.savingGoal;
-  const paymentsToGo = savingsData?.paymentsToGo || 4;
+  const paymentsToGo = getMonthsRemainingInYear();
 
   // Extract account details
   const accountName = "Ikhwezi Daystar";
@@ -106,15 +106,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                 className="shadow-lg border-4 border-white w-14 h-14 sm:w-20 sm:h-20"
               />
             </div>
-            <div className="flex items-start gap-4 mb-2">
-              {/* <Avatar
-                size="2xl"
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
-                alt="Profile"
-                verified={true}
-                contrastBorder={true}
-                className="shadow-lg border-4 border-white w-14 h-14 sm:w-20 sm:h-20"
-              /> */}
+            <div className="flex-col sm:flex-row items-start gap-4 mb-2">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h2 className="text-xl font-bold text-gray-900">
@@ -125,24 +117,24 @@ export const DepositModal: React.FC<DepositModalProps> = ({
               </div>
 
               {/* Edit/Delete Actions - Repositioned */}
-              <div className="flex gap-2">
+              <div className="grid grid-cols-2 sm:flex gap-2">
                 <div className="flex-1 bg-gray-50 rounded-xl p-2 min-w-fit">
                   <p className="text-xs text-gray-500 mb-1">
                     You've Paid yourself
                   </p>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {formatCurrency(totalPaid)}
+                  <p className="text-base sm:text-lg font-semibold text-gray-900">
+                    {formatCurrency(totalPaid || 0)}
                   </p>
                 </div>
                 <div className="flex-1 bg-gray-50 rounded-xl p-2 min-w-fit">
                   <p className="text-xs text-gray-500 mb-1">Your Goal</p>
-                  <p className="text-lg font-bold text-gray-900">
-                    {formatCurrency(goalAmount)}
+                  <p className="text-base sm:text-lg font-bold text-gray-900">
+                    {formatCurrency(goalAmount || 0)}
                   </p>
                 </div>
                 <div className="flex-1 bg-[#D1E9FF] rounded-xl p-2 min-w-fit">
                   <p className="text-xs text-gray-500 mb-1">Payments to go</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-base sm:text-lg font-bold text-gray-900">
                     {paymentsToGo}
                   </p>
                 </div>

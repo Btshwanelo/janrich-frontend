@@ -217,9 +217,11 @@ const TransactionDetailPage = () => {
                           Amount
                         </p>
                         <p className="text-base font-semibold text-gray-900">
-                          {displayTransaction.currency || ""}{" "}
                           {typeof displayTransaction.amount === "number"
-                            ? amountConversion(displayTransaction.amount)
+                            ? amountConversion(
+                                displayTransaction.amount,
+                                displayTransaction.currency || "R"
+                              )
                             : "N/A"}
                         </p>
                       </div>

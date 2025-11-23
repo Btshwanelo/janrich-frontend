@@ -14,6 +14,7 @@ import {
 import { CircularProgress } from "@/components/CircularProgress";
 import { DASHBOARD_CONSTANTS, SAVINGS_MESSAGES } from "@/constants/dashboard";
 import { DepositModal } from "./DepositModal";
+import { PayoutModal } from "./PayoutModal";
 import { amountConversion } from "@/utils/amountConversion";
 
 interface SavingsGoalCardProps {
@@ -35,6 +36,7 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
   ({ savingsGoalPercentage, savingGoal, totalSaved, profileData }) => {
     const router = useRouter();
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+    const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
 
     // Validate and sanitize percentage to prevent NaN values
     const safePercentage =
@@ -90,10 +92,8 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
                   <Dropdown.Menu className="!outline-none">
                     <Dropdown.Item
                       icon={Wallet}
-                      isDisabled
                       onAction={() => {
-                        // Handle request payout action
-                        // You can add a route or modal here
+                        setIsPayoutModalOpen(true);
                       }}
                     >
                       Request Payout
@@ -135,12 +135,12 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
               <h2 className="text-[181D27] font-bold text-xl">
                 {totalSaved > 0 ? (
                   <span className="text-[#34C759]">
-                    R {amountConversion(totalSaved)}
+                    {amountConversion(totalSaved)}
                   </span>
                 ) : (
-                  <span className=""> R {amountConversion(totalSaved)}</span>
+                  <span className=""> {amountConversion(totalSaved)}</span>
                 )}{" "}
-                of R{amountConversion(savingGoal)}
+                of {amountConversion(savingGoal)}
               </h2>
             </div>
             <div className="flex items-center justify-center">
@@ -198,6 +198,18 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = memo(
               (savingGoal - totalSaved) / (savingGoal / 12)
             ), // Approximate monthly payments
           }}
+        />
+        <PayoutModal
+          isOpen={isPayoutModalOpen}
+          onClose={() => setIsPayoutModalOpen(false)}
+          totalSaved={totalSaved}
+          payoutAccounts={[
+            {
+              id: "1",
+              label: "Capitec Acc",
+              accountNumber: profileData?.iban_account || "1412614242",
+            },
+          ]}
         />
       </>
     );

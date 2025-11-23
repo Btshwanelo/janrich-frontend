@@ -65,7 +65,7 @@ export default function SavingsGoalModal({
       // Show success toast
       showSuccessToast(
         "Savings Goal Set!",
-        `Your annual savings goal of R ${amountConversion(
+        `Your annual savings goal of ${amountConversion(
           amount[0]
         )} has been saved successfully.`,
         {
@@ -118,12 +118,12 @@ export default function SavingsGoalModal({
           <div className="space-y-6 mx-4">
             <div className="text-center">
               <div className="text-4xl font-bold text-primary-500 mb-6">
-                R {amountConversion(amount[0])}
+                {amountConversion(amount[0])}
               </div>
 
               <div className="flex justify-between text-sm text-text mb-4 px-1">
-                <span>R {amountConversion(minAmount)}</span>
-                <span>R {amountConversion(maxAmount)}</span>
+                <span>{amountConversion(minAmount)}</span>
+                <span>{amountConversion(maxAmount)}</span>
               </div>
 
               <div className="w-full px-1 mb-6 overflow-hidden max-w-full">

@@ -31,7 +31,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
     <>
       {/* Backdrop */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={onClose}
         />
@@ -40,21 +40,17 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
       {/* Drawer */}
       <div
         className={`fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden flex flex-col overflow-hidden ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+          isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <img
-            src="/logo-svg.svg"
+            src="/jr-logo-black.svg"
             alt="JanRich Logo"
             className="w-10 h-auto"
           />
-          <Button
-            color="tertiary"
-            size="sm"
-            onClick={onClose}
-          >
+          <Button color="tertiary" size="sm" onClick={onClose}>
             <X className="w-5 h-5" />
           </Button>
         </div>
@@ -153,8 +149,8 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
             </a> */}
             <button
               onClick={() => {
-                handleLogout()
-                handleLinkClick()
+                handleLogout();
+                handleLinkClick();
               }}
               className="flex items-center space-x-3 px-4 py-4 text-[#535862] text-sm hover:bg-gray-100 rounded-lg transition-colors text-left"
             >
@@ -165,7 +161,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
         </nav>
       </div>
     </>
-  )
+  );
 }
 
 export default MobileDrawer

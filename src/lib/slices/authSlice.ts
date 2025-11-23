@@ -233,6 +233,22 @@ export interface DepositResponse {
     };
   };
 }
+export interface RequestPayoutResponse {
+  message: {
+    result: string;
+    message: string;
+  };
+}
+export interface RequestPayoutRequest {
+  customer: string;
+  date: string;
+  amount: number;
+  remarks: string;
+  bank: string;
+  bank_code: string;
+  bank_account: string;
+  account_holder: string;
+}
 
 export interface ProfileUpdateRequest {
   customer_id: string;
@@ -403,6 +419,13 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
     sendRegistrationOTP: builder.mutation<SendOTPResponse, SendOTPRequest>({
       query: (otpData) => ({
+        url: "janriches.api.otp.send_registration_otp",
+        method: "POST",
+        body: otpData,
+      }),
+    }),
+    sendWhatsappOTP: builder.mutation<SendOTPResponse, SendOTPRequest>({
+      query: (otpData) => ({
         url: "jan.sendotp",
         method: "POST",
         body: otpData,
@@ -451,6 +474,17 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
+    requestPayout: builder.mutation<
+      RequestPayoutResponse,
+      RequestPayoutRequest
+    >({
+      query: (depositData) => ({
+        url: "jan.payout",
+        method: "POST",
+        body: depositData,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
   }),
 });
 
@@ -467,6 +501,8 @@ export const {
   useUpdateSavingsGoalMutation,
   useGetLedgerQuery,
   useAddDepositMutation,
+  useRequestPayoutMutation,
+  useSendWhatsappOTPMutation,
 } = authApiSlice;
 
 // Auth slice
