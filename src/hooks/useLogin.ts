@@ -9,6 +9,7 @@ import {
 } from "@/lib/slices/authSlice";
 import { addPageError, clearAllPageErrors } from "@/lib/slices/errorSlice";
 import { extractErrorMessage } from "@/utils/errorHelpers";
+import { resetOnboardingFlow } from "@/lib/slices/onboardingSlice";
 
 export interface LoginFormValues {
   email: string;
@@ -49,6 +50,10 @@ export const useLogin = () => {
           })
         );
 
+        // Don't reset onboarding flow on login - let it persist
+        // The profile page will sync completion state based on actual data
+        // Only reset if this is truly a first-time user (we'll check savings goal in dashboard)
+
         // Set authentication cookie
         setAuthCookie(true);
 
@@ -72,5 +77,3 @@ export const useLogin = () => {
     isLoading: isLoading || isLoginLoading,
   };
 };
-
-

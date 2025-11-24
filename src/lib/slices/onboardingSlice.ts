@@ -114,6 +114,7 @@ const onboardingSlice = createSlice({
       state.age = null;
       state.isCompleted = false;
       state.error = null;
+      state.flow = initialFlowState;
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;

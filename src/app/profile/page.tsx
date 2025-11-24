@@ -176,12 +176,19 @@ export default function ProfileBeneficiaryScreen() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [flow, isProfileComplete]);
 
-  // Populate form fields when profile data is loaded
+  // Track if we've already synced completion state to prevent infinite loops
+  const hasSyncedCompletionRef = React.useRef<string | null>(null);
+
+  // Populate form fields when profile data is loaded and sync completion state
   React.useEffect(() => {
     if (profileData?.message?.data) {
       const data = profileData.message.data;
-      console.log("data", data);
-      console.log("data basic", data?.basic_info);
+      const customerId = data.basic_info?.customer_id;
+      
+      // Reset sync flag if this is a different customer or new data
+      if (hasSyncedCompletionRef.current !== customerId) {
+        hasSyncedCompletionRef.current = null;
+      }
       // Basic info
       const customerName = data.basic_info?.customer_name || "";
       const nameParts = customerName.split(" ");
@@ -228,8 +235,64 @@ export default function ProfileBeneficiaryScreen() {
       setBeneficiaryTitle(data.beneficiary.beneficiary_surname || ""); // Using surname as title for now
       setBeneficiaryCell(data.beneficiary.beneficiary_cell || "");
       setBeneficiaryRelation(data.beneficiary.beneficiary_relation || "");
+
+      // Only sync profile completion state if user is NOT in onboarding flow
+      // If they're in onboarding (welcomeShown is false), don't auto-complete based on data
+      // This ensures first-time users go through the full onboarding process
+      if (flow.welcomeShown && hasSyncedCompletionRef.current !== customerId) {
+        // User has already been through onboarding, sync state with actual data
+        // Check if details tab is complete (has required fields)
+        const detailsComplete =
+          customerName &&
+          data.basic_info.phone &&
+          data.about_you.birth_date &&
+          data.about_you.profile_gender &&
+          data.about_you.nationality &&
+          data.about_you.country_of_residence &&
+          data.about_you.race &&
+          data.about_you.communication_preference;
+
+        // Check if beneficiary tab is complete
+        const beneficiaryComplete =
+          data.beneficiary.beneficiary_type &&
+          data.beneficiary.beneficiary_name &&
+          data.beneficiary.beneficiary_surname &&
+          data.beneficiary.beneficiary_cell &&
+          data.beneficiary.beneficiary_relation;
+
+        // Check if financial tab is complete
+        const financialComplete =
+          data.financials.employment_status &&
+          data.financials.deposit_frequency &&
+          data.financials.customer_bank &&
+          data.financials.fund_source &&
+          data.financials.saving_for &&
+          data.financials.account_holder &&
+          data.financials.iban_account;
+
+        // Only update Redux state if it doesn't match actual data
+        // Use a ref to prevent multiple syncs and infinite loops
+        // Read current flow.profileCompleted inside the effect to get latest value
+        const currentProfileCompleted = flow.profileCompleted;
+        if (detailsComplete && !currentProfileCompleted.details) {
+          markProfileTabCompleted("details");
+        }
+        if (beneficiaryComplete && !currentProfileCompleted.beneficiary) {
+          markProfileTabCompleted("beneficiary");
+        }
+        if (financialComplete && !currentProfileCompleted.financial) {
+          markProfileTabCompleted("financial");
+        }
+        
+        // Mark that we've synced for this customer to prevent re-syncing
+        hasSyncedCompletionRef.current = customerId;
+      }
     }
-  }, [profileData]);
+    // Only depend on profileData and flow.welcomeShown to prevent infinite loops
+    // flow.profileCompleted changes when we call markProfileTabCompleted, which would cause a loop
+    // We read flow.profileCompleted inside the effect to get the current value
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileData, flow.welcomeShown]);
   const [uploadedFiles, setUploadedFiles] = useState<
     Array<{
       id: string;

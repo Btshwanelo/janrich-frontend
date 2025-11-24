@@ -28,6 +28,7 @@ import {
   useOnboardingFlow,
   getNextOnboardingStep,
 } from "@/utils/onboardingState";
+import { resetOnboardingFlow } from "@/lib/slices/onboardingSlice";
 
 const Dashboard = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -35,7 +36,7 @@ const Dashboard = () => {
   const router = useRouter();
 
   const { user, fullName, customer } = useAppSelector((state) => state.auth);
-  const { flow } = useOnboardingFlow();
+  const { flow, isProfileComplete } = useOnboardingFlow();
   const {
     data,
     refetch,
@@ -64,22 +65,46 @@ const Dashboard = () => {
   const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
   const transactions: Transaction[] = dataLedger?.message?.data || [];
 
-  // Check onboarding state and redirect if needed (only for first-time users)
+  // Check onboarding state and redirect if needed
   useEffect(() => {
     if (!isProfileLoading && data) {
-      // Only redirect if savings goal is 0 (first-time user)
+      // Case 1: First-time user (savings goal is 0)
       if (savingsGoal === 0) {
-        const nextStep = getNextOnboardingStep(flow);
-
+        // Reset onboarding flow for first-time users to ensure fresh state
+        dispatch(resetOnboardingFlow());
+        
+        const nextStep = getNextOnboardingStep({
+          savingsGoalCreated: false,
+          welcomeShown: false,
+          profileCompleted: {
+            details: false,
+            beneficiary: false,
+            financial: false,
+          },
+        });
+        
         // Only redirect if onboarding is incomplete
         if (nextStep === "welcome") {
           router.push("/welcome");
         } else if (nextStep === "profile") {
           router.push("/profile");
         }
+      } 
+      // Case 2: User has savings goal but hasn't completed profile
+      else if (savingsGoal > 0 && !isProfileComplete) {
+        // Check if they've started onboarding flow
+        if (!flow.welcomeShown) {
+          // They set a goal but haven't seen welcome yet
+          router.push("/welcome");
+        } else {
+          // They've seen welcome but haven't completed profile
+          router.push("/profile");
+        }
       }
+      // Case 3: User has savings goal > 0 and profile is complete
+      // They can stay on dashboard - onboarding is complete
     }
-  }, [isProfileLoading, data, router, savingsGoal, flow]);
+  }, [isProfileLoading, data, router, savingsGoal, dispatch, flow, isProfileComplete]);
 
   // Loading and error states
   const isLoading = isProfileLoading || isLedgerLoading;
