@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { useGetProfileQuery, useGetLedgerQuery } from "@/lib/slices/authSlice";
@@ -23,12 +24,18 @@ import { usePagination } from "@/hooks/usePagination";
 import { useSavingsModal } from "@/hooks/useSavingsModal";
 import { Transaction } from "@/types/dashboard";
 import { DASHBOARD_CONSTANTS } from "@/constants/dashboard";
+import {
+  useOnboardingFlow,
+  getNextOnboardingStep,
+} from "@/utils/onboardingState";
 
 const Dashboard = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const { user, fullName, customer } = useAppSelector((state) => state.auth);
+  const { flow } = useOnboardingFlow();
   const {
     data,
     refetch,
@@ -54,10 +61,25 @@ const Dashboard = () => {
     }
   }, [dataLedger, dispatch]);
 
-  console.log("dataLedger", dataLedger);
-
   const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
   const transactions: Transaction[] = dataLedger?.message?.data || [];
+
+  // Check onboarding state and redirect if needed (only for first-time users)
+  useEffect(() => {
+    if (!isProfileLoading && data) {
+      // Only redirect if savings goal is 0 (first-time user)
+      if (savingsGoal === 0) {
+        const nextStep = getNextOnboardingStep(flow);
+
+        // Only redirect if onboarding is incomplete
+        if (nextStep === "welcome") {
+          router.push("/welcome");
+        } else if (nextStep === "profile") {
+          router.push("/profile");
+        }
+      }
+    }
+  }, [isProfileLoading, data, router, savingsGoal, flow]);
 
   // Loading and error states
   const isLoading = isProfileLoading || isLedgerLoading;

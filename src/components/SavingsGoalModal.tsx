@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { Slider } from "@/components/base/slider/slider";
@@ -12,6 +13,7 @@ import {
 import { useUpdateSavingsGoalMutation } from "@/lib/slices/authSlice";
 import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 import { amountConversion } from "@/utils/amountConversion";
+import { useOnboardingFlow } from "@/utils/onboardingState";
 
 interface SavingsGoalModalProps {
   isOpen: boolean;
@@ -28,6 +30,7 @@ export default function SavingsGoalModal({
 }: SavingsGoalModalProps) {
   const [amount, setAmount] = useState([15000]);
   const [isSaving, setIsSaving] = useState(false);
+  const router = useRouter();
 
   const minAmount = 5000;
   const maxAmount = 100000;
@@ -37,6 +40,7 @@ export default function SavingsGoalModal({
     useUpdateSavingsGoalMutation();
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
+  const { markSavingsGoalCreated } = useOnboardingFlow();
 
   const cardTitle = "Great Start! You don't need a million to change your life";
   const cardImage =
@@ -62,6 +66,9 @@ export default function SavingsGoalModal({
         annual_savings_goal: amount[0],
       }).unwrap();
 
+      // Mark savings goal as created in onboarding state
+      markSavingsGoalCreated();
+
       // Show success toast
       showSuccessToast(
         "Savings Goal Set!",
@@ -80,6 +87,9 @@ export default function SavingsGoalModal({
 
       // Close the modal
       onClose();
+
+      // Redirect to welcome page
+      router.push("/welcome");
     } catch (error: any) {
       // Show error toast
       showErrorToast(

@@ -121,3 +121,4 @@ export const useRegistration = () => {
     isSendingOTP: isRegisterOtpLoading,
   };
 };
+

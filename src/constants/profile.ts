@@ -60,8 +60,8 @@ export const COMMUNICATION_OPTIONS: Array<{ id: string; label: string }> = [
 ] as const;
 
 export const EMPLOYMENT_STATUS_OPTIONS: Array<{ id: string; label: string }> = [
-  { id: "employed", label: "Employed" },
-  { id: "self-employed", label: "Self-employed" },
+  { id: "employed", label: "Employed (Full-time)" },
+  { id: "self-employed", label: "Employed (Part-time)" },
   { id: "unemployed", label: "Unemployed" },
   { id: "student", label: "Student" },
   { id: "retired", label: "Retired" },

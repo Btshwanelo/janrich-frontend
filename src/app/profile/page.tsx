@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Home,
   BarChart3,
@@ -61,14 +62,17 @@ import {
   PROFILE_TABS,
 } from "@/constants/profile";
 import { amountConversion } from "@/utils/amountConversion";
+import { useOnboardingFlow, getNextOnboardingStep } from "@/utils/onboardingState";
 
 export default function ProfileBeneficiaryScreen() {
+  const router = useRouter();
   const [selectedTab, setSelectedTab] = useState("details");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [amount, setAmount] = useState([100000]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { user, customer } = useAppSelector((state) => state.auth);
+  const { flow, isProfileComplete, markProfileTabCompleted } = useOnboardingFlow();
   const {
     data: profileData,
     isLoading: isProfileLoading,
@@ -136,6 +140,42 @@ export default function ProfileBeneficiaryScreen() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [countryCode, setCountryCode] = useState("");
   const [raceOther, setRaceOther] = useState("");
+  // Check onboarding state and enforce tab completion
+  useEffect(() => {
+    // If user hasn't completed welcome, redirect
+    if (!flow.welcomeShown) {
+      router.push("/welcome");
+      return;
+    }
+
+    // If user hasn't created savings goal, redirect to dashboard
+    if (!flow.savingsGoalCreated) {
+      router.push("/dashboard");
+      return;
+    }
+  }, [router, flow]);
+
+  // Check if user tries to navigate away before completing all tabs
+  useEffect(() => {
+    if (!flow.welcomeShown) return; // Only enforce if in onboarding flow
+
+    // If profile is complete, allow navigation
+    if (isProfileComplete) {
+      return;
+    }
+
+    // Force user to stay on profile page until all tabs are completed
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!isProfileComplete) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [flow, isProfileComplete]);
+
   // Populate form fields when profile data is loaded
   React.useEffect(() => {
     if (profileData?.message?.data) {
@@ -340,6 +380,9 @@ export default function ProfileBeneficiaryScreen() {
 
       const result = await updateFinancialDetails(financialData).unwrap();
 
+      // Mark financial tab as completed
+      markProfileTabCompleted("financial");
+
       // Show success toast
       showSuccessToast(
         "Financial Details Updated!",
@@ -348,6 +391,13 @@ export default function ProfileBeneficiaryScreen() {
           duration: 4000,
         }
       );
+
+      // If all tabs are complete, redirect to dashboard
+      if (isProfileComplete) {
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      }
     } catch (error: any) {
       console.error("Failed to update financial details:", error);
 
@@ -378,6 +428,9 @@ export default function ProfileBeneficiaryScreen() {
 
       const result = await updateBeneficiary(beneficiaryData).unwrap();
 
+      // Mark beneficiary tab as completed
+      markProfileTabCompleted("beneficiary");
+
       // Show success toast
       showSuccessToast(
         "Beneficiary Updated!",
@@ -386,6 +439,13 @@ export default function ProfileBeneficiaryScreen() {
           duration: 4000,
         }
       );
+
+      // If all tabs are complete, redirect to dashboard
+      if (isProfileComplete) {
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      }
     } catch (error: any) {
       // Show error toast
       showErrorToast(
@@ -487,6 +547,16 @@ export default function ProfileBeneficiaryScreen() {
 
       // Then update profile information
       await handleProfileUpdate();
+
+      // Mark details tab as completed
+      markProfileTabCompleted("details");
+
+      // If all tabs are complete, redirect to dashboard
+      if (isProfileComplete) {
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      }
     } catch (error) {
       console.error("Failed to update My Details:", error);
     }
@@ -617,13 +687,45 @@ export default function ProfileBeneficiaryScreen() {
                 <div className="w-full bg-[#FAFAFA] overflow-x-auto">
                   <Tabs
                     selectedKey={selectedTab}
-                    onSelectionChange={(key) => setSelectedTab(key as string)}
+                    onSelectionChange={(key) => {
+                      // Only allow tab switching if current tab is completed or onboarding is complete
+                      if (flow.welcomeShown && !isProfileComplete) {
+                        // In onboarding flow, check if previous tabs are completed
+                        const tabOrder = ["details", "beneficiary", "financial"];
+                        const currentIndex = tabOrder.indexOf(selectedTab);
+                        const targetIndex = tabOrder.indexOf(key as string);
+                        
+                        // Allow navigation to next tab if current is completed, or backwards
+                        if (targetIndex > currentIndex) {
+                          const currentTabCompleted = flow.profileCompleted[selectedTab as keyof typeof flow.profileCompleted];
+                          if (!currentTabCompleted) {
+                            showErrorToast(
+                              "Complete Current Tab",
+                              "Please complete the current tab before moving to the next one.",
+                              { duration: 3000 }
+                            );
+                            return;
+                          }
+                        }
+                      }
+                      setSelectedTab(key as string);
+                    }}
                     className="w-full"
                   >
                     <Tabs.List
                       type="button-gray"
                       size="sm"
-                      items={PROFILE_TABS}
+                      items={PROFILE_TABS.map((tab) => ({
+                        ...tab,
+                        label: (
+                          <span className="flex items-center gap-2">
+                            {tab.label}
+                            {flow.profileCompleted[tab.id as keyof typeof flow.profileCompleted] && (
+                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                            )}
+                          </span>
+                        ),
+                      }))}
                       className="flex-nowrap"
                     >
                       {(tab) => <Tabs.Item {...tab} />}

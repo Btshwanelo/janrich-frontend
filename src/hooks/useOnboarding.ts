@@ -124,7 +124,7 @@ export const useOnboarding = () => {
     showOTPModal,
     setShowOTPModal,
     userEmail,
-    userContact:contact,
+    userContact: contact,
     isLoading: isLoading || isSendingOTP,
   };
 };

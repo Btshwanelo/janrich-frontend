@@ -56,3 +56,4 @@ export const useNewPassword = (email: string) => {
     setOtp,
   };
 };
+
