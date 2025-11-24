@@ -1,7 +1,10 @@
 import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/lib/hooks";
-import { useSendRegistrationOTPMutation } from "@/lib/slices/authSlice";
+import {
+  useSendRegistrationOTPMutation,
+  useSendWhatsappOTPMutation,
+} from "@/lib/slices/authSlice";
 import { addPageError, clearAllPageErrors } from "@/lib/slices/errorSlice";
 import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 import { extractErrorMessage } from "@/utils/errorHelpers";
@@ -14,8 +17,7 @@ export interface ForgotPasswordFormValues {
 export const useForgotPassword = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const [sendOTP, { isLoading: isSendingOTP }] =
-    useSendRegistrationOTPMutation();
+  const [sendOTP, { isLoading: isSendingOTP }] = useSendWhatsappOTPMutation();
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
 
@@ -56,4 +58,3 @@ export const useForgotPassword = () => {
     isLoading: isSendingOTP,
   };
 };
-
