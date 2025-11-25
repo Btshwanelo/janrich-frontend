@@ -80,6 +80,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (!isProfileLoading && data) {
       const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
+      const profileData = data?.message?.data;
       
       console.log("🔵 DASHBOARD - Onboarding Check:", {
         savingsGoal,
@@ -92,47 +93,131 @@ const Dashboard = () => {
         },
       });
       
-      // Simple logic: If savings goal > 0, user has completed onboarding
-      // Check both: savings goal > 0 AND onboarding flag is false
-      if (savingsGoal > 0 && !isOnboardingComplete) {
-        console.log("✅ DASHBOARD - User has savings goal but onboarding not marked complete, marking as complete");
+      // If user has a savings goal > 0, they've already set it - sync the state
+      if (savingsGoal > 0 && !flow.savingsGoalCreated) {
+        console.log("🟡 DASHBOARD - User has savings goal but state not synced, marking as created");
+        markSavingsGoalCreated();
+      }
+      
+      // Check if profile is complete based on actual API data
+      const isProfileDataComplete = 
+        profileData?.basic_info?.customer_name &&
+        profileData?.basic_info?.phone &&
+        profileData?.about_you?.birth_date &&
+        profileData?.about_you?.profile_gender &&
+        profileData?.about_you?.nationality &&
+        profileData?.about_you?.country_of_residence &&
+        profileData?.about_you?.race &&
+        profileData?.about_you?.communication_preference &&
+        profileData?.beneficiary?.beneficiary_type &&
+        profileData?.beneficiary?.beneficiary_name &&
+        profileData?.beneficiary?.beneficiary_surname &&
+        profileData?.beneficiary?.beneficiary_cell &&
+        profileData?.beneficiary?.beneficiary_relation &&
+        profileData?.financials?.employment_status &&
+        profileData?.financials?.deposit_frequency &&
+        profileData?.financials?.customer_bank &&
+        profileData?.financials?.fund_source &&
+        profileData?.financials?.saving_for &&
+        profileData?.financials?.account_holder &&
+        profileData?.financials?.iban_account;
+      
+      console.log("🔵 DASHBOARD - Profile Data Check:", {
+        isProfileDataComplete,
+        hasSavingsGoal: savingsGoal > 0,
+      });
+      
+      // If user has savings goal and profile is complete, mark onboarding as complete
+      if (savingsGoal > 0 && isProfileDataComplete && !isOnboardingComplete) {
+        console.log("✅ DASHBOARD - User has savings goal and complete profile, marking onboarding as complete");
+        
+        // Sync all flow steps
+        if (!flow.savingsGoalCreated) {
+          console.log("🟡 DASHBOARD - Syncing savingsGoalCreated");
+          markSavingsGoalCreated();
+        }
+        if (!flow.welcomeShown) {
+          console.log("🟡 DASHBOARD - Syncing welcomeShown");
+          markWelcomeShown();
+        }
+        if (!flow.profileCompleted.details) {
+          console.log("🟡 DASHBOARD - Syncing profile details");
+          markProfileTabCompleted("details");
+        }
+        if (!flow.profileCompleted.beneficiary) {
+          console.log("🟡 DASHBOARD - Syncing profile beneficiary");
+          markProfileTabCompleted("beneficiary");
+        }
+        if (!flow.profileCompleted.financial) {
+          console.log("🟡 DASHBOARD - Syncing profile financial");
+          markProfileTabCompleted("financial");
+        }
+        if (!flow.depositModalShown) {
+          console.log("🟡 DASHBOARD - Syncing depositModalShown");
+          markDepositModalShown();
+        }
+        console.log("🟡 DASHBOARD - Completing onboarding");
         completeOnboarding();
-        console.log("✅ DASHBOARD - Onboarding marked complete, staying on dashboard");
-        return; // User can stay on dashboard
+        
+        console.log("✅ DASHBOARD - Onboarding synced and marked as complete");
+        return; // Don't redirect, user can stay on dashboard
       }
       
-      // If savings goal > 0 and onboarding is already complete, user can stay
-      if (savingsGoal > 0 && isOnboardingComplete) {
-        console.log("✅ DASHBOARD - User has savings goal and onboarding is complete, staying on dashboard");
-        return; // User can stay on dashboard
+      // Check if flow state is actually complete
+      const isFlowActuallyComplete = 
+        flow.savingsGoalCreated &&
+        flow.welcomeShown &&
+        flow.profileCompleted.details &&
+        flow.profileCompleted.beneficiary &&
+        flow.profileCompleted.financial &&
+        flow.depositModalShown;
+      
+      console.log("🔵 DASHBOARD - Flow Completion Check:", {
+        isFlowActuallyComplete,
+        breakdown: {
+          savingsGoalCreated: flow.savingsGoalCreated,
+          welcomeShown: flow.welcomeShown,
+          details: flow.profileCompleted.details,
+          beneficiary: flow.profileCompleted.beneficiary,
+          financial: flow.profileCompleted.financial,
+          depositModalShown: flow.depositModalShown,
+        },
+      });
+      
+      // Check if state is inconsistent (flag says complete but flow isn't)
+      const isStateInconsistent = isOnboardingComplete && !isFlowActuallyComplete;
+      
+      console.log("🔵 DASHBOARD - State Consistency:", {
+        isStateInconsistent,
+        isOnboardingComplete,
+        isFlowActuallyComplete,
+      });
+      
+      // If state is inconsistent, fix it immediately
+      if (isStateInconsistent) {
+        console.log("🔴 DASHBOARD - Fixing inconsistent state!");
+        dispatch(fixInconsistentState());
       }
       
-      // If savings goal is 0, user needs to go through onboarding
+      // Check if user is a first-time user (savings goal is 0)
+      // If so, reset onboarding flow to ensure fresh state
       if (savingsGoal === 0) {
-        console.log("🟡 DASHBOARD - First-time user (savings goal = 0), starting onboarding flow");
-        
-        // Reset onboarding flow to ensure fresh state
+        console.log("🟡 DASHBOARD - First-time user detected (savings goal = 0), resetting onboarding");
         dispatch(resetOnboardingFlow());
-        
-        // Get the next step in onboarding
-        const nextStep = getNextOnboardingStep({
-          isOnboardingComplete: false,
-          savingsGoalCreated: false,
-          welcomeShown: false,
-          depositModalShown: false,
-          profileCompleted: {
-            details: false,
-            beneficiary: false,
-            financial: false,
-          },
-        });
-        
-        console.log("🟢 DASHBOARD - Next onboarding step:", nextStep);
+        // After reset, show savings goal modal
+        return;
+      }
+      
+      // Main check: if onboarding is not complete, redirect based on flow state
+      // Use the actual flow state, not just the flag (which might be inconsistent)
+      if (!isFlowActuallyComplete) {
+        const nextStep = getNextOnboardingStep(flow);
+        console.log("🟢 DASHBOARD - Onboarding incomplete, next step:", nextStep);
         
         if (nextStep === "savings") {
           // Show savings goal modal (handled by useSavingsModal hook)
+          // Don't redirect, let the modal show
           console.log("🟢 DASHBOARD - Showing savings goal modal");
-          // Modal will be shown by useSavingsModal hook
         } else if (nextStep === "welcome") {
           console.log("🟢 DASHBOARD - Redirecting to /welcome");
           router.push("/welcome");
@@ -140,12 +225,16 @@ const Dashboard = () => {
           console.log("🟢 DASHBOARD - Redirecting to /profile");
           router.push("/profile");
         } else if (nextStep === "deposit") {
+          // Show deposit modal
           console.log("🟢 DASHBOARD - Showing deposit modal");
           setIsDepositModalOpen(true);
         }
+      } else {
+        console.log("✅ DASHBOARD - Onboarding complete, staying on dashboard");
       }
+      // If flow is actually complete, user can stay on dashboard
     }
-  }, [isProfileLoading, data, router, isOnboardingComplete, flow, dispatch, completeOnboarding]);
+  }, [isProfileLoading, data, router, isOnboardingComplete, flow, dispatch]);
 
   // Handle deposit modal close
   const handleDepositModalClose = () => {
