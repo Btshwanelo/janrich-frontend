@@ -142,18 +142,29 @@ export default function ProfileBeneficiaryScreen() {
   const [raceOther, setRaceOther] = useState("");
   // Check onboarding state and enforce tab completion
   useEffect(() => {
-    // If user hasn't completed welcome, redirect
-    if (!flow.welcomeShown) {
-      router.push("/welcome");
-      return;
-    }
+    // Check if state is inconsistent (isOnboardingComplete true but flow incomplete)
+    const isFlowIncomplete = !flow.savingsGoalCreated || !flow.welcomeShown || 
+      !flow.profileCompleted.details || !flow.profileCompleted.beneficiary || 
+      !flow.profileCompleted.financial || !flow.depositModalShown;
+    
+    const isStateInconsistent = isOnboardingComplete && isFlowIncomplete;
+    
+    // If state is inconsistent or onboarding is not complete, check flow steps
+    if (!isOnboardingComplete || isStateInconsistent) {
+      // If user hasn't completed welcome, redirect
+      if (!flow.welcomeShown) {
+        router.push("/welcome");
+        return;
+      }
 
-    // If user hasn't created savings goal, redirect to dashboard
-    if (!flow.savingsGoalCreated) {
-      router.push("/dashboard");
-      return;
+      // If user hasn't created savings goal, redirect to dashboard
+      if (!flow.savingsGoalCreated) {
+        router.push("/dashboard");
+        return;
+      }
     }
-  }, [router, flow]);
+    // If onboarding is complete and flow is consistent, allow access
+  }, [router, flow, isOnboardingComplete]);
 
   // Check if user tries to navigate away before completing all tabs
   useEffect(() => {
