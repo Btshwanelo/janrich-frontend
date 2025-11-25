@@ -45,6 +45,7 @@ export default function SavingsGoalModal({
   // Mark onboarding as started when modal opens
   React.useEffect(() => {
     if (isOpen) {
+      console.log("🟢 SAVINGS_MODAL - Opening, starting onboarding");
       startOnboarding();
     }
   }, [isOpen, startOnboarding]);

@@ -62,7 +62,10 @@ import {
   PROFILE_TABS,
 } from "@/constants/profile";
 import { amountConversion } from "@/utils/amountConversion";
-import { useOnboardingFlow, getNextOnboardingStep } from "@/utils/onboardingState";
+import {
+  useOnboardingFlow,
+  getNextOnboardingStep,
+} from "@/utils/onboardingState";
 
 export default function ProfileBeneficiaryScreen() {
   const router = useRouter();
@@ -72,7 +75,13 @@ export default function ProfileBeneficiaryScreen() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { user, customer } = useAppSelector((state) => state.auth);
-  const { flow, isProfileComplete, isOnboardingComplete, markProfileTabCompleted, completeOnboarding } = useOnboardingFlow();
+  const {
+    flow,
+    isProfileComplete,
+    isOnboardingComplete,
+    markProfileTabCompleted,
+    completeOnboarding,
+  } = useOnboardingFlow();
   const {
     data: profileData,
     isLoading: isProfileLoading,
@@ -142,26 +151,59 @@ export default function ProfileBeneficiaryScreen() {
   const [raceOther, setRaceOther] = useState("");
   // Check onboarding state and enforce tab completion
   useEffect(() => {
+    console.log("🟣 PROFILE - Onboarding Check:", {
+      isOnboardingComplete,
+      flow: {
+        savingsGoalCreated: flow.savingsGoalCreated,
+        welcomeShown: flow.welcomeShown,
+        depositModalShown: flow.depositModalShown,
+        profileCompleted: flow.profileCompleted,
+      },
+    });
+    
     // Check if state is inconsistent (isOnboardingComplete true but flow incomplete)
-    const isFlowIncomplete = !flow.savingsGoalCreated || !flow.welcomeShown || 
-      !flow.profileCompleted.details || !flow.profileCompleted.beneficiary || 
-      !flow.profileCompleted.financial || !flow.depositModalShown;
-    
+    const isFlowIncomplete =
+      !flow.savingsGoalCreated ||
+      !flow.welcomeShown ||
+      !flow.profileCompleted.details ||
+      !flow.profileCompleted.beneficiary ||
+      !flow.profileCompleted.financial ||
+      !flow.depositModalShown;
+
     const isStateInconsistent = isOnboardingComplete && isFlowIncomplete;
-    
+
+    console.log("🟣 PROFILE - State Check:", {
+      isFlowIncomplete,
+      isStateInconsistent,
+      breakdown: {
+        savingsGoalCreated: flow.savingsGoalCreated,
+        welcomeShown: flow.welcomeShown,
+        details: flow.profileCompleted.details,
+        beneficiary: flow.profileCompleted.beneficiary,
+        financial: flow.profileCompleted.financial,
+        depositModalShown: flow.depositModalShown,
+      },
+    });
+
     // If state is inconsistent or onboarding is not complete, check flow steps
     if (!isOnboardingComplete || isStateInconsistent) {
       // If user hasn't completed welcome, redirect
       if (!flow.welcomeShown) {
+        console.log("🟣 PROFILE - Welcome not shown, redirecting to /welcome");
         router.push("/welcome");
         return;
       }
 
       // If user hasn't created savings goal, redirect to dashboard
       if (!flow.savingsGoalCreated) {
+        console.log("🟣 PROFILE - Savings goal not created, redirecting to /dashboard");
         router.push("/dashboard");
         return;
       }
+      
+      console.log("🟣 PROFILE - Onboarding incomplete but prerequisites met, allowing access");
+    } else {
+      console.log("✅ PROFILE - Onboarding complete, allowing access");
     }
     // If onboarding is complete and flow is consistent, allow access
   }, [router, flow, isOnboardingComplete]);
@@ -195,7 +237,7 @@ export default function ProfileBeneficiaryScreen() {
     if (profileData?.message?.data) {
       const data = profileData.message.data;
       const customerId = data.basic_info?.customer_id;
-      
+
       // Reset sync flag if this is a different customer or new data
       if (hasSyncedCompletionRef.current !== customerId) {
         hasSyncedCompletionRef.current = null;
@@ -294,7 +336,7 @@ export default function ProfileBeneficiaryScreen() {
         if (financialComplete && !currentProfileCompleted.financial) {
           markProfileTabCompleted("financial");
         }
-        
+
         // Mark that we've synced for this customer to prevent re-syncing
         hasSyncedCompletionRef.current = customerId;
       }
@@ -677,9 +719,6 @@ export default function ProfileBeneficiaryScreen() {
     );
   }
 
-  console.log("race:", race, RACE_OPTIONS);
-  console.log("benefitiary:", beneficiaryType, BENEFICIARY_TYPE_OPTIONS);
-
   return (
     <AuthGuard>
       <div className="min-h-screen bg-white flex">
@@ -765,13 +804,20 @@ export default function ProfileBeneficiaryScreen() {
                       // Only allow tab switching if current tab is completed or onboarding is complete
                       if (flow.welcomeShown && !isProfileComplete) {
                         // In onboarding flow, check if previous tabs are completed
-                        const tabOrder = ["details", "beneficiary", "financial"];
+                        const tabOrder = [
+                          "details",
+                          "beneficiary",
+                          "financial",
+                        ];
                         const currentIndex = tabOrder.indexOf(selectedTab);
                         const targetIndex = tabOrder.indexOf(key as string);
-                        
+
                         // Allow navigation to next tab if current is completed, or backwards
                         if (targetIndex > currentIndex) {
-                          const currentTabCompleted = flow.profileCompleted[selectedTab as keyof typeof flow.profileCompleted];
+                          const currentTabCompleted =
+                            flow.profileCompleted[
+                              selectedTab as keyof typeof flow.profileCompleted
+                            ];
                           if (!currentTabCompleted) {
                             showErrorToast(
                               "Complete Current Tab",
@@ -794,7 +840,9 @@ export default function ProfileBeneficiaryScreen() {
                         label: (
                           <span className="flex items-center gap-2">
                             {tab.label}
-                            {flow.profileCompleted[tab.id as keyof typeof flow.profileCompleted] && (
+                            {flow.profileCompleted[
+                              tab.id as keyof typeof flow.profileCompleted
+                            ] && (
                               <CheckCircle2 className="w-4 h-4 text-green-600" />
                             )}
                           </span>

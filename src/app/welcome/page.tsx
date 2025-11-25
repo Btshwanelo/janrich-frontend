@@ -14,18 +14,29 @@ export default function WelcomePage() {
   const { flow, markWelcomeShown } = useOnboardingFlow();
 
   const handleGoToDashboard = () => {
+    console.log("🟡 WELCOME - Continue clicked, marking welcome as shown");
     // Mark welcome as shown
     markWelcomeShown();
+    console.log("🟡 WELCOME - Redirecting to /profile");
     // Redirect to profile page
     router.push("/profile");
   };
 
   // Prevent back navigation - if user hasn't completed savings goal, redirect
   useEffect(() => {
+    console.log("🟡 WELCOME - Onboarding Check:", {
+      savingsGoalCreated: flow.savingsGoalCreated,
+      welcomeShown: flow.welcomeShown,
+      flow: flow,
+    });
+    
     if (!flow.savingsGoalCreated) {
+      console.log("🟡 WELCOME - Savings goal not created, redirecting to /dashboard");
       router.push("/dashboard");
+    } else {
+      console.log("✅ WELCOME - Savings goal created, staying on welcome page");
     }
-  }, [router, flow.savingsGoalCreated]);
+  }, [router, flow.savingsGoalCreated, flow]);
 
   return (
     <AuthGuard>

@@ -207,7 +207,10 @@ export const selectOnboardingFlow = (state: RootState) =>
   state.onboarding?.flow || initialFlowState;
 export const selectIsOnboardingComplete = (state: RootState) => {
   const flow = state.onboarding?.flow;
-  if (!flow) return false;
+  if (!flow) {
+    console.log("⚪ SELECTOR - No flow state, returning false");
+    return false;
+  }
   
   // Check if state is consistent - if flag says complete, verify all steps are actually complete
   if (flow.isOnboardingComplete) {
@@ -221,11 +224,33 @@ export const selectIsOnboardingComplete = (state: RootState) => {
     
     // If flag says complete but steps aren't, fix the inconsistency
     if (!isActuallyComplete) {
+      console.log("🔴 SELECTOR - Inconsistent state detected! Flag says complete but steps aren't:", {
+        flag: flow.isOnboardingComplete,
+        actual: isActuallyComplete,
+        breakdown: {
+          savingsGoalCreated: flow.savingsGoalCreated,
+          welcomeShown: flow.welcomeShown,
+          details: flow.profileCompleted.details,
+          beneficiary: flow.profileCompleted.beneficiary,
+          financial: flow.profileCompleted.financial,
+          depositModalShown: flow.depositModalShown,
+        },
+      });
       return false;
     }
   }
   
-  return flow.isOnboardingComplete ?? false;
+  const result = flow.isOnboardingComplete ?? false;
+  console.log("⚪ SELECTOR - isOnboardingComplete:", result, {
+    flag: flow.isOnboardingComplete,
+    flow: {
+      savingsGoalCreated: flow.savingsGoalCreated,
+      welcomeShown: flow.welcomeShown,
+      depositModalShown: flow.depositModalShown,
+      profileCompleted: flow.profileCompleted,
+    },
+  });
+  return result;
 };
 export const selectSavingsGoalCreated = (state: RootState) =>
   state.onboarding?.flow?.savingsGoalCreated || false;
