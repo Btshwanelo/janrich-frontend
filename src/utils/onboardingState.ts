@@ -80,7 +80,7 @@ export const getNextOnboardingStep = (
 export const getOnboardingState = (): OnboardingFlowState => {
   if (typeof window === "undefined") {
     return {
-      isOnboardingComplete: false,
+      isOnboardingComplete: true,
       savingsGoalCreated: false,
       welcomeShown: false,
       depositModalShown: false,
@@ -99,7 +99,7 @@ export const getOnboardingState = (): OnboardingFlowState => {
     "getOnboardingState() is deprecated. Use useOnboardingFlow() hook instead."
   );
   return {
-    isOnboardingComplete: false,
+    isOnboardingComplete: true,
     savingsGoalCreated: false,
     welcomeShown: false,
     depositModalShown: false,

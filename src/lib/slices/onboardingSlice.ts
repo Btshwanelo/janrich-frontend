@@ -49,7 +49,7 @@ export interface OnboardingState {
 }
 
 const initialFlowState: OnboardingFlowState = {
-  isOnboardingComplete: false, // Default to false - user needs to complete onboarding
+  isOnboardingComplete: true, // Default to true - user has completed onboarding
   savingsGoalCreated: false,
   welcomeShown: false,
   depositModalShown: false,
@@ -153,21 +153,6 @@ const onboardingSlice = createSlice({
     resetOnboardingFlow: (state) => {
       state.flow = initialFlowState;
     },
-    fixInconsistentState: (state) => {
-      // Fix inconsistent state where isOnboardingComplete is true but flow steps are incomplete
-      const isFlowActuallyComplete = 
-        state.flow.savingsGoalCreated &&
-        state.flow.welcomeShown &&
-        state.flow.profileCompleted.details &&
-        state.flow.profileCompleted.beneficiary &&
-        state.flow.profileCompleted.financial &&
-        state.flow.depositModalShown;
-      
-      // If flag says complete but flow isn't, fix it
-      if (state.flow.isOnboardingComplete && !isFlowActuallyComplete) {
-        state.flow.isOnboardingComplete = false;
-      }
-    },
     updateOnboardingFlow: (
       state,
       action: PayloadAction<Partial<OnboardingFlowState>>
@@ -196,7 +181,6 @@ export const {
   markProfileTabCompleted,
   completeOnboarding,
   resetOnboardingFlow,
-  fixInconsistentState,
   updateOnboardingFlow,
 } = onboardingSlice.actions;
 
@@ -205,28 +189,8 @@ export default onboardingSlice.reducer;
 // Selectors with defensive checks
 export const selectOnboardingFlow = (state: RootState) =>
   state.onboarding?.flow || initialFlowState;
-export const selectIsOnboardingComplete = (state: RootState) => {
-  const flow = state.onboarding?.flow;
-  if (!flow) return false;
-  
-  // Check if state is consistent - if flag says complete, verify all steps are actually complete
-  if (flow.isOnboardingComplete) {
-    const isActuallyComplete = 
-      flow.savingsGoalCreated &&
-      flow.welcomeShown &&
-      flow.profileCompleted.details &&
-      flow.profileCompleted.beneficiary &&
-      flow.profileCompleted.financial &&
-      flow.depositModalShown;
-    
-    // If flag says complete but steps aren't, fix the inconsistency
-    if (!isActuallyComplete) {
-      return false;
-    }
-  }
-  
-  return flow.isOnboardingComplete ?? false;
-};
+export const selectIsOnboardingComplete = (state: RootState) =>
+  state.onboarding?.flow?.isOnboardingComplete ?? true; // Default to true
 export const selectSavingsGoalCreated = (state: RootState) =>
   state.onboarding?.flow?.savingsGoalCreated || false;
 export const selectWelcomeShown = (state: RootState) =>
