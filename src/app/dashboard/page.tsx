@@ -71,25 +71,8 @@ const Dashboard = () => {
   // Check onboarding state and redirect if needed
   useEffect(() => {
     if (!isProfileLoading && data) {
-      const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
-      
-      // Check if user is a first-time user (savings goal is 0)
-      // If so, reset onboarding flow to ensure fresh state
-      if (savingsGoal === 0 && isOnboardingComplete) {
-        // User has savings goal 0 but onboarding is marked complete (inconsistent state)
-        // Reset onboarding flow
-        dispatch(resetOnboardingFlow());
-        // Show savings goal modal
-        return;
-      }
-      
       // Main check: if onboarding is not complete, redirect based on flow state
-      // Also check if flow state is inconsistent (isOnboardingComplete true but steps incomplete)
-      const isFlowIncomplete = !flow.savingsGoalCreated || !flow.welcomeShown || 
-        !flow.profileCompleted.details || !flow.profileCompleted.beneficiary || 
-        !flow.profileCompleted.financial || !flow.depositModalShown;
-      
-      if (!isOnboardingComplete || (isOnboardingComplete && isFlowIncomplete)) {
+      if (!isOnboardingComplete) {
         const nextStep = getNextOnboardingStep(flow);
         
         if (nextStep === "savings") {
@@ -104,9 +87,9 @@ const Dashboard = () => {
           setIsDepositModalOpen(true);
         }
       }
-      // If isOnboardingComplete is true AND flow is consistent, user can stay on dashboard
+      // If isOnboardingComplete is true, user can stay on dashboard
     }
-  }, [isProfileLoading, data, router, isOnboardingComplete, flow, dispatch]);
+  }, [isProfileLoading, data, router, isOnboardingComplete, flow]);
 
   // Handle deposit modal close
   const handleDepositModalClose = () => {
