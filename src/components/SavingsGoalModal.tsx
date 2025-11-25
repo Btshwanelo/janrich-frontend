@@ -40,7 +40,14 @@ export default function SavingsGoalModal({
     useUpdateSavingsGoalMutation();
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
-  const { markSavingsGoalCreated } = useOnboardingFlow();
+  const { startOnboarding, markSavingsGoalCreated } = useOnboardingFlow();
+
+  // Mark onboarding as started when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      startOnboarding();
+    }
+  }, [isOpen, startOnboarding]);
 
   const cardTitle = "Great Start! You don't need a million to change your life";
   const cardImage =

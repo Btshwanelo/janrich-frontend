@@ -33,6 +33,7 @@ export const useLogin = () => {
       try {
         dispatch(setLoading(true));
         dispatch(clearAllPageErrors());
+        dispatch(resetOnboardingFlow());
 
         const result = await login({
           email: values.email,

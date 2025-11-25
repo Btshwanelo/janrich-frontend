@@ -72,7 +72,7 @@ export default function ProfileBeneficiaryScreen() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { user, customer } = useAppSelector((state) => state.auth);
-  const { flow, isProfileComplete, markProfileTabCompleted } = useOnboardingFlow();
+  const { flow, isProfileComplete, isOnboardingComplete, markProfileTabCompleted, completeOnboarding } = useOnboardingFlow();
   const {
     data: profileData,
     isLoading: isProfileLoading,
@@ -455,7 +455,7 @@ export default function ProfileBeneficiaryScreen() {
         }
       );
 
-      // If all tabs are complete, redirect to dashboard
+      // If all tabs are complete, redirect to dashboard (which will show deposit modal)
       if (isProfileComplete) {
         setTimeout(() => {
           router.push("/dashboard");
@@ -503,7 +503,7 @@ export default function ProfileBeneficiaryScreen() {
         }
       );
 
-      // If all tabs are complete, redirect to dashboard
+      // If all tabs are complete, redirect to dashboard (which will show deposit modal)
       if (isProfileComplete) {
         setTimeout(() => {
           router.push("/dashboard");
@@ -614,7 +614,7 @@ export default function ProfileBeneficiaryScreen() {
       // Mark details tab as completed
       markProfileTabCompleted("details");
 
-      // If all tabs are complete, redirect to dashboard
+      // If all tabs are complete, redirect to dashboard (which will show deposit modal)
       if (isProfileComplete) {
         setTimeout(() => {
           router.push("/dashboard");

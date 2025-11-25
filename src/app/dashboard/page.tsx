@@ -9,6 +9,7 @@ import {
   setCurrentTransaction,
 } from "@/lib/slices/ledgerSlice";
 import SavingsGoalModal from "@/components/SavingsGoalModal";
+import { DepositModal } from "@/components/dashboard/DepositModal";
 import SidebarWrapper from "@/components/SidebarWrapper";
 import MobileTopNav from "@/components/MobileTopNav";
 import {
@@ -24,6 +25,7 @@ import { usePagination } from "@/hooks/usePagination";
 import { useSavingsModal } from "@/hooks/useSavingsModal";
 import { Transaction } from "@/types/dashboard";
 import { DASHBOARD_CONSTANTS } from "@/constants/dashboard";
+import { getMonthsRemainingInYear } from "@/utils/dateUtils";
 import {
   useOnboardingFlow,
   getNextOnboardingStep,
@@ -36,7 +38,8 @@ const Dashboard = () => {
   const router = useRouter();
 
   const { user, fullName, customer } = useAppSelector((state) => state.auth);
-  const { flow, isProfileComplete } = useOnboardingFlow();
+  const { flow, isOnboardingComplete, markDepositModalShown, completeOnboarding } = useOnboardingFlow();
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const {
     data,
     refetch,
@@ -68,43 +71,32 @@ const Dashboard = () => {
   // Check onboarding state and redirect if needed
   useEffect(() => {
     if (!isProfileLoading && data) {
-      // Case 1: First-time user (savings goal is 0)
-      if (savingsGoal === 0) {
-        // Reset onboarding flow for first-time users to ensure fresh state
-        dispatch(resetOnboardingFlow());
+      // Main check: if onboarding is not complete, redirect based on flow state
+      if (!isOnboardingComplete) {
+        const nextStep = getNextOnboardingStep(flow);
         
-        const nextStep = getNextOnboardingStep({
-          savingsGoalCreated: false,
-          welcomeShown: false,
-          profileCompleted: {
-            details: false,
-            beneficiary: false,
-            financial: false,
-          },
-        });
-        
-        // Only redirect if onboarding is incomplete
-        if (nextStep === "welcome") {
+        if (nextStep === "savings") {
+          // Show savings goal modal (handled by useSavingsModal hook)
+          // Don't redirect, let the modal show
+        } else if (nextStep === "welcome") {
           router.push("/welcome");
         } else if (nextStep === "profile") {
           router.push("/profile");
-        }
-      } 
-      // Case 2: User has savings goal but hasn't completed profile
-      else if (savingsGoal > 0 && !isProfileComplete) {
-        // Check if they've started onboarding flow
-        if (!flow.welcomeShown) {
-          // They set a goal but haven't seen welcome yet
-          router.push("/welcome");
-        } else {
-          // They've seen welcome but haven't completed profile
-          router.push("/profile");
+        } else if (nextStep === "deposit") {
+          // Show deposit modal
+          setIsDepositModalOpen(true);
         }
       }
-      // Case 3: User has savings goal > 0 and profile is complete
-      // They can stay on dashboard - onboarding is complete
+      // If isOnboardingComplete is true, user can stay on dashboard
     }
-  }, [isProfileLoading, data, router, savingsGoal, dispatch, flow, isProfileComplete]);
+  }, [isProfileLoading, data, router, isOnboardingComplete, flow]);
+
+  // Handle deposit modal close
+  const handleDepositModalClose = () => {
+    markDepositModalShown();
+    completeOnboarding();
+    setIsDepositModalOpen(false);
+  };
 
   // Loading and error states
   const isLoading = isProfileLoading || isLedgerLoading;
@@ -150,6 +142,24 @@ const Dashboard = () => {
           onClose={handleModalClose}
           customerId={customer || undefined}
           onSave={handleModalSave}
+        />
+        <DepositModal
+          isOpen={isDepositModalOpen}
+          onClose={handleDepositModalClose}
+          profileData={{
+            customer_name: data?.message?.data?.basic_info?.customer_name,
+            customer_id: data?.message?.data?.basic_info?.customer_id,
+            email: data?.message?.data?.basic_info?.email,
+            account_holder: data?.message?.data?.financials?.account_holder,
+            branch_code: data?.message?.data?.financials?.branch_code,
+            iban_account: data?.message?.data?.financials?.iban_account,
+            customer_bank: data?.message?.data?.financials?.customer_bank,
+          }}
+          savingsData={{
+            totalSaved: savingsResult.totalSaved,
+            savingGoal: savingsGoal,
+            paymentsToGo: getMonthsRemainingInYear(),
+          }}
         />
 
         {/* Main Content */}

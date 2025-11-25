@@ -8,9 +8,12 @@
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
+  startOnboarding as startOnboardingAction,
   markSavingsGoalCreated as markSavingsGoalCreatedAction,
   markWelcomeShown as markWelcomeShownAction,
+  markDepositModalShown as markDepositModalShownAction,
   markProfileTabCompleted as markProfileTabCompletedAction,
+  completeOnboarding as completeOnboardingAction,
   resetOnboardingFlow as resetOnboardingFlowAction,
   selectOnboardingFlow,
   selectIsProfileComplete,
@@ -31,10 +34,13 @@ export const useOnboardingFlow = () => {
     flow,
     isProfileComplete,
     isOnboardingComplete,
+    startOnboarding: () => dispatch(startOnboardingAction()),
     markSavingsGoalCreated: () => dispatch(markSavingsGoalCreatedAction()),
     markWelcomeShown: () => dispatch(markWelcomeShownAction()),
+    markDepositModalShown: () => dispatch(markDepositModalShownAction()),
     markProfileTabCompleted: (tab: "details" | "beneficiary" | "financial") =>
       dispatch(markProfileTabCompletedAction(tab)),
+    completeOnboarding: () => dispatch(completeOnboardingAction()),
     resetOnboardingFlow: () => dispatch(resetOnboardingFlowAction()),
   };
 };
@@ -44,7 +50,7 @@ export const useOnboardingFlow = () => {
  */
 export const getNextOnboardingStep = (
   flow: OnboardingFlowState
-): "savings" | "welcome" | "profile" | "complete" => {
+): "savings" | "welcome" | "profile" | "deposit" | "complete" => {
   if (!flow.savingsGoalCreated) {
     return "savings";
   }
@@ -62,6 +68,10 @@ export const getNextOnboardingStep = (
     return "profile";
   }
 
+  if (!flow.depositModalShown) {
+    return "deposit";
+  }
+
   return "complete";
 };
 
@@ -70,8 +80,10 @@ export const getNextOnboardingStep = (
 export const getOnboardingState = (): OnboardingFlowState => {
   if (typeof window === "undefined") {
     return {
+      isOnboardingComplete: true,
       savingsGoalCreated: false,
       welcomeShown: false,
+      depositModalShown: false,
       profileCompleted: {
         details: false,
         beneficiary: false,
@@ -87,8 +99,10 @@ export const getOnboardingState = (): OnboardingFlowState => {
     "getOnboardingState() is deprecated. Use useOnboardingFlow() hook instead."
   );
   return {
+    isOnboardingComplete: true,
     savingsGoalCreated: false,
     welcomeShown: false,
+    depositModalShown: false,
     profileCompleted: {
       details: false,
       beneficiary: false,
