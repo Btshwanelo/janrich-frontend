@@ -30,7 +30,7 @@ import {
   useOnboardingFlow,
   getNextOnboardingStep,
 } from "@/utils/onboardingState";
-import { resetOnboardingFlow } from "@/lib/slices/onboardingSlice";
+import { resetOnboardingFlow, fixInconsistentState } from "@/lib/slices/onboardingSlice";
 
 const Dashboard = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -73,23 +73,34 @@ const Dashboard = () => {
     if (!isProfileLoading && data) {
       const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
       
+      // Check if flow state is actually complete
+      const isFlowActuallyComplete = 
+        flow.savingsGoalCreated &&
+        flow.welcomeShown &&
+        flow.profileCompleted.details &&
+        flow.profileCompleted.beneficiary &&
+        flow.profileCompleted.financial &&
+        flow.depositModalShown;
+      
+      // Check if state is inconsistent (flag says complete but flow isn't)
+      const isStateInconsistent = isOnboardingComplete && !isFlowActuallyComplete;
+      
+      // If state is inconsistent, fix it immediately
+      if (isStateInconsistent) {
+        dispatch(fixInconsistentState());
+      }
+      
       // Check if user is a first-time user (savings goal is 0)
       // If so, reset onboarding flow to ensure fresh state
-      if (savingsGoal === 0 && isOnboardingComplete) {
-        // User has savings goal 0 but onboarding is marked complete (inconsistent state)
-        // Reset onboarding flow
+      if (savingsGoal === 0) {
         dispatch(resetOnboardingFlow());
-        // Show savings goal modal
+        // After reset, show savings goal modal
         return;
       }
       
       // Main check: if onboarding is not complete, redirect based on flow state
-      // Also check if flow state is inconsistent (isOnboardingComplete true but steps incomplete)
-      const isFlowIncomplete = !flow.savingsGoalCreated || !flow.welcomeShown || 
-        !flow.profileCompleted.details || !flow.profileCompleted.beneficiary || 
-        !flow.profileCompleted.financial || !flow.depositModalShown;
-      
-      if (!isOnboardingComplete || (isOnboardingComplete && isFlowIncomplete)) {
+      // Use the actual flow state, not just the flag (which might be inconsistent)
+      if (!isFlowActuallyComplete) {
         const nextStep = getNextOnboardingStep(flow);
         
         if (nextStep === "savings") {
@@ -104,7 +115,7 @@ const Dashboard = () => {
           setIsDepositModalOpen(true);
         }
       }
-      // If isOnboardingComplete is true AND flow is consistent, user can stay on dashboard
+      // If flow is actually complete, user can stay on dashboard
     }
   }, [isProfileLoading, data, router, isOnboardingComplete, flow, dispatch]);
 
