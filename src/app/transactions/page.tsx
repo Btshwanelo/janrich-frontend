@@ -274,13 +274,16 @@ const TransactionDetailPage = () => {
 
               {/* Testimonial Section */}
               <div className="!mt-2 border-t border-gray-200">
-                <div className="text-center space-y-4 px-10 py-6 mt-6 rounded-2xl bg-[#FAFAFA]">
-                  <p className="text-sm font-medium text-blue-600">
+                <div className="text-center space-y-4 px-10 py-6 mt-4 rounded-2xl bg-[#FAFAFA]">
+                  <p className="text-lg font-cinzel text-[#004EEB]">
                     Financial Services
                   </p>
-                  <p className="text-base text-gray-700 max-w-md mx-auto">
-                    "Untitled has saved us thousands of hours of work. We're
-                    able to spin up projects and features faster."
+                  <p className="text-base text-[#181D27] font-medium max-w-md mx-auto">
+                    I have been a part of JanRiches for two years and I wish I
+                    joined sooner. In a short space of time, I have managed to
+                    use my savings to start my event equipment hiring business.
+                    I am looking forward to a beautiful future that involves
+                    financial literacy and freedom.
                   </p>
                   <div className="flex flex-col items-center gap-1">
                     <Avatar
@@ -290,11 +293,8 @@ const TransactionDetailPage = () => {
                       contrastBorder={true}
                     />
                     <div className="text-center">
-                      <p className="text-sm font-semibold text-gray-900">
-                        Fleur Cook
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        Web Developer, Sisyphus
+                      <p className="text-sm font-semibold text-[#181D27]">
+                        Andi D - Member since 2023
                       </p>
                     </div>
                   </div>

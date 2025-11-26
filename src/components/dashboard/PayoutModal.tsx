@@ -288,18 +288,14 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
   return (
     <ModalOverlay isOpen={isOpen} onOpenChange={onClose}>
       <Modal>
-        <Dialog className="!flex !flex-col !items-stretch bg-white rounded-2xl w-full max-w-lg mx-auto relative overflow-hidden shadow-xl">
+        <Dialog className="!flex !flex-col !items-stretch bg-white rounded-2xl w-full max-w-2xl mx-auto relative overflow-hidden shadow-xl">
           {/* Header */}
-          <div className="flex items-start justify-between p-6 pb-4 border-b border-gray-200">
+          <div className="flex items-start justify-between p-6 pb-1">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-                <Wallet className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 rounded-lg border border-[#D5D7DA] flex items-center justify-center flex-shrink-0">
+                <Wallet className="w-5 h-5" />
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">
-                  Payout Request
-                </h2>
-              </div>
+              <div></div>
             </div>
             <button
               onClick={onClose}
@@ -314,10 +310,16 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
           <div className="px-6 py-4">
             {/* Description */}
             {!successMessage && (
-              <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-                It's January for you but janu-worry for others, you have
-                options, you can request all or some of the money you've saved.
-              </p>
+              <>
+                <h2 className="text-base font-semibold text-[#181D27]">
+                  Payout Request
+                </h2>
+                <p className="text-sm text-[#535862] mb-2 leading-relaxed">
+                  It's January for you but janu-worry for others, you have
+                  options, you can request all or some of the money you've
+                  saved.
+                </p>
+              </>
             )}
 
             {/* Error Alert */}
@@ -370,20 +372,23 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
                   {/* Partial Withdrawal Option */}
                   <div
                     onClick={() => handlePayoutTypeChange("partial")}
-                    className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    className={`flex items-start gap-4 p-4 rounded-xl  cursor-pointer transition-all ${
                       payoutType === "partial"
-                        ? "border-blue-600 bg-blue-50"
-                        : "border-gray-200 bg-white hover:border-gray-300"
+                        ? "border-blue-600 border-2 "
+                        : "border-gray-200 border bg-white hover:border-gray-300"
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-lg border border-[#D5D7DA] flex items-center justify-center flex-shrink-0">
                       <Wallet className="w-5 h-5 text-gray-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-1">
-                        Make it rain but safe Withdraw Some your money
+                      <h3 className="text-sm text-[#535862] mb-1">
+                        <span className="font-medium">
+                          Make it rain but safe
+                        </span>{" "}
+                        Withdraw Some your money
                       </h3>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-[#535862]">
                         A partial payout sets you up to not start from zero this
                         year.
                       </p>
@@ -398,18 +403,19 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
                   {/* Full Withdrawal Option */}
                   <div
                     onClick={() => handlePayoutTypeChange("full")}
-                    className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    className={`flex items-start gap-4 p-4 rounded-xl  cursor-pointer transition-all ${
                       payoutType === "full"
-                        ? "border-blue-600 bg-blue-50"
-                        : "border-gray-200 bg-white hover:border-gray-300"
+                        ? "border-blue-600 border-2"
+                        : "border-gray-200 border bg-white hover:border-gray-300"
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-lg border border-[#D5D7DA] flex items-center justify-center flex-shrink-0">
                       <Wallet className="w-5 h-5 text-gray-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-1">
-                        Make it rain withdraw all your money
+                      <h3 className="text-sm text-[#535862] mb-1">
+                        <span className="font-medium">Make it rain</span>{" "}
+                        Withdraw all your money
                       </h3>
                       <p className="text-xs text-gray-600">
                         Withdraw it all, start afresh - 'money will come'
@@ -424,7 +430,7 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
                 </div>
 
                 {/* Amount Input */}
-                <div className="mb-6">
+                <div className="mb-3">
                   <Input
                     label="Amount"
                     value={amount}
@@ -620,7 +626,7 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
                 color="secondary"
                 size="md"
                 onClick={onClose}
-                className="min-w-[100px]"
+                className="w-full"
               >
                 Cancel
               </Button>
@@ -628,7 +634,7 @@ export const PayoutModal: React.FC<PayoutModalProps> = ({
                 color="primary"
                 size="md"
                 onClick={handleRequestPayout}
-                className="min-w-[140px]"
+                className="w-full"
                 isDisabled={
                   isPayoutLoading || isProfileLoading || isBalanceLoading
                 }

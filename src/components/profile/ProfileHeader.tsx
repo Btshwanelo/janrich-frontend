@@ -19,7 +19,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = memo(({
       <div className={`${PROFILE_CONSTANTS.HEADER_HEIGHT.MOBILE} sm:${PROFILE_CONSTANTS.HEADER_HEIGHT.SM} lg:${PROFILE_CONSTANTS.HEADER_HEIGHT.LG} relative mt-16 lg:mt-0`}>
         <div className="absolute inset-0">
           <img
-            src="/image 5.png"
+            src="/profile-bg.png"
             alt="User"
             className="w-full h-full object-cover"
           />

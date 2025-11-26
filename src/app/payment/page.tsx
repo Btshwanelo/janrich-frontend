@@ -29,14 +29,14 @@ const PlanSelectionScreen = () => {
               <img
                 src="/jr-logo-black.svg"
                 alt="JanRich Logo"
-                className="mx-auto w-12 h-auto"
+                className="mx-auto w-[99px] h-auto"
               />
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-cinzel font-normal text-[#181D27] mb-2">
               Complete your sign up
             </h1>
-            <p className="text-gray-600">We're nearly done,</p>
+            <p className="text-[#535862]">We're nearly done,</p>
           </div>
 
           {/* Plan Selection Card */}
@@ -53,7 +53,7 @@ const PlanSelectionScreen = () => {
             </div>
 
             <div className="mb-6">
-              <h2 className="text-sm font-semibold text-error-600 mb-2">
+              <h2 className="text-sm font-semibold  mb-2">
                 Plan Selection
               </h2>
               <p className="text-text text-sm">

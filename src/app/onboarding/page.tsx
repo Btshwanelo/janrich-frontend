@@ -49,12 +49,14 @@ const Onboarding = () => {
               <img
                 src="/jr-logo-black.svg"
                 alt="JanRich Logo"
-                className="mx-auto w-12 h-auto"
+                className="mx-auto w-[99px] h-auto"
               />
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">About you</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-cinzel font-normal text-[#181D27] mb-2">
+              About you
+            </h1>
+            <p className="text-[#535862]">
               Tell us about you just a little bit more
             </p>
           </div>

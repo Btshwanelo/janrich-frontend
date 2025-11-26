@@ -106,10 +106,10 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                 className="shadow-lg border-4 border-white w-14 h-14 sm:w-20 sm:h-20"
               />
             </div>
-            <div className="flex-col sm:flex-row items-start gap-4 mb-2">
+            <div className="flex-col sm:flex-row items-start gap-4 my-6">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h2 className="text-xl font-bold text-gray-900">
+                  <h2 className="text-xl font-bold text-[#181D27]">
                     {customerName}
                   </h2>
                 </div>
@@ -122,19 +122,19 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                   <p className="text-xs text-gray-500 mb-1">
                     You've Paid yourself
                   </p>
-                  <p className="text-base sm:text-lg font-semibold text-gray-900">
+                  <p className="text-base sm:text-lg font-semibold text-[#181D27]">
                     {formatCurrency(totalPaid || 0)}
                   </p>
                 </div>
                 <div className="flex-1 bg-gray-50 rounded-xl p-2 min-w-fit">
                   <p className="text-xs text-gray-500 mb-1">Your Goal</p>
-                  <p className="text-base sm:text-lg font-bold text-gray-900">
+                  <p className="text-base sm:text-lg font-bold text-[#181D27]">
                     {formatCurrency(goalAmount || 0)}
                   </p>
                 </div>
                 <div className="flex-1 bg-[#D1E9FF] rounded-xl p-2 min-w-fit">
                   <p className="text-xs text-gray-500 mb-1">Payments to go</p>
-                  <p className="text-base sm:text-lg font-bold text-gray-900">
+                  <p className="text-base sm:text-lg font-bold text-[#181D27]">
                     {paymentsToGo}
                   </p>
                 </div>
@@ -170,7 +170,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
 
             {/* Payment Details Section */}
             <div className="">
-              <h3 className="text-2xl font-bold text-black mb-4">
+              <h3 className="text-2xl font-cinzel text-[#181D27] mb-4">
                 Pay yourself a bit more.
               </h3>
               <div className="space-y-1">

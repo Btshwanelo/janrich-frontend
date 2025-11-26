@@ -45,6 +45,7 @@ export default function SavingsGoalModal({
   // Mark onboarding as started when modal opens
   React.useEffect(() => {
     if (isOpen) {
+      console.log("🟢 SAVINGS_MODAL - Opening, starting onboarding");
       startOnboarding();
     }
   }, [isOpen, startOnboarding]);
@@ -168,9 +169,9 @@ export default function SavingsGoalModal({
 
               <div className="w-full">
                 <img
-                  src={cardImage}
+                  src={"/saving-Img.png"}
                   alt={cardImageAlt}
-                  className="w-full h-48 object-cover rounded-lg"
+                  className="w-full h-48 object-fill rounded-lg"
                 />
               </div>
             </div>

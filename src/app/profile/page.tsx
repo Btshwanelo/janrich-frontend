@@ -683,7 +683,7 @@ export default function ProfileBeneficiaryScreen() {
             <div className="h-32 sm:h-40 lg:h-56 relative mt-16 lg:mt-0">
               <div className="absolute inset-0">
                 <img
-                  src="/image 5.png"
+                  src="/profile-bg.png"
                   alt="User"
                   className="w-full h-full object-cover"
                 />
@@ -707,11 +707,11 @@ export default function ProfileBeneficiaryScreen() {
                     </div>
 
                     <div className="text-left">
-                      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+                      <h1 className="text-xl sm:text-2xl font-cinzel text-[#181D27] mb-1">
                         {profileData?.message?.data?.basic_info
                           ?.customer_name || "Loading..."}
                       </h1>
-                      <p className="text-sm sm:text-base text-gray-600">
+                      <p className="text-sm sm:text-base text-[#535862]">
                         {profileData?.message?.data?.basic_info?.email}
                         {" • "}
                         {customer}
@@ -1284,7 +1284,7 @@ export default function ProfileBeneficiaryScreen() {
                             <div className="relative h-32 sm:h-40 lg:h-48 w-full p-4 sm:p-6 lg:p-8">
                               <div className="absolute inset-0">
                                 <img
-                                  src="/image 5.png"
+                                  src="/profile-bg.png"
                                   alt="User"
                                   className="w-full h-full rounded-lg object-cover"
                                 />
@@ -1294,8 +1294,8 @@ export default function ProfileBeneficiaryScreen() {
                                   I want to save
                                 </span>
                               </div>
-                              <div className="flex text-center font-bold z-10 text-4xl sm:text-5xl lg:text-7xl justify-center text-white mb-4 px-1 relative">
-                                <span className="font-bold">
+                              <div className="flex mt-4 text-center font-bold z-10 text-4xl sm:text-5xl lg:text-7xl justify-center text-white mb-4 px-1 relative">
+                                <span className="font-bold font-cinzel">
                                   {amountConversion(amount?.[0] || 0)}
                                 </span>
                               </div>

@@ -62,7 +62,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
         <img
           src="/JR-Logo.svg"
           alt="JanRich Logo"
-          className={isSidebarCollapsed ? "w-8 h-auto" : "w-10 h-auto"}
+          className={isSidebarCollapsed ? "w-8 h-auto" : "w-16 h-auto"}
         />
         <Button
           color="tertiary"
