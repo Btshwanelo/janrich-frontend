@@ -54,7 +54,7 @@ export const useLogin = () => {
         // Don't reset onboarding flow on login - let it persist
         // The profile page will sync completion state based on actual data
         // Only reset if this is truly a first-time user (we'll check savings goal in dashboard)
-
+        dispatch(resetOnboardingFlow());
         // Set authentication cookie
         setAuthCookie(true);
 

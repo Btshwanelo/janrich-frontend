@@ -23,7 +23,7 @@ export const useSavingsModal = ({
 
   useEffect(() => {
     // Check if savings goal hasn't been set (0, null, undefined, or missing)
-    if (savingsGoal === 0 && !hasUserDismissedModal) {
+    if (savingsGoal === 0) {
       setIsModalOpen(true);
     } else if (savingsGoal && savingsGoal > 0) {
       setIsModalOpen(false);

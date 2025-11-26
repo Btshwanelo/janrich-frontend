@@ -30,7 +30,6 @@ import {
   useOnboardingFlow,
   getNextOnboardingStep,
 } from "@/utils/onboardingState";
-import { resetOnboardingFlow } from "@/lib/slices/onboardingSlice";
 
 const Dashboard = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -38,7 +37,12 @@ const Dashboard = () => {
   const router = useRouter();
 
   const { user, fullName, customer } = useAppSelector((state) => state.auth);
-  const { flow, isOnboardingComplete, markDepositModalShown, completeOnboarding } = useOnboardingFlow();
+  const {
+    flow,
+    isOnboardingComplete,
+    markDepositModalShown,
+    completeOnboarding,
+  } = useOnboardingFlow();
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const {
     data,
@@ -74,7 +78,7 @@ const Dashboard = () => {
       // Main check: if onboarding is not complete, redirect based on flow state
       if (!isOnboardingComplete) {
         const nextStep = getNextOnboardingStep(flow);
-        
+
         if (nextStep === "savings") {
           // Show savings goal modal (handled by useSavingsModal hook)
           // Don't redirect, let the modal show
@@ -87,7 +91,6 @@ const Dashboard = () => {
           setIsDepositModalOpen(true);
         }
       }
-      // If isOnboardingComplete is true, user can stay on dashboard
     }
   }, [isProfileLoading, data, router, isOnboardingComplete, flow]);
 

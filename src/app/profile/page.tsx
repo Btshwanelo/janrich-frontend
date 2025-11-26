@@ -53,6 +53,8 @@ import {
   TITLE_OPTIONS,
   GENDER_OPTIONS,
   RACE_OPTIONS,
+  NATIONALITY_OPTIONS,
+  COUNTRY_OPTIONS,
   BENEFICIARY_TYPE_OPTIONS,
   RELATION_OPTIONS,
   EMPLOYMENT_STATUS_OPTIONS,
@@ -62,7 +64,10 @@ import {
   PROFILE_TABS,
 } from "@/constants/profile";
 import { amountConversion } from "@/utils/amountConversion";
-import { useOnboardingFlow, getNextOnboardingStep } from "@/utils/onboardingState";
+import {
+  useOnboardingFlow,
+  getNextOnboardingStep,
+} from "@/utils/onboardingState";
 
 export default function ProfileBeneficiaryScreen() {
   const router = useRouter();
@@ -72,7 +77,13 @@ export default function ProfileBeneficiaryScreen() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { user, customer } = useAppSelector((state) => state.auth);
-  const { flow, isProfileComplete, isOnboardingComplete, markProfileTabCompleted, completeOnboarding } = useOnboardingFlow();
+  const {
+    flow,
+    isProfileComplete,
+    isOnboardingComplete,
+    markProfileTabCompleted,
+    completeOnboarding,
+  } = useOnboardingFlow();
   const {
     data: profileData,
     isLoading: isProfileLoading,
@@ -143,13 +154,13 @@ export default function ProfileBeneficiaryScreen() {
   // Check onboarding state and enforce tab completion
   useEffect(() => {
     // If user hasn't completed welcome, redirect
-    if (!flow.welcomeShown) {
-      router.push("/welcome");
+    if (!flow.welcomeShown && !flow.isOnboardingComplete) {
+      router.push("/dashboard");
       return;
     }
 
     // If user hasn't created savings goal, redirect to dashboard
-    if (!flow.savingsGoalCreated) {
+    if (!flow.savingsGoalCreated && !flow.isOnboardingComplete) {
       router.push("/dashboard");
       return;
     }
@@ -160,13 +171,13 @@ export default function ProfileBeneficiaryScreen() {
     if (!flow.welcomeShown) return; // Only enforce if in onboarding flow
 
     // If profile is complete, allow navigation
-    if (isProfileComplete) {
+    if (flow.isOnboardingComplete) {
       return;
     }
 
     // Force user to stay on profile page until all tabs are completed
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (!isProfileComplete) {
+      if (!flow.isOnboardingComplete) {
         e.preventDefault();
         e.returnValue = "";
       }
@@ -174,7 +185,7 @@ export default function ProfileBeneficiaryScreen() {
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [flow, isProfileComplete]);
+  }, [flow]);
 
   // Track if we've already synced completion state to prevent infinite loops
   const hasSyncedCompletionRef = React.useRef<string | null>(null);
@@ -184,7 +195,7 @@ export default function ProfileBeneficiaryScreen() {
     if (profileData?.message?.data) {
       const data = profileData.message.data;
       const customerId = data.basic_info?.customer_id;
-      
+
       // Reset sync flag if this is a different customer or new data
       if (hasSyncedCompletionRef.current !== customerId) {
         hasSyncedCompletionRef.current = null;
@@ -273,17 +284,17 @@ export default function ProfileBeneficiaryScreen() {
         // Only update Redux state if it doesn't match actual data
         // Use a ref to prevent multiple syncs and infinite loops
         // Read current flow.profileCompleted inside the effect to get latest value
-        const currentProfileCompleted = flow.profileCompleted;
-        if (detailsComplete && !currentProfileCompleted.details) {
-          markProfileTabCompleted("details");
-        }
-        if (beneficiaryComplete && !currentProfileCompleted.beneficiary) {
-          markProfileTabCompleted("beneficiary");
-        }
-        if (financialComplete && !currentProfileCompleted.financial) {
-          markProfileTabCompleted("financial");
-        }
-        
+        // const currentProfileCompleted = flow.profileCompleted;
+        // if (detailsComplete && !currentProfileCompleted.details) {
+        //   markProfileTabCompleted("details");
+        // }
+        // if (beneficiaryComplete && !currentProfileCompleted.beneficiary) {
+        //   markProfileTabCompleted("beneficiary");
+        // }
+        // if (financialComplete && !currentProfileCompleted.financial) {
+        //   markProfileTabCompleted("financial");
+        // }
+
         // Mark that we've synced for this customer to prevent re-syncing
         hasSyncedCompletionRef.current = customerId;
       }
@@ -454,13 +465,6 @@ export default function ProfileBeneficiaryScreen() {
           duration: 4000,
         }
       );
-
-      // If all tabs are complete, redirect to dashboard (which will show deposit modal)
-      if (isProfileComplete) {
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1500);
-      }
     } catch (error: any) {
       console.error("Failed to update financial details:", error);
 
@@ -502,13 +506,6 @@ export default function ProfileBeneficiaryScreen() {
           duration: 4000,
         }
       );
-
-      // If all tabs are complete, redirect to dashboard (which will show deposit modal)
-      if (isProfileComplete) {
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1500);
-      }
     } catch (error: any) {
       // Show error toast
       showErrorToast(
@@ -666,9 +663,6 @@ export default function ProfileBeneficiaryScreen() {
     );
   }
 
-  console.log("race:", race, RACE_OPTIONS);
-  console.log("benefitiary:", beneficiaryType, BENEFICIARY_TYPE_OPTIONS);
-
   return (
     <AuthGuard>
       <div className="min-h-screen bg-white flex">
@@ -754,13 +748,20 @@ export default function ProfileBeneficiaryScreen() {
                       // Only allow tab switching if current tab is completed or onboarding is complete
                       if (flow.welcomeShown && !isProfileComplete) {
                         // In onboarding flow, check if previous tabs are completed
-                        const tabOrder = ["details", "beneficiary", "financial"];
+                        const tabOrder = [
+                          "details",
+                          "beneficiary",
+                          "financial",
+                        ];
                         const currentIndex = tabOrder.indexOf(selectedTab);
                         const targetIndex = tabOrder.indexOf(key as string);
-                        
+
                         // Allow navigation to next tab if current is completed, or backwards
                         if (targetIndex > currentIndex) {
-                          const currentTabCompleted = flow.profileCompleted[selectedTab as keyof typeof flow.profileCompleted];
+                          const currentTabCompleted =
+                            flow.profileCompleted[
+                              selectedTab as keyof typeof flow.profileCompleted
+                            ];
                           if (!currentTabCompleted) {
                             showErrorToast(
                               "Complete Current Tab",
@@ -783,7 +784,9 @@ export default function ProfileBeneficiaryScreen() {
                         label: (
                           <span className="flex items-center gap-2">
                             {tab.label}
-                            {flow.profileCompleted[tab.id as keyof typeof flow.profileCompleted] && (
+                            {flow.profileCompleted[
+                              tab.id as keyof typeof flow.profileCompleted
+                            ] && (
                               <CheckCircle2 className="w-4 h-4 text-green-600" />
                             )}
                           </span>
@@ -1101,24 +1104,46 @@ export default function ProfileBeneficiaryScreen() {
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
-                                  <Input
+                                  <Select
                                     label="Nationality"
-                                    placeholder="Enter nationality"
-                                    value={nationality}
-                                    onChange={(value) => setNationality(value)}
-                                    isRequired
-                                  />
+                                    placeholder="Select nationality"
+                                    items={NATIONALITY_OPTIONS}
+                                    className="w-full"
+                                    selectedKey={mapApiValueToSelectKey(
+                                      nationality,
+                                      NATIONALITY_OPTIONS
+                                    )}
+                                    onSelectionChange={(key) =>
+                                      setNationality(key as string)
+                                    }
+                                  >
+                                    {(item) => (
+                                      <Select.Item key={item.id} id={item.id}>
+                                        {item.label}
+                                      </Select.Item>
+                                    )}
+                                  </Select>
                                 </div>
                                 <div>
-                                  <Input
+                                  <Select
                                     label="Country of Residence"
-                                    placeholder="Enter country of residence"
-                                    value={countryOfResidence}
-                                    onChange={(value) =>
-                                      setCountryOfResidence(value)
+                                    placeholder="Select country of residence"
+                                    items={COUNTRY_OPTIONS}
+                                    className="w-full"
+                                    selectedKey={mapApiValueToSelectKey(
+                                      countryOfResidence,
+                                      COUNTRY_OPTIONS
+                                    )}
+                                    onSelectionChange={(key) =>
+                                      setCountryOfResidence(key as string)
                                     }
-                                    isRequired
-                                  />
+                                  >
+                                    {(item) => (
+                                      <Select.Item key={item.id} id={item.id}>
+                                        {item.label}
+                                      </Select.Item>
+                                    )}
+                                  </Select>
                                 </div>
                               </div>
 

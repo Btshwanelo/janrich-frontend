@@ -11,8 +11,10 @@ import { Avatar } from "@/components/base/avatar/avatar";
 export default function WelcomePage() {
   const router = useRouter();
   const { fullName } = useAppSelector((state) => state.auth);
+  const onBoardingFlow = useAppSelector((state) => state.onboarding.flow);
   const { flow, markWelcomeShown } = useOnboardingFlow();
-
+  console.log("flow", flow);
+  console.log("onBoardingFlow", onBoardingFlow);
   const handleGoToDashboard = () => {
     // Mark welcome as shown
     markWelcomeShown();
@@ -22,8 +24,17 @@ export default function WelcomePage() {
 
   // Prevent back navigation - if user hasn't completed savings goal, redirect
   useEffect(() => {
-    if (!flow.savingsGoalCreated) {
+    if (onBoardingFlow.isOnboardingComplete) {
       router.push("/dashboard");
+    }
+    if (
+      !onBoardingFlow.isOnboardingComplete &&
+      !onBoardingFlow.savingsGoalCreated
+    ) {
+      router.push("/dashboard");
+    }
+    if (!onBoardingFlow.isOnboardingComplete && onBoardingFlow.welcomeShown) {
+      router.push("/profile");
     }
   }, [router, flow.savingsGoalCreated]);
 
@@ -188,32 +199,31 @@ export default function WelcomePage() {
             <p className="text-xl font-semibold  mb-8">
               Here's to abundance, growth, and financial freedom!
             </p>
-
           </div>
-            {/* Call to Action */}
-            <div className="flex flex-col sm:flex-row items-center justify-start gap-4 sm:gap-6">
-              <div className="flex items-center gap-3 mr-2">
-                <Avatar
-                  size="md"
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
-                  alt="Jan Riches Executive"
-                  className="w-10 h-10"
-                />
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-gray-900">
-                    Jan Riches Executive
-                  </p>
-                </div>
+          {/* Call to Action */}
+          <div className="flex flex-col sm:flex-row items-center justify-start gap-4 sm:gap-6">
+            <div className="flex items-center gap-3 mr-2">
+              <Avatar
+                size="md"
+                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
+                alt="Jan Riches Executive"
+                className="w-10 h-10"
+              />
+              <div className="text-left">
+                <p className="text-sm font-semibold text-gray-900">
+                  Jan Riches Executive
+                </p>
               </div>
-              <Button
-                onClick={handleGoToDashboard}
-                color="primary"
-                size="lg"
-                className="w-full sm:w-auto"
-              >
-                Go to Dashboard
-              </Button>
             </div>
+            <Button
+              onClick={handleGoToDashboard}
+              color="primary"
+              size="lg"
+              className="w-full sm:w-auto"
+            >
+              Go to Dashboard
+            </Button>
+          </div>
         </div>
       </div>
     </AuthGuard>

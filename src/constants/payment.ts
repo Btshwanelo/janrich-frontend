@@ -35,3 +35,4 @@ export const PAYFAST_CONFIG = {
 export type PaymentPlanType = keyof typeof PAYMENT_PLANS;
 
 
+
