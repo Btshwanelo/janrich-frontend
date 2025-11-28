@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import { useCompleteOnboardingMutation } from "@/lib/slices/onboardingSlice";
 import {
+  useSendEmailOTPMutation,
   useSendRegistrationOTPMutation,
   useSendWhatsappOTPMutation,
 } from "@/lib/slices/authSlice";
@@ -29,7 +30,7 @@ export const useOnboarding = () => {
   );
 
   const [completeOnboarding, { isLoading }] = useCompleteOnboardingMutation();
-  const [sendOTP, { isLoading: isSendingOTP }] = useSendWhatsappOTPMutation();
+  const [sendOTP, { isLoading: isSendingOTP }] = useSendEmailOTPMutation();
 
   const [showOTPModal, setShowOTPModal] = useState(false);
   const [userEmail, setUserEmail] = useState("");
@@ -73,8 +74,7 @@ export const useOnboarding = () => {
         // Send OTP for email verification
         try {
           await sendOTP({
-            whatsapp: contact,
-            username: user,
+            email: user,
           }).unwrap();
           setShowOTPModal(true);
         } catch (otpError: unknown) {
@@ -124,7 +124,7 @@ export const useOnboarding = () => {
     showOTPModal,
     setShowOTPModal,
     userEmail,
-    userContact: contact,
+    userContact: user,
     isLoading: isLoading || isSendingOTP,
   };
 };

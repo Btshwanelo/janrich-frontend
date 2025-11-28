@@ -68,7 +68,7 @@ export const NATIONALITY_OPTIONS: Array<{ id: string; label: string }> = [
   { id: "bolivian", label: "Bolivian" },
   { id: "bosnian-or-herzegovinian", label: "Bosnian or Herzegovinian" },
   { id: "botswanan", label: "Botswanan" },
-  { id: "bouvet-islander", label: "Bouvet Islander" },
+  { id: "bouvet-island", label: "Bouvet Islander" },
   { id: "brazilian", label: "Brazilian" },
   {
     id: "british-indian-ocean-territory",
@@ -110,6 +110,7 @@ export const NATIONALITY_OPTIONS: Array<{ id: string; label: string }> = [
   { id: "ecuadorean", label: "Ecuadorean" },
   { id: "egyptian", label: "Egyptian" },
   { id: "salvadoran", label: "Salvadoran" },
+  { id: "south-africa", label: "South Africa" },
   { id: "equatorial-guinean", label: "Equatorial Guinean" },
   { id: "eritrean", label: "Eritrean" },
   { id: "estonian", label: "Estonian" },
@@ -142,7 +143,7 @@ export const NATIONALITY_OPTIONS: Array<{ id: string; label: string }> = [
   { id: "haitian", label: "Haitian" },
   { id: "heard-islander", label: "Heard Islander" },
   { id: "honduran", label: "Honduran" },
-];
+] as const;
 
 export const COUNTRY_OPTIONS: Array<{ id: string; label: string }> = [
   { id: "afghanistan", label: "Afghanistan" },
@@ -247,8 +248,8 @@ export const COUNTRY_OPTIONS: Array<{ id: string; label: string }> = [
   { id: "haiti", label: "Haiti" },
   { id: "heard-and-mcdonald-islands", label: "Heard & McDonald Islands" },
   { id: "honduras", label: "Honduras" },
+  { id: "south-africa", label: "South Africa" },
 ] as const;
-
 
 export const RACE_OPTIONS: Array<{ id: string; label: string }> = [
   { id: "african", label: "Black African" },
@@ -261,8 +262,8 @@ export const RACE_OPTIONS: Array<{ id: string; label: string }> = [
 ] as const;
 
 export const COMMUNICATION_OPTIONS: Array<{ id: string; label: string }> = [
-  { id: "email", label: "Email" },
-  { id: "whatsapp", label: "WhatsApp" },
+  { id: "Email", label: "Email" },
+  { id: "Whatsapp", label: "WhatsApp" },
 ] as const;
 
 export const EMPLOYMENT_STATUS_OPTIONS: Array<{ id: string; label: string }> = [

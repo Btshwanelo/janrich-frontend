@@ -309,7 +309,7 @@ const Verification = () => {
             isLoading={isVerifying || isVerifyingOTP}
             className="w-full mb-4"
           >
-            {isVerifying || isVerifyingOTP ? "Verifying..." : "Verify email"}
+            {isVerifying || isVerifyingOTP ? "Verifying..." : "Verify Whatsapp"}
           </Button>
 
           {/* Resend Code */}

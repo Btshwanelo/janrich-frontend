@@ -178,7 +178,7 @@ const Onboarding = () => {
         isOpen={showOTPModal}
         onClose={() => setShowOTPModal(false)}
         contactInfo={userContact}
-        verificationMethod="whatsapp"
+        verificationMethod="email"
         email={userEmail}
         onSuccess={handleOTPSuccess}
         otpLength={6}
