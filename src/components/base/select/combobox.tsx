@@ -44,9 +44,9 @@ const ComboBoxValue = ({ size, shortcut, placeholder, shortcutClassName, ...othe
             {...otherProps}
             className={({ isFocusWithin, isDisabled }) =>
                 cx(
-                    "relative flex w-full items-center gap-2 rounded-lg bg-primary shadow-xs ring-1 ring-primary outline-hidden transition-shadow duration-100 ease-linear ring-inset",
+                    "relative flex w-full items-center gap-2 rounded-lg bg-primary shadow-xs ring-1 ring-gray-300 outline-hidden transition-shadow duration-100 ease-linear ring-inset",
                     isDisabled && "cursor-not-allowed bg-disabled_subtle",
-                    isFocusWithin && "ring-2 ring-brand",
+                    isFocusWithin && "ring-2 ring-primary-500",
                     sizes[size].root,
                 )
             }
@@ -65,7 +65,7 @@ const ComboBoxValue = ({ size, shortcut, placeholder, shortcutClassName, ...othe
 
                         <AriaInput
                             placeholder={placeholder}
-                            className="z-10 w-full appearance-none bg-transparent text-md text-transparent caret-alpha-black/90 placeholder:text-placeholder focus:outline-hidden disabled:cursor-not-allowed disabled:text-disabled disabled:placeholder:text-disabled"
+                            className="z-10 w-full focus-visible:outline-none appearance-none bg-transparent text-md text-transparent caret-alpha-black/90 placeholder:text-placeholder focus:outline-hidden disabled:cursor-not-allowed disabled:text-disabled disabled:placeholder:text-disabled"
                         />
                     </div>
 

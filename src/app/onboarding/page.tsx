@@ -22,6 +22,7 @@ import {
   TITLE_OPTIONS,
 } from "@/constants/profile";
 import AuthGuard from "@/components/AuthGuard";
+import { SearchField } from "@/components/registration/SearchField";
 
 const Onboarding = () => {
   const {
@@ -103,7 +104,14 @@ const Onboarding = () => {
                   </div>
 
                   {/* Nationality */}
-                  <SelectField
+                  {/* <SelectField
+                    name="nationality"
+                    label="Nationality"
+                    placeholder="Select nationality"
+                    options={NATIONALITY_OPTIONS}
+                    required
+                  /> */}
+                  <SearchField
                     name="nationality"
                     label="Nationality"
                     placeholder="Select nationality"
@@ -112,7 +120,14 @@ const Onboarding = () => {
                   />
 
                   {/* Country of Residence */}
-                  <SelectField
+                  {/* <SelectField
+                    name="countryOfResidence"
+                    label="Country of Residence"
+                    placeholder="Select country"
+                    options={COUNTRY_OPTIONS}
+                    required
+                  /> */}
+                  <SearchField
                     name="countryOfResidence"
                     label="Country of Residence"
                     placeholder="Select country"
