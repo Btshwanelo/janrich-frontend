@@ -32,36 +32,15 @@ export const useRegistration = () => {
   const [register, { isLoading: isRegisterLoading }] = useRegisterMutation();
   const [login, { isLoading: isLoginLoading }] = useLoginMutation();
 
-  const [
-    sendRegisterOTP,
-    { isLoading: isRegisterOtpLoading, isSuccess, isError, error },
-  ] = useSendWhatsappOTPMutation();
-  const [showOTPModal, setShowOTPModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginData, setLoginData] = useState({});
 
   // Clear errors on mount
   useEffect(() => {
     dispatch(clearAllPageErrors());
   }, [dispatch]);
 
-  // Show OTP modal when OTP is sent successfully
-  useEffect(() => {
-    if (isSuccess) {
-      setShowOTPModal(true);
-    }
-  }, [isSuccess]);
-
   const buildRegistrationPayload = useCallback(
     (values: RegistrationFormValues) => {
-      setLoginData({
-        email: values.email,
-        password: values.password,
-      });
-      console.log("loginData", {
-        email: values.email,
-        password: values.password,
-      });
       return {
         customer_name: `${values.name} ${values.surname}`,
         customer_type: "Individual",
@@ -81,15 +60,45 @@ export const useRegistration = () => {
     []
   );
 
-  useEffect(() => {
-    if (isError) {
-      const errorMessage = extractErrorMessage(
-        error,
-        "Registration failed. Please try again."
-      );
-      dispatch(addPageError({ message: errorMessage }));
-    }
-  }, [isError]);
+  const handleLoginUser = useCallback(
+    async (email: string, password: string) => {
+      try {
+        const loginCredentials = {
+          email: email,
+          password: password,
+        };
+
+        console.log("Attempting login with:", loginCredentials);
+
+        // Log in user
+        const result = await login(loginCredentials).unwrap();
+
+        // Dispatch credentials to Redux store
+        dispatch(
+          setCredentials({
+            user: result.message.user,
+            sid: result.message.sid,
+            fullName: result.full_name,
+            homePage: result.home_page,
+            customer: result.message.customer.name,
+          })
+        );
+
+        // Use window.location for more reliable redirect after state update
+        // Small delay to ensure Redux state is updated
+        setTimeout(() => {
+          window.location.href = "/verification";
+        }, 100);
+      } catch (error: unknown) {
+        const errorMessage = extractErrorMessage(
+          error,
+          "Something went wrong when logging you in."
+        );
+        dispatch(addPageError({ message: errorMessage }));
+      }
+    },
+    [dispatch, login, router]
+  );
 
   const handleSubmit = useCallback(
     async (values: RegistrationFormValues) => {
@@ -110,14 +119,8 @@ export const useRegistration = () => {
           })
         );
 
-        const whatsappNumber = values.whatsappSame
-          ? values.phoneNumber
-          : values.whatsappNumber;
-
-        sendRegisterOTP({
-          whatsapp: whatsappNumber,
-          username: values.email,
-        });
+        // Log in user immediately after successful registration
+        await handleLoginUser(values.email, values.password);
       } catch (error: unknown) {
         const errorMessage = extractErrorMessage(
           error,
@@ -129,45 +132,11 @@ export const useRegistration = () => {
         setIsSubmitting(false);
       }
     },
-    [dispatch, register, sendRegisterOTP, buildRegistrationPayload]
+    [dispatch, register, buildRegistrationPayload, handleLoginUser]
   );
-
-  const handleOTPSuccess = useCallback(async () => {
-    try {
-      console.log("loginData 1", loginData);
-      //log in user
-      const result = await login(loginData).unwrap();
-
-      // Dispatch credentials to Redux store
-      dispatch(
-        setCredentials({
-          user: result.message.user,
-          sid: result.message.sid,
-          fullName: result.full_name,
-          homePage: result.home_page,
-          customer: result.message.customer.name,
-        })
-      );
-
-      //
-      setShowOTPModal(false);
-      router.push("/onboarding");
-    } catch (error: unknown) {
-      setShowOTPModal(false);
-      const errorMessage = extractErrorMessage(
-        error,
-        "Something went wrong when logging you in."
-      );
-      dispatch(addPageError({ message: errorMessage }));
-    }
-  }, [router]);
 
   return {
     handleSubmit,
-    handleOTPSuccess,
-    showOTPModal,
-    setShowOTPModal,
     isLoading: isSubmitting || isRegisterLoading || isLoginLoading,
-    isSendingOTP: isRegisterOtpLoading,
   };
 };

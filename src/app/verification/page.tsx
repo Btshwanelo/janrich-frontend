@@ -1,58 +1,119 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/base/buttons/button";
 import { PinInput } from "@/components/base/pin-input/pin-input";
 import { Circle } from "@/components/shared-assets/background-patterns/circle";
-import { useVerifyRegistrationOTPMutation } from "@/lib/slices/authSlice";
 import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 import { ArrowLeft } from "lucide-react";
 import AuthGuard from "@/components/AuthGuard";
+import {
+  useSendWhatsappOTPMutation,
+  useVerifyRegistrationOTPMutation,
+} from "@/lib/slices/authSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { ErrorAlert } from "@/components/base/error-alert";
+import { addPageError, clearAllPageErrors } from "@/lib/slices/errorSlice";
+import { extractErrorMessage } from "@/utils/errorHelpers";
 
 const Verification = () => {
   const router = useRouter();
-  const [otp, setOTP] = useState("");
-  const [error, setError] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
+  const dispatch = useAppDispatch();
+  const { user, fullName, customer, contact } = useAppSelector(
+    (state) => state.auth
+  );
 
-  // For demo purposes - in production, get this from context/state/query params
-  const phoneNumber = "0791234590"; // This should come from registration flow
-  const lastTwoDigits = phoneNumber.slice(-2);
-  const otpLength = 7; // 7-digit code as shown in design
+  const [otp, setOTP] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const hasSentInitialOTP = useRef(false);
+
+  const otpLength = 6; // Standard 6-digit OTP
 
   const [verifyOTP, { isLoading: isVerifyingOTP }] =
     useVerifyRegistrationOTPMutation();
+  const [sendOTP, { isLoading: isSendingOTPLoading }] =
+    useSendWhatsappOTPMutation();
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
 
+  // Clear errors on mount
+  useEffect(() => {
+    dispatch(clearAllPageErrors());
+  }, [dispatch]);
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => {
+        setResendCooldown(resendCooldown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  // Send OTP on mount if contact and user are available (only once)
+  useEffect(() => {
+    if (contact && user && !hasSentInitialOTP.current) {
+      hasSentInitialOTP.current = true;
+      sendOTP({
+        whatsapp: contact,
+        username: user,
+      });
+      // Set initial cooldown
+      setResendCooldown(60);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contact, user]);
+
   const handleOTPChange = (value: string) => {
     setOTP(value);
-    if (error) {
-      setError("");
-    }
+    // Clear errors when user starts typing
+    dispatch(clearAllPageErrors());
   };
 
   const handleVerify = async () => {
-    setError("");
+    // Clear previous errors
+    dispatch(clearAllPageErrors());
+
+    // Validation
+    if (!user) {
+      dispatch(
+        addPageError({
+          message: "Email is required. Please go back to registration.",
+        })
+      );
+      return;
+    }
+
+    if (otp.length !== otpLength) {
+      dispatch(
+        addPageError({
+          message: `Please enter a ${otpLength}-digit verification code.`,
+        })
+      );
+      return;
+    }
+
+    if (!otp || otp.trim().length === 0) {
+      dispatch(
+        addPageError({
+          message: "Please enter the verification code.",
+        })
+      );
+      return;
+    }
+
     setIsVerifying(true);
 
     try {
-      // TODO: Get email from context/state/query params
-      const email = ""; // This should come from registration flow
-
-      if (!email) {
-        setError("Email is required for verification.");
-        setIsVerifying(false);
-        return;
-      }
-
       const result = await verifyOTP({
-        email: email,
+        email: user,
         otp_input: otp,
       }).unwrap();
 
-      if (result.message.result === "success") {
+      if (result.message?.result === "success") {
         showSuccessToast(
           "Verification Successful!",
           "Your WhatsApp number has been successfully verified.",
@@ -60,36 +121,95 @@ const Verification = () => {
         );
         router.push("/onboarding");
       } else {
-        setError("Verification failed. Please try again.");
+        const errorMessage =
+          result.message?.message || "Verification failed. Please try again.";
+        dispatch(addPageError({ message: errorMessage }));
         setOTP("");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("OTP verification failed:", error);
-      const errorMessage =
-        error?.data?.message || "Verification failed. Please try again.";
-      setError(errorMessage);
+      const errorMessage = extractErrorMessage(
+        error,
+        "Verification failed. Please try again."
+      );
+      dispatch(addPageError({ message: errorMessage }));
       setOTP("");
     } finally {
       setIsVerifying(false);
     }
   };
 
-  const handleResendCode = () => {
-    // TODO: Implement resend OTP logic
-    showSuccessToast(
-      "Code Resent",
-      "A new verification code has been sent to your WhatsApp."
-    );
+  const handleResendCode = async () => {
+    // Prevent resend if cooldown is active
+    if (resendCooldown > 0) {
+      dispatch(
+        addPageError({
+          message: `Please wait ${resendCooldown} seconds before requesting a new code.`,
+        })
+      );
+      return;
+    }
+
+    // Clear previous errors
+    dispatch(clearAllPageErrors());
+
+    // Validation
+    if (!contact) {
+      dispatch(
+        addPageError({
+          message: "Phone number is required to resend OTP.",
+        })
+      );
+      return;
+    }
+
+    if (!user) {
+      dispatch(
+        addPageError({
+          message: "Email is required. Please go back to registration.",
+        })
+      );
+      return;
+    }
+
+    try {
+      const result = await sendOTP({
+        whatsapp: contact,
+        username: user,
+      }).unwrap();
+
+      // Check if OTP was sent successfully
+      showSuccessToast(
+        "Code Resent!",
+        "A new verification code has been sent to your WhatsApp number.",
+        { duration: 5000 }
+      );
+
+      // Set resend cooldown to 60 seconds
+      setResendCooldown(60);
+      // Clear OTP input to allow user to enter new code
+      setOTP("");
+    } catch (error: unknown) {
+      console.error("OTP resend failed:", error);
+      const errorMessage = extractErrorMessage(
+        error,
+        "Failed to resend OTP. Please try again."
+      );
+      dispatch(addPageError({ message: errorMessage }));
+      showErrorToast("Resend Failed", errorMessage);
+    }
   };
 
   const handleChangeNumber = () => {
-    // TODO: Navigate back to registration to change number
-    router.push("/register");
+    router.push("/verification/update");
   };
 
   const handleBackToSignUp = () => {
     router.push("/register");
   };
+
+  // Get last two digits from contact
+  const lastTwoDigits = contact ? contact.slice(-2) : "90";
 
   return (
     <AuthGuard>
@@ -125,7 +245,7 @@ const Verification = () => {
             <strong>**{lastTwoDigits}</strong>
           </p>
 
-          {/* OTP Input - 5 fields, dash, 2 fields (7 digits total) */}
+          {/* OTP Input - 6 digits with separator */}
           <div className="flex justify-center mb-6">
             <PinInput size="md">
               <PinInput.Group
@@ -169,21 +289,25 @@ const Verification = () => {
             </PinInput>
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="w-full mb-4">
-              <p className="text-red-500 text-sm text-center">{error}</p>
-            </div>
-          )}
+          {/* Error Alert */}
+          <div className="w-full mb-4">
+            <ErrorAlert autoClearOnUnmount={false} />
+          </div>
 
           {/* Verify Button */}
           <Button
             onClick={handleVerify}
-            disabled={isVerifying || isVerifyingOTP || otp.length !== otpLength}
+            disabled={
+              isVerifying ||
+              isVerifyingOTP ||
+              otp.length !== otpLength ||
+              !otp ||
+              otp.trim().length === 0
+            }
             color="primary"
             size="lg"
             isLoading={isVerifying || isVerifyingOTP}
-            className="w-full mb-6"
+            className="w-full mb-4"
           >
             {isVerifying || isVerifyingOTP ? "Verifying..." : "Verify email"}
           </Button>
@@ -193,9 +317,18 @@ const Verification = () => {
             Didn't receive the code?{" "}
             <button
               onClick={handleResendCode}
-              className="text-red-500 underline hover:text-red-600 font-medium"
+              disabled={isSendingOTPLoading || resendCooldown > 0}
+              className={`${
+                isSendingOTPLoading || resendCooldown > 0
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-red-500 hover:text-red-600"
+              } underline font-medium transition-colors`}
             >
-              Resend code
+              {isSendingOTPLoading
+                ? "Sending..."
+                : resendCooldown > 0
+                ? `Resend code (${resendCooldown}s)`
+                : "Resend code"}
             </button>
           </p>
 

@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { Button } from "@/components/base/buttons/button";
-import { PinInput } from "@/components/base/pin-input/pin-input";
 import { Circle } from "@/components/shared-assets/background-patterns/circle";
 import {
-  useVerifyRegistrationOTPMutation,
-  useSendWhatsappOTPMutation,
+  useUpdateCustomerMutation,
+  useGetProfileQuery,
   setRegistrationData,
 } from "@/lib/slices/authSlice";
 import { useSuccessToast, useErrorToast } from "@/components/base/toast";
@@ -18,136 +17,130 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { Label } from "@/components/base/input/label";
 import { DEFAULT_COUNTRY } from "@/constants/registration";
+import { ErrorAlert } from "@/components/base/error-alert";
+import {
+  addPageError,
+  clearAllPageErrors,
+} from "@/lib/slices/errorSlice";
+import { extractErrorMessage } from "@/utils/errorHelpers";
 
 const UpdateNumberVerification = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { user, contact, customer, address, registrationMessage } =
+  const { user, contact, customer, address, registrationMessage, fullName } =
     useAppSelector((state) => state.auth);
 
   const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [otp, setOTP] = useState("");
-  const [error, setError] = useState("");
-  const [isSendingOTP, setIsSendingOTP] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [showOTPInput, setShowOTPInput] = useState(false);
 
-  const otpLength = 6; // Standard 6-digit OTP
+  // Get customer profile data to use existing values for update
+  const { data: profileData, isLoading: isLoadingProfile } =
+    useGetProfileQuery(customer || "", {
+      skip: !customer,
+    });
 
-  const [sendOTP, { isLoading: isSendingOTPLoading }] =
-    useSendWhatsappOTPMutation();
-  const [verifyOTP, { isLoading: isVerifyingOTP }] =
-    useVerifyRegistrationOTPMutation();
+  const [updateCustomer, { isLoading: isUpdatingCustomer }] =
+    useUpdateCustomerMutation();
   const showSuccessToast = useSuccessToast();
   const showErrorToast = useErrorToast();
 
-  const handleOTPChange = (value: string) => {
-    setOTP(value);
-    if (error) {
-      setError("");
-    }
-  };
+  // Clear errors on mount
+  useEffect(() => {
+    dispatch(clearAllPageErrors());
+  }, [dispatch]);
 
-  const handleSendOTP = async () => {
+  const handleUpdateNumber = async () => {
+    // Clear previous errors
+    dispatch(clearAllPageErrors());
+
+    // Validation
     if (!phoneNumber) {
-      setError("Please enter a phone number.");
-      return;
-    }
-
-    if (!user) {
-      setError("Email is required. Please go back to registration.");
-      return;
-    }
-
-    setError("");
-    setIsSendingOTP(true);
-
-    try {
-      await sendOTP({
-        whatsapp: phoneNumber,
-        username: user,
-      }).unwrap();
-
-      showSuccessToast(
-        "OTP Sent!",
-        "A verification code has been sent to your new WhatsApp number.",
-        { duration: 5000 }
-      );
-
-      // Update registration data with new phone number
       dispatch(
-        setRegistrationData({
-          customer: customer || "",
-          user: user,
-          contact: phoneNumber,
-          address: address,
-          message: registrationMessage || "",
+        addPageError({ message: "Please enter a phone number." })
+      );
+      return;
+    }
+
+    if (!customer) {
+      dispatch(
+        addPageError({
+          message: "Customer ID is required. Please go back to registration.",
         })
       );
-
-      setShowOTPInput(true);
-    } catch (error: any) {
-      console.error("OTP send failed:", error);
-      const errorMessage =
-        error?.data?.message || "Failed to send OTP. Please try again.";
-      setError(errorMessage);
-      showErrorToast("OTP Send Failed", errorMessage);
-    } finally {
-      setIsSendingOTP(false);
-    }
-  };
-
-  const handleVerify = async () => {
-    if (!user) {
-      setError("Email is required. Please go back to registration.");
       return;
     }
 
-    setError("");
-    setIsVerifying(true);
-
     try {
-      const result = await verifyOTP({
-        email: user,
-        otp_input: otp,
+      // Extract country code from phone number (e.g., +27 from +27781234567)
+      const countryCode = phoneNumber.startsWith("+")
+        ? phoneNumber.substring(0, 3)
+        : "+27"; // Default to South Africa
+
+      // Use profile data if available, otherwise use registration data with defaults
+      const basicInfo = profileData?.message?.data?.basic_info;
+      const customerName = fullName || basicInfo?.customer_name || "Customer";
+      const firstName = basicInfo?.first_name || customerName.split(" ")[0] || "Customer";
+      const lastName = basicInfo?.last_name || customerName.split(" ").slice(1).join(" ") || "";
+      const email = user || basicInfo?.email || "";
+      const territory = basicInfo?.territory || "";
+      const title = basicInfo?.salutation || "";
+      const gender = profileData?.message?.data?.about_you?.profile_gender || basicInfo?.gender || "";
+      const agreeToTerms = basicInfo?.agree_to_terms ?? 1;
+
+      const result = await updateCustomer({
+        customer_id: customer,
+        customer_name: customerName,
+        first_name: firstName,
+        last_name: lastName,
+        territory: territory,
+        email: email,
+        phone: phoneNumber,
+        whatsapp_number: phoneNumber,
+        country_code: countryCode,
+        title: title,
+        gender: gender,
+        agree_to_terms: agreeToTerms,
       }).unwrap();
 
-      if (result.message.result === "success") {
+      if (result.message?.result === "success") {
+        // Update registration data with new phone number
+        dispatch(
+          setRegistrationData({
+            customer: customer,
+            user: email,
+            contact: phoneNumber,
+            address: address,
+            message: registrationMessage || "",
+          })
+        );
+
         showSuccessToast(
           "Number Updated!",
-          "Your phone number has been successfully updated and verified.",
+          "Your phone number has been successfully updated.",
           { duration: 5000 }
         );
-        // Navigate back to verification page with updated number
+
+        // Redirect to verification page
         router.push("/verification");
       } else {
-        setError("Verification failed. Please try again.");
-        setOTP("");
+        const errorMessage =
+          result.message?.message || "Failed to update phone number. Please try again.";
+        dispatch(addPageError({ message: errorMessage }));
+        showErrorToast("Update Failed", errorMessage);
       }
-    } catch (error: any) {
-      console.error("OTP verification failed:", error);
-      const errorMessage =
-        error?.data?.message || "Verification failed. Please try again.";
-      setError(errorMessage);
-      setOTP("");
-    } finally {
-      setIsVerifying(false);
+    } catch (error: unknown) {
+      console.error("Update customer failed:", error);
+      const errorMessage = extractErrorMessage(
+        error,
+        "Failed to update phone number. Please try again."
+      );
+      dispatch(addPageError({ message: errorMessage }));
+      showErrorToast("Update Failed", errorMessage);
     }
-  };
-
-  const handleResendCode = async () => {
-    await handleSendOTP();
   };
 
   const handleBackToVerification = () => {
     router.push("/verification");
   };
-
-  const lastTwoDigits = phoneNumber
-    ? phoneNumber.slice(-2)
-    : contact
-    ? contact.slice(-2)
-    : "90";
 
   return (
     <AuthGuard>
@@ -176,141 +169,52 @@ const UpdateNumberVerification = () => {
             Change phone number
           </h1>
 
-          {!showOTPInput ? (
-            <>
-              {/* Description */}
-              <p className="text-[#535862] text-base mb-6 text-center">
-                Enter your new WhatsApp number to receive a verification code.
-              </p>
+          {/* Description */}
+          <p className="text-[#535862] text-base mb-6 text-center">
+            Enter your new WhatsApp number to update your contact information.
+          </p>
 
-              {/* Phone Number Input */}
-              <div className="w-full mb-6">
-                <Label
-                  htmlFor="phoneNumber"
-                  className="text-sm font-medium text-gray-700 mb-2 block"
-                >
-                  Cell Number <span className="text-error-500">*</span>
-                </Label>
-                <div className="mt-1">
-                  <PhoneInput
-                    id="phoneNumber"
-                    placeholder="Enter phone number"
-                    value={phoneNumber}
-                    onChange={(value) => setPhoneNumber(value || "")}
-                    defaultCountry={DEFAULT_COUNTRY as any}
-                    className="phone-input"
-                  />
-                </div>
-              </div>
+          {/* Phone Number Input */}
+          <div className="w-full mb-6">
+            <Label
+              htmlFor="phoneNumber"
+              className="text-sm font-medium text-gray-700 mb-2 block"
+            >
+              Cell Number <span className="text-error-500">*</span>
+            </Label>
+            <div className="mt-1">
+              <PhoneInput
+                id="phoneNumber"
+                placeholder="Enter phone number"
+                value={phoneNumber}
+                onChange={(value) => {
+                  setPhoneNumber(value || "");
+                  dispatch(clearAllPageErrors());
+                }}
+                defaultCountry={DEFAULT_COUNTRY as any}
+                className="phone-input"
+              />
+            </div>
+          </div>
 
-              {/* Error Message */}
-              {error && (
-                <div className="w-full mb-4">
-                  <p className="text-red-500 text-sm text-center">{error}</p>
-                </div>
-              )}
+          {/* Error Alert */}
+          <div className="w-full mb-4">
+            <ErrorAlert autoClearOnUnmount={false} />
+          </div>
 
-              {/* Send OTP Button */}
-              <Button
-                onClick={handleSendOTP}
-                disabled={!phoneNumber || isSendingOTP || isSendingOTPLoading}
-                color="primary"
-                size="lg"
-                isLoading={isSendingOTP || isSendingOTPLoading}
-                className="w-full mb-6"
-              >
-                {isSendingOTP || isSendingOTPLoading
-                  ? "Sending..."
-                  : "Change Number"}
-              </Button>
-            </>
-          ) : (
-            <>
-              {/* Description */}
-              <p className="text-[#535862] text-base mb-8 text-center">
-                We sent a verification code to your WhatsApp number ending in{" "}
-                <strong>**{lastTwoDigits}</strong>
-              </p>
-
-              {/* OTP Input */}
-              <div className="flex justify-center mb-6">
-                <PinInput size="md">
-                  <PinInput.Group
-                    value={otp}
-                    onChange={handleOTPChange}
-                    maxLength={otpLength}
-                    containerClassName="gap-2 items-center justify-center"
-                  >
-                    <PinInput.Slot
-                      index={0}
-                      className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
-                      style={{ color: "#1F235B !important" }}
-                    />
-                    <PinInput.Slot
-                      index={1}
-                      className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
-                      style={{ color: "#1F235B !important" }}
-                    />
-                    <PinInput.Slot
-                      index={2}
-                      className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
-                      style={{ color: "#1F235B !important" }}
-                    />
-                    <PinInput.Separator className="text-[60px] text-[#D5D7DA] font-semibold" />
-                    <PinInput.Slot
-                      index={3}
-                      className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
-                      style={{ color: "#1F235B !important" }}
-                    />
-                    <PinInput.Slot
-                      index={4}
-                      className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
-                      style={{ color: "#1F235B !important" }}
-                    />
-                    <PinInput.Slot
-                      index={5}
-                      className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
-                      style={{ color: "#1F235B !important" }}
-                    />
-                  </PinInput.Group>
-                </PinInput>
-              </div>
-
-              {/* Error Message */}
-              {error && (
-                <div className="w-full mb-4">
-                  <p className="text-red-500 text-sm text-center">{error}</p>
-                </div>
-              )}
-
-              {/* Verify Button */}
-              <Button
-                onClick={handleVerify}
-                disabled={
-                  isVerifying || isVerifyingOTP || otp.length !== otpLength
-                }
-                color="primary"
-                size="lg"
-                isLoading={isVerifying || isVerifyingOTP}
-                className="w-full mb-4"
-              >
-                {isVerifying || isVerifyingOTP
-                  ? "Verifying..."
-                  : "Verify Number"}
-              </Button>
-
-              {/* Resend Code */}
-              <p className="text-[#535862] text-sm mb-6 text-center">
-                Didn't receive the code?{" "}
-                <button
-                  onClick={handleResendCode}
-                  className="text-red-500 underline hover:text-red-600 font-medium"
-                >
-                  Resend code
-                </button>
-              </p>
-            </>
-          )}
+          {/* Update Button */}
+          <Button
+            onClick={handleUpdateNumber}
+            disabled={!phoneNumber || isUpdatingCustomer || isLoadingProfile}
+            color="primary"
+            size="lg"
+            isLoading={isUpdatingCustomer || isLoadingProfile}
+            className="w-full mb-6"
+          >
+            {isUpdatingCustomer || isLoadingProfile
+              ? "Updating..."
+              : "Change Number"}
+          </Button>
 
           {/* Back to Verification */}
           <button

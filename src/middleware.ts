@@ -2,19 +2,21 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Define protected routes that require authentication
-const protectedRoutes = ["/dashboard2"];
-
-// Define public routes that should redirect to dashboard if authenticated
-const publicRoutes = [
-  "/login",
+const protectedRoutes = [
   "/dashboard",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
+  "/verification",
   "/onboarding",
   "/payment",
   "/payment-success",
   "/payment-cancelled",
+];
+
+// Define public routes that should redirect to dashboard if authenticated
+const publicRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
 ];
 
 export function middleware(request: NextRequest) {

@@ -583,11 +583,21 @@ const authSlice = createSlice({
       state.registrationMessage = action.payload.message;
       state.error = null;
     },
+    setContactData: (
+      state,
+      action: PayloadAction<{
+        contact: string;
+      }>
+    ) => {
+      state.contact = action.payload.contact;
+      state.error = null;
+    },
   },
 });
 
 export const {
   setCredentials,
+  setContactData,
   clearCredentials,
   setLoading,
   setError,

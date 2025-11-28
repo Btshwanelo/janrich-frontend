@@ -37,13 +37,15 @@ export const SelectField: React.FC<SelectFieldProps> = ({
               isInvalid={!!(meta.error && meta.touched)}
             >
               {options.map((option) => (
-                <Select.Item key={option.id} id={option.id}>
+                <Select.Item key={option.id} id={option.label}>
                   {option.label}
                 </Select.Item>
               ))}
             </Select>
             {meta.error && meta.touched && (
-              <p className="text-error-500 text-sm mt-1">{String(meta.error)}</p>
+              <p className="text-error-500 text-sm mt-1">
+                {String(meta.error)}
+              </p>
             )}
           </>
         )}
@@ -51,4 +53,3 @@ export const SelectField: React.FC<SelectFieldProps> = ({
     </div>
   );
 };
-

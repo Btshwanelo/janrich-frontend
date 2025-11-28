@@ -24,9 +24,6 @@ import {
 const RegistrationScreen = () => {
   const {
     handleSubmit,
-    handleOTPSuccess,
-    showOTPModal,
-    setShowOTPModal,
     isLoading,
   } = useRegistration();
 
@@ -74,7 +71,7 @@ const RegistrationScreen = () => {
         >
           {({ values, setFieldValue }) => (
             <>
-              <OTPVerificationModal
+              {/* <OTPVerificationModal
                 isOpen={showOTPModal}
                 onClose={() => setShowOTPModal(false)}
                 contactInfo={values.whatsappNumber || values.phoneNumber}
@@ -83,7 +80,7 @@ const RegistrationScreen = () => {
                 handleResentOTP={()=>console.log("qw")}
                 otpLength={6}
                 verificationMethod="whatsapp"
-              />
+              /> */}
 
               <Form className="space-y-4">
                 {/* Name and Surname */}
