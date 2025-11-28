@@ -6,7 +6,7 @@
   :root {
     --Font-family-font-family-display: Cinzel;
   }
-  
+
   body {
     @apply text-text;
   }
@@ -51,20 +51,20 @@
 /* From Uiverse.io by Fernando-sv */
 .loader {
   border: 4px solid #e2e8f0;
-  border-left-color: #2563eb;
+  border-left-color: #1f235b;
   border-radius: 50%;
 }
 
 .loader {
   border: 4px solid #e2e8f0;
-  border-left-color: #2563eb;
+  border-left-color: #1f235b;
   width: 50px;
   height: 50px;
 }
 
 .loader {
   border: 4px solid #e2e8f0;
-  border-left-color: #2563eb;
+  border-left-color: #1f235b;
   width: 50px;
   height: 50px;
   animation: spin89345 1s linear infinite;

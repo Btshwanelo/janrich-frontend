@@ -9,18 +9,25 @@ export const ONBOARDING_INITIAL_VALUES = {
 } as const;
 
 export const ONBOARDING_TITLE_OPTIONS = [
+  { id: "dr", label: "Dr" },
+  { id: "madam", label: "Madam" },
+  { id: "master", label: "Master" },
+  { id: "miss", label: "Miss" },
   { id: "mr", label: "Mr" },
   { id: "mrs", label: "Mrs" },
   { id: "ms", label: "Ms" },
-  { id: "dr", label: "Dr" },
+  { id: "mx", label: "Mx" },
   { id: "prof", label: "Prof" },
 ] as const;
 
 export const ONBOARDING_GENDER_OPTIONS = [
-  { id: "male", label: "Male" },
   { id: "female", label: "Female" },
-  { id: "non-binary", label: "Non-binary" },
+  { id: "genderqueer", label: "Genderqueer" },
+  { id: "male", label: "Male" },
+  { id: "non-conforming", label: "Non-Conforming" },
+  { id: "other", label: "Other" },
   { id: "prefer-not-to-say", label: "Prefer not to say" },
+  { id: "transgender", label: "Transgender" },
 ] as const;
 
 export const ONBOARDING_NATIONALITY_OPTIONS = [
@@ -54,7 +61,3 @@ export const ONBOARDING_COMMUNICATION_OPTIONS = [
   { id: "Whatsapp", label: "WhatsApp" },
   { id: "Email", label: "Email" },
 ] as const;
-
-
-
-

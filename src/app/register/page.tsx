@@ -57,12 +57,12 @@ const RegistrationScreen = () => {
         showTestimonial={true}
       >
         {/* Progress Steps */}
-        <div className="mb-8 mx-auto">
+        <div className="mb-4 mx-auto">
           <div className="flex items-center justify-center">
             <CircularProgressStep status="isActive" />
-            <div className="flex-1 h-[3px] bg-primary-500" />
+            <div className="flex-1 h-[3px] bg-[#1F235B]" />
             <CircularProgressStep status="" />
-            <div className="flex-1 h-[3px] bg-primary-500" />
+            <div className="flex-1 h-[3px] bg-[#1F235B]" />
             <CircularProgressStep status="" />
           </div>
         </div>
@@ -77,14 +77,15 @@ const RegistrationScreen = () => {
               <OTPVerificationModal
                 isOpen={showOTPModal}
                 onClose={() => setShowOTPModal(false)}
-                contactInfo={values.email}
+                contactInfo={values.whatsappNumber || values.phoneNumber}
                 email={values.email}
                 onSuccess={handleOTPSuccess}
+                handleResentOTP={()=>console.log("qw")}
                 otpLength={6}
-                verificationMethod="email"
+                verificationMethod="whatsapp"
               />
 
-              <Form className="space-y-6">
+              <Form className="space-y-4">
                 {/* Name and Surname */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
@@ -175,6 +176,7 @@ const RegistrationScreen = () => {
                 <PasswordField
                   name="password"
                   label="Password"
+                  required
                   placeholder="Create a password"
                   inputRef={passwordRef}
                   onKeyDown={(e) => {
@@ -195,6 +197,7 @@ const RegistrationScreen = () => {
                 <PasswordField
                   name="confirmPassword"
                   label="Confirm Password"
+                  required
                   placeholder="Confirm your password"
                   inputRef={confirmPasswordRef}
                   onFocus={() => setShowPasswordChecks(true)}

@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { useRouter } from "next/navigation";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
+import AuthGuard from "@/components/AuthGuard";
 
 const PaymentSuccessPage = () => {
   const router = useRouter();
@@ -13,7 +14,7 @@ const PaymentSuccessPage = () => {
   };
 
   return (
-    <PublicRouteGuard>
+    <AuthGuard>
       <div
         className="min-h-screen flex  justify-center p-6"
         style={{
@@ -65,7 +66,7 @@ const PaymentSuccessPage = () => {
           </Button>
         </div>
       </div>
-    </PublicRouteGuard>
+    </AuthGuard>
   );
 };
 

@@ -22,19 +22,19 @@ export const CommunicationPreferenceField: React.FC<
       <Field name={name}>
         {({ field, meta, form }: FieldProps) => (
           <>
-            <Label className="text-sm font-medium text-[#414651] mb-3 block">
+            <Label className="text-sm font-medium text-[#414651] mb-2 block">
               {label} {required && <span className="text-error-500">*</span>}
             </Label>
             <div className="space-y-3">
               {options.map((option) => (
                 <div
                   key={option.id}
-                  className={`border-2 rounded-lg px-3 py-2 cursor-pointer transition-all ${
+                  className={` rounded-lg px-3 py-2 cursor-pointer transition-all ${
                     field.value === option.id
-                      ? "border-primary-500"
+                      ? "border-primary-500 border-2"
                       : meta.error && meta.touched
-                      ? "border-error-500"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-error-500 border"
+                      : "border-gray-200 hover:border-gray-300 border"
                   }`}
                   onClick={() => form.setFieldValue(name, option.id)}
                 >
@@ -68,4 +68,3 @@ export const CommunicationPreferenceField: React.FC<
     </div>
   );
 };
-

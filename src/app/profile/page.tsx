@@ -1177,10 +1177,10 @@ export default function ProfileBeneficiaryScreen() {
                                 </Label>
                                 <div className="space-y-3">
                                   <div
-                                    className={`border-2 rounded-lg px-3 py-2 cursor-pointer transition-all ${
+                                    className={` rounded-lg px-3 py-2 cursor-pointer transition-all ${
                                       communicationPreference === "Whatsapp"
-                                        ? "border-primary-500"
-                                        : "border-gray-200 hover:border-gray-300"
+                                        ? "border-primary-500 border-2"
+                                        : "border-gray-200 hover:border-gray-300 border"
                                     }`}
                                     onClick={() =>
                                       setCommunicationPreference("Whatsapp")
@@ -1208,10 +1208,10 @@ export default function ProfileBeneficiaryScreen() {
                                   </div>
 
                                   <div
-                                    className={`border-2 rounded-lg px-3 py-2 cursor-pointer transition-all ${
+                                    className={` rounded-lg px-3 py-2 cursor-pointer transition-all ${
                                       communicationPreference === "Email"
-                                        ? "border-primary-500"
-                                        : "border-gray-200 hover:border-gray-300"
+                                        ? "border-primary-500 border-2"
+                                        : "border-gray-200 hover:border-gray-300 border"
                                     }`}
                                     onClick={() =>
                                       setCommunicationPreference("Email")
@@ -1299,25 +1299,27 @@ export default function ProfileBeneficiaryScreen() {
                                   {amountConversion(amount?.[0] || 0)}
                                 </span>
                               </div>
-                              <div className="relative z-10">
-                                <div className="mb-6 [&_.bg-brand-solid]:bg-[#E31B54] [&_.ring-\\[\\#155EEF\\]]:ring-[#E31B54] [&_.text-\\[\\#E31B54\\]]:text-[#E31B54] [&_.bg-slider-handle-bg]:bg-white">
-                                  <Slider
-                                    value={amount}
-                                    onChange={(value) =>
-                                      setAmount(
-                                        Array.isArray(value) ? value : [value]
-                                      )
-                                    }
-                                    isDisabled={(amount?.[0] ?? 0) > 0}
-                                    minValue={5000}
-                                    maxValue={1000000}
-                                    step={500}
-                                    labelFormatter={(value) =>
-                                      amountConversion(value)
-                                    }
-                                  />
+                              {(amount?.[0] ?? 0) > 0 ? null : (
+                                <div className="relative z-10">
+                                  <div className="mb-6 [&_.bg-brand-solid]:bg-[#E31B54] [&_.ring-\\[\\#1F235B\\]]:ring-[#E31B54] [&_.text-\\[\\#E31B54\\]]:text-[#E31B54] [&_.bg-slider-handle-bg]:bg-white">
+                                    <Slider
+                                      value={amount}
+                                      onChange={(value) =>
+                                        setAmount(
+                                          Array.isArray(value) ? value : [value]
+                                        )
+                                      }
+                                      isDisabled={(amount?.[0] ?? 0) > 0}
+                                      minValue={5000}
+                                      maxValue={1000000}
+                                      step={500}
+                                      labelFormatter={(value) =>
+                                        amountConversion(value)
+                                      }
+                                    />
+                                  </div>
                                 </div>
-                              </div>
+                              )}
                             </div>
 
                             {/* What are you saving for - Full width */}

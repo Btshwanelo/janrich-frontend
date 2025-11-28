@@ -2,11 +2,11 @@
 import React from "react";
 import { Button } from "@/components/base/buttons/button";
 import CircularProgressStep from "@/components/CircularProgressStep";
-import PublicRouteGuard from "@/components/PublicRouteGuard";
 import { usePayment } from "@/hooks/usePayment";
 import { PAYMENT_PLANS } from "@/constants/payment";
 import { PlanCard, PaymentMethods } from "@/components/payment";
 import { ErrorAlert } from "@/components/base/error-alert";
+import AuthGuard from "@/components/AuthGuard";
 
 const PlanSelectionScreen = () => {
   const { selectedPlan, setSelectedPlan, handlePayment, isProcessing } =
@@ -15,7 +15,7 @@ const PlanSelectionScreen = () => {
   const selectedPlanData = PAYMENT_PLANS[selectedPlan];
 
   return (
-    <PublicRouteGuard>
+    <AuthGuard>
       <div
         className="min-h-screen flex items-center justify-center px-10 py-8"
         style={{
@@ -45,17 +45,15 @@ const PlanSelectionScreen = () => {
             <div className="mb-8 mx-10">
               <div className="flex items-center justify-center">
                 <CircularProgressStep status="isCompleted" />
-                <div className="flex-1 h-[3px] bg-primary-500" />
+                <div className="flex-1 h-[3px] bg-[#1F235B]" />
                 <CircularProgressStep status="isCompleted" />
-                <div className="flex-1 h-[3px] bg-primary-500" />
+                <div className="flex-1 h-[3px] bg-[#1F235B]" />
                 <CircularProgressStep status="isActive" />
               </div>
             </div>
 
             <div className="mb-6">
-              <h2 className="text-sm font-semibold  mb-2">
-                Plan Selection
-              </h2>
+              <h2 className="text-sm font-semibold  mb-2">Plan Selection</h2>
               <p className="text-text text-sm">
                 We've got two payment options for you, Subscriptions and
                 Once-off
@@ -117,7 +115,7 @@ const PlanSelectionScreen = () => {
           </div>
         </div>
       </div>
-    </PublicRouteGuard>
+    </AuthGuard>
   );
 };
 

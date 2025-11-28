@@ -431,7 +431,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
-    sendRegistrationOTP: builder.mutation<SendOTPResponse, SendOTPRequest>({
+    sendEmailOTP: builder.mutation<SendOTPResponse, SendOTPRequest>({
       query: (otpData) => ({
         url: "janriches.api.otp.send_registration_otp",
         method: "POST",
@@ -511,7 +511,7 @@ export const {
   useUpdateBeneficiaryMutation,
   useUpdateCustomerMutation,
   useUpdateProfileMutation,
-  useSendRegistrationOTPMutation,
+  useSendEmailOTPMutation,
   useVerifyRegistrationOTPMutation,
   useUpdateSavingsGoalMutation,
   useGetLedgerQuery,

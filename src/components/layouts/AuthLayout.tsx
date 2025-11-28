@@ -26,8 +26,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       <div className="flex-1 flex flex-col justify-center sm:p-0 pr-0">
         <div className="w-full max-h-screen overflow-y-auto">
           <div className="max-w-md mx-auto py-6">
-            <div className="text-center relative mb-8">
-              <div className="mb-6">
+            <div className="text-center relative mb-4">
+              <div className="mb-4">
                 <img
                   src="/jr-logo-black.svg"
                   alt="JanRich Logo"

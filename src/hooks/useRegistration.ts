@@ -3,9 +3,11 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/lib/hooks";
 import {
   useRegisterMutation,
-  useSendRegistrationOTPMutation,
   setLoading,
   setRegistrationData,
+  useSendWhatsappOTPMutation,
+  useLoginMutation,
+  setCredentials,
 } from "@/lib/slices/authSlice";
 import { addPageError, clearAllPageErrors } from "@/lib/slices/errorSlice";
 import { extractErrorMessage } from "@/utils/errorHelpers";
@@ -28,10 +30,15 @@ export const useRegistration = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [register, { isLoading: isRegisterLoading }] = useRegisterMutation();
-  const [sendRegisterOTP, { isLoading: isRegisterOtpLoading, isSuccess }] =
-    useSendRegistrationOTPMutation();
+  const [login, { isLoading: isLoginLoading }] = useLoginMutation();
+
+  const [
+    sendRegisterOTP,
+    { isLoading: isRegisterOtpLoading, isSuccess, isError, error },
+  ] = useSendWhatsappOTPMutation();
   const [showOTPModal, setShowOTPModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginData, setLoginData] = useState({});
 
   // Clear errors on mount
   useEffect(() => {
@@ -47,6 +54,14 @@ export const useRegistration = () => {
 
   const buildRegistrationPayload = useCallback(
     (values: RegistrationFormValues) => {
+      setLoginData({
+        email: values.email,
+        password: values.password,
+      });
+      console.log("loginData", {
+        email: values.email,
+        password: values.password,
+      });
       return {
         customer_name: `${values.name} ${values.surname}`,
         customer_type: "Individual",
@@ -65,6 +80,16 @@ export const useRegistration = () => {
     },
     []
   );
+
+  useEffect(() => {
+    if (isError) {
+      const errorMessage = extractErrorMessage(
+        error,
+        "Registration failed. Please try again."
+      );
+      dispatch(addPageError({ message: errorMessage }));
+    }
+  }, [isError]);
 
   const handleSubmit = useCallback(
     async (values: RegistrationFormValues) => {
@@ -90,8 +115,8 @@ export const useRegistration = () => {
           : values.whatsappNumber;
 
         sendRegisterOTP({
-          // whatsapp: whatsappNumber,
-          email: values.email,
+          whatsapp: whatsappNumber,
+          username: values.email,
         });
       } catch (error: unknown) {
         const errorMessage = extractErrorMessage(
@@ -107,9 +132,34 @@ export const useRegistration = () => {
     [dispatch, register, sendRegisterOTP, buildRegistrationPayload]
   );
 
-  const handleOTPSuccess = useCallback(() => {
-    setShowOTPModal(false);
-    router.push("/onboarding");
+  const handleOTPSuccess = useCallback(async () => {
+    try {
+      console.log("loginData 1", loginData);
+      //log in user
+      const result = await login(loginData).unwrap();
+
+      // Dispatch credentials to Redux store
+      dispatch(
+        setCredentials({
+          user: result.message.user,
+          sid: result.message.sid,
+          fullName: result.full_name,
+          homePage: result.home_page,
+          customer: result.message.customer.name,
+        })
+      );
+
+      //
+      setShowOTPModal(false);
+      router.push("/onboarding");
+    } catch (error: unknown) {
+      setShowOTPModal(false);
+      const errorMessage = extractErrorMessage(
+        error,
+        "Something went wrong when logging you in."
+      );
+      dispatch(addPageError({ message: errorMessage }));
+    }
   }, [router]);
 
   return {
@@ -117,10 +167,7 @@ export const useRegistration = () => {
     handleOTPSuccess,
     showOTPModal,
     setShowOTPModal,
-    isLoading: isSubmitting || isRegisterLoading,
+    isLoading: isSubmitting || isRegisterLoading || isLoginLoading,
     isSendingOTP: isRegisterOtpLoading,
   };
 };
-
-
-

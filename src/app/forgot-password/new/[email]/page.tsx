@@ -37,7 +37,7 @@ const ResetPasswordScreen = () => {
           onSubmit={handleSubmit}
         >
           {({ values, errors, touched, setFieldValue, isValid }) => (
-            <Form className="space-y-6">
+            <Form className="space-y-4">
               {/* OTP Input */}
               <OTPField
                 name="otp"
@@ -52,6 +52,7 @@ const ResetPasswordScreen = () => {
               <PasswordField
                 name="password"
                 label="New Password"
+                required
                 placeholder="Enter new password"
                 inputRef={passwordRef}
                 onFocus={() => setShowPasswordChecks(true)}
@@ -66,6 +67,7 @@ const ResetPasswordScreen = () => {
               <PasswordField
                 name="confirmPassword"
                 label="Confirm New Password"
+                required
                 placeholder="Confirm new password"
                 inputRef={confirmPasswordRef}
                 onFocus={() => setShowPasswordChecks(true)}

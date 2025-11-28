@@ -28,9 +28,9 @@ const ForgotPasswordScreen = () => {
           onSubmit={handleSubmit}
         >
           {({ values, isValid }) => (
-            <Form className="space-y-6">
+            <Form className="space-y-4">
               {/* Email/Username */}
-              <FormField
+              <FormField 
                 name="username"
                 label="Email"
                 type="email"

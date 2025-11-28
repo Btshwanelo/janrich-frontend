@@ -3,18 +3,9 @@ import React from "react";
 import { Formik, Form } from "formik";
 import { Button } from "@/components/base/buttons/button";
 import CircularProgressStep from "@/components/CircularProgressStep";
-import PublicRouteGuard from "@/components/PublicRouteGuard";
 import OTPVerificationModal from "@/components/OTPVerificationModal";
 import { onboardingSchema } from "@/utils/schema";
 import { ONBOARDING_INITIAL_VALUES } from "@/constants/onboarding";
-import {
-  ONBOARDING_TITLE_OPTIONS,
-  ONBOARDING_GENDER_OPTIONS,
-  ONBOARDING_NATIONALITY_OPTIONS,
-  ONBOARDING_COUNTRY_OPTIONS,
-  ONBOARDING_RACE_OPTIONS,
-  ONBOARDING_COMMUNICATION_OPTIONS,
-} from "@/constants/onboarding";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import {
   SelectField,
@@ -22,6 +13,15 @@ import {
   CommunicationPreferenceField,
 } from "@/components/registration";
 import { ErrorAlert } from "@/components/base/error-alert";
+import {
+  COMMUNICATION_OPTIONS,
+  COUNTRY_OPTIONS,
+  GENDER_OPTIONS,
+  NATIONALITY_OPTIONS,
+  RACE_OPTIONS,
+  TITLE_OPTIONS,
+} from "@/constants/profile";
+import AuthGuard from "@/components/AuthGuard";
 
 const Onboarding = () => {
   const {
@@ -35,7 +35,7 @@ const Onboarding = () => {
   } = useOnboarding();
 
   return (
-    <PublicRouteGuard>
+    <AuthGuard>
       <div
         className="min-h-screen flex items-center justify-center px-6 py-8"
         style={{
@@ -62,14 +62,14 @@ const Onboarding = () => {
           </div>
 
           {/* Form Card */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
+          <div className="bg-white rounded-2xl p-6 shadow-lg mb-4">
             {/* Progress Steps */}
             <div className="mb-8 mx-10">
               <div className="flex items-center justify-center">
                 <CircularProgressStep status="isCompleted" />
-                <div className="flex-1 h-[3px] bg-[#E31B54]" />
+                <div className="flex-1 h-[3px] bg-[#1F235B]" />
                 <CircularProgressStep status="isActive" />
-                <div className="flex-1 h-[3px] bg-[#E31B54]" />
+                <div className="flex-1 h-[3px] bg-[#1F235B]" />
                 <CircularProgressStep status="inactive" />
               </div>
             </div>
@@ -80,13 +80,13 @@ const Onboarding = () => {
               onSubmit={handleSubmit}
             >
               {({ isSubmitting }) => (
-                <Form className="space-y-6">
+                <Form className="space-y-4">
                   {/* What do we call you */}
                   <SelectField
                     name="whatToCallYou"
                     label="What do we call you?"
                     placeholder="Select an option"
-                    options={ONBOARDING_TITLE_OPTIONS}
+                    options={TITLE_OPTIONS}
                     required
                   />
 
@@ -97,7 +97,7 @@ const Onboarding = () => {
                       name="gender"
                       label="Gender"
                       placeholder="Select gender"
-                      options={ONBOARDING_GENDER_OPTIONS}
+                      options={GENDER_OPTIONS}
                       required
                     />
                   </div>
@@ -107,7 +107,7 @@ const Onboarding = () => {
                     name="nationality"
                     label="Nationality"
                     placeholder="Select nationality"
-                    options={ONBOARDING_NATIONALITY_OPTIONS}
+                    options={NATIONALITY_OPTIONS}
                     required
                   />
 
@@ -116,7 +116,7 @@ const Onboarding = () => {
                     name="countryOfResidence"
                     label="Country of Residence"
                     placeholder="Select country"
-                    options={ONBOARDING_COUNTRY_OPTIONS}
+                    options={COUNTRY_OPTIONS}
                     required
                   />
 
@@ -125,7 +125,7 @@ const Onboarding = () => {
                     name="race"
                     label="Race"
                     placeholder="Select race"
-                    options={ONBOARDING_RACE_OPTIONS}
+                    options={RACE_OPTIONS}
                     required
                   />
 
@@ -133,7 +133,7 @@ const Onboarding = () => {
                   <CommunicationPreferenceField
                     name="communicationPreference"
                     label="Communication Preference"
-                    options={ONBOARDING_COMMUNICATION_OPTIONS}
+                    options={COMMUNICATION_OPTIONS}
                     required
                   />
 
@@ -183,7 +183,7 @@ const Onboarding = () => {
         onSuccess={handleOTPSuccess}
         otpLength={6}
       />
-    </PublicRouteGuard>
+    </AuthGuard>
   );
 };
 

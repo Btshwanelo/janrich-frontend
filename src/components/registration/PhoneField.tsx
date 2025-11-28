@@ -22,7 +22,7 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
 }) => {
   return (
     <div>
-      <Label htmlFor={name} className="text-sm font-medium text-gray-700">
+      <Label htmlFor={name} className="text-sm font-medium text-gray-700 mb-2">
         {label} <span className="text-error-500">*</span>
       </Label>
       <div className="mt-1">

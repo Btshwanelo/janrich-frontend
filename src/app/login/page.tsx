@@ -33,7 +33,7 @@ const LoginScreen = () => {
           onSubmit={handleSubmit}
         >
           {({ values, setFieldValue, isValid }) => (
-            <Form className="space-y-6">
+            <Form className="space-y-4">
               {/* Email */}
               <FormField
                 name="email"

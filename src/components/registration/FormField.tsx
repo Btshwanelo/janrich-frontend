@@ -24,7 +24,7 @@ export const FormField: React.FC<FormFieldProps> = ({
 }) => {
   return (
     <div>
-      <Label htmlFor={name} className="text-sm font-medium text-gray-700">
+      <Label htmlFor={name} className="text-sm font-medium text-gray-700  mb-2">
         {label} {required && <span className="text-error-500">*</span>}
       </Label>
       <Field name={name}>

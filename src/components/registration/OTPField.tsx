@@ -43,37 +43,37 @@ export const OTPField: React.FC<OTPFieldProps> = ({
               >
                 <PinInput.Slot
                   index={0}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px]"
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={1}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px]"
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={2}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px]"
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Separator
                   className="!text-[#D5D7DA] !ring-[#D5D7DA] text-[38px]"
-                  style={{ color: "#155EEF !important" }}
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={3}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px]"
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={4}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px]"
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={5}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px]"
+                  style={{ color: "#1F235B !important" }}
                 />
               </PinInput.Group>
             </PinInput>
@@ -86,6 +86,7 @@ export const OTPField: React.FC<OTPFieldProps> = ({
     </div>
   );
 };
+
 
 
 

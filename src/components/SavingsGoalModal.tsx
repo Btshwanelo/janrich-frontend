@@ -145,7 +145,7 @@ export default function SavingsGoalModal({
               </div>
 
               <div className="w-full px-1 mb-6 overflow-hidden max-w-full">
-                <div className="mb-6 left-0 [&_.bg-brand-solid]:bg-[#E31B54] [&_.ring-\\[\\#155EEF\\]]:ring-[#E31B54] [&_.text-\\[\\#E31B54\\]]:text-[#E31B54] [&_.bg-slider-handle-bg]:bg-white">
+                <div className="mb-6 left-0 [&_.bg-brand-solid]:bg-[#E31B54] [&_.ring-\\[\\#1F235B\\]]:ring-[#E31B54] [&_.text-\\[\\#E31B54\\]]:text-[#E31B54] [&_.bg-slider-handle-bg]:bg-white">
                   <Slider
                     value={amount}
                     onChange={(value) =>

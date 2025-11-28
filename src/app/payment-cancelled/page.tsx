@@ -3,18 +3,18 @@ import React from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { useRouter } from "next/navigation";
-import PublicRouteGuard from "@/components/PublicRouteGuard";
+import AuthGuard from "@/components/AuthGuard";
 
 const PaymentErrorPage = () => {
   const router = useRouter();
-  
+
   const handleTryAgain = () => {
     // Navigate back to payment page
     router.push("/payment");
   };
 
   return (
-    <PublicRouteGuard>
+    <AuthGuard>
       <div
         className="min-h-screen flex  justify-center p-6"
         style={{
@@ -50,7 +50,8 @@ const PaymentErrorPage = () => {
               Payment Cancelled
             </h1>
             <p className="text-text text-base leading-relaxed">
-              Your payment was cancelled. You can try again or contact support if you need assistance.
+              Your payment was cancelled. You can try again or contact support
+              if you need assistance.
             </p>
           </div>
 
@@ -65,7 +66,7 @@ const PaymentErrorPage = () => {
           </Button>
         </div>
       </div>
-    </PublicRouteGuard>
+    </AuthGuard>
   );
 };
 

@@ -107,15 +107,15 @@ export const InputBase = ({
         cx(
           "relative flex w-full flex-row place-content-center place-items-center rounded-lg bg-primary shadow-xs ring-1 ring-[#D5D7DA] transition-shadow duration-100 ease-linear ring-inset",
 
-          isFocusWithin && !isDisabled && "ring-2 ring-[#155EEF]",
+          isFocusWithin && !isDisabled && "ring-2 ring-[#1F235B]",
 
           // Disabled state styles
           isDisabled && "cursor-not-allowed bg-disabled_subtle ring-disabled",
           "group-disabled:cursor-not-allowed group-disabled:bg-disabled_subtle group-disabled:ring-disabled",
 
           // Invalid state styles
-          isInvalid && "ring-[#155EEF]",
-          "group-invalid:ring-[#155EEF]",
+          isInvalid && "ring-[#1F235B]",
+          "group-invalid:ring-[#1F235B]",
 
           // Invalid state with focus-within styles
           isInvalid && isFocusWithin && "ring-2 ring-error",

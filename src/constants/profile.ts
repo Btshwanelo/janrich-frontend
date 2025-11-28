@@ -18,18 +18,25 @@ export const PROFILE_TABS: Array<{ id: string; label: string }> = [
 ] as const;
 
 export const TITLE_OPTIONS: Array<{ id: string; label: string }> = [
+  { id: "dr", label: "Dr" },
+  { id: "madam", label: "Madam" },
+  { id: "master", label: "Master" },
+  { id: "miss", label: "Miss" },
   { id: "mr", label: "Mr" },
   { id: "mrs", label: "Mrs" },
   { id: "ms", label: "Ms" },
-  { id: "dr", label: "Dr" },
+  { id: "mx", label: "Mx" },
   { id: "prof", label: "Prof" },
 ] as const;
 
 export const GENDER_OPTIONS: Array<{ id: string; label: string }> = [
-  { id: "male", label: "Male" },
   { id: "female", label: "Female" },
+  { id: "genderqueer", label: "Genderqueer" },
+  { id: "male", label: "Male" },
+  { id: "non-conforming", label: "Non-Conforming" },
   { id: "other", label: "Other" },
   { id: "prefer-not-to-say", label: "Prefer not to say" },
+  { id: "transgender", label: "Transgender" },
 ] as const;
 
 export const NATIONALITY_OPTIONS: Array<{ id: string; label: string }> = [
@@ -255,9 +262,7 @@ export const RACE_OPTIONS: Array<{ id: string; label: string }> = [
 
 export const COMMUNICATION_OPTIONS: Array<{ id: string; label: string }> = [
   { id: "email", label: "Email" },
-  { id: "sms", label: "SMS" },
   { id: "whatsapp", label: "WhatsApp" },
-  { id: "phone", label: "Phone call" },
 ] as const;
 
 export const EMPLOYMENT_STATUS_OPTIONS: Array<{ id: string; label: string }> = [

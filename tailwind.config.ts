@@ -9,27 +9,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Custom Primary Color Palette based on #155EEF
+        // Custom Primary Color Palette based on #1F235B
         primary: {
-          25: "#f0f6ff",
-          50: "#e6f2ff",
-          100: "#cce5ff",
-          200: "#99ccff",
-          300: "#66b3ff",
-          400: "#3399ff",
-          500: "#155EEF",
-          600: "#0f4bc7",
-          700: "#0c3a9f",
-          800: "#092977",
-          900: "#06184f",
-          950: "#030c27",
+          25: "#f4f5f8",
+          50: "#e8eaf1",
+          100: "#d1d5e3",
+          200: "#a3abc7",
+          300: "#7581ab",
+          400: "#47578f",
+          500: "#1F235B",
+          600: "#191c49",
+          700: "#131537",
+          800: "#0d0e25",
+          900: "#070713",
+          950: "#030409",
         },
         // Brand colors for the existing button component
         brand: {
-          solid: "#155EEF",
-          solid_hover: "#0f4bc7",
-          secondary: "#155EEF",
-          secondary_hover: "#0f4bc7",
+          solid: "#1F235B",
+          solid_hover: "#191c49",
+          secondary: "#1F235B",
+          secondary_hover: "#191c49",
         },
         gray: {
           25: "#fcfcfd",
@@ -102,8 +102,8 @@ const config: Config = {
         primary_alt: "#f2f4f7",
         secondary_alt: "#f9fafb",
         quaternary: "#667085",
-        "fg-brand-primary_alt": "#155EEF",
-        "brand-secondary": "#155EEF",
+        "fg-brand-primary_alt": "#1F235B",
+        "brand-secondary": "#1F235B",
         "border-secondary": "#e4e7ec",
       },
       fontFamily: {

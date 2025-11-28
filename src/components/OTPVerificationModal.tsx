@@ -16,6 +16,7 @@ interface OTPVerificationModalProps {
   contactInfo: string; // Can be phone number, email, etc.
   verificationMethod: "email" | "sms" | "whatsapp";
   onSuccess?: () => void;
+  handleResentOTP?: () => void;
   otpLength?: number; // Default to 6, but can be customized
   validOtp?: string; // For testing purposes
   email?: string; // Required for email verification
@@ -28,14 +29,13 @@ const OTPVerificationModal = ({
   contactInfo,
   verificationMethod,
   onSuccess,
+  handleResentOTP,
   otpLength = 6,
   email,
 }: OTPVerificationModalProps) => {
   const [otp, setOTP] = useState("");
   const [error, setError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
-
-  console.log("error:", error);
 
   // API hooks
   const [verifyOTP, { isLoading: isVerifyingOTP }] =
@@ -59,7 +59,7 @@ const OTPVerificationModal = ({
 
   useEffect(() => {
     setError("");
-  }, []);
+  }, [isOpen]);
 
   const getVerificationTitle = () => {
     switch (verificationMethod) {
@@ -95,8 +95,6 @@ const OTPVerificationModal = ({
   };
 
   const handleVerify = async () => {
-    console.log("OTP entered:", otp);
-
     // Clear previous error
     setError("");
     setIsVerifying(true);
@@ -223,48 +221,48 @@ const OTPVerificationModal = ({
                   <PinInput.Slot
                     key={index}
                     index={index}
-                    className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                    style={{ color: "#155EEF !important" }}
+                    className="!text-[#1F235B] !ring-[#1F235B] text-[48px]"
+                    style={{ color: "#1F235B !important" }}
                   />
                 ))} */}
                 <PinInput.Slot
                   index={0}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={1}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={2}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Separator className="text-[60px] text-[#D5D7DA] font-semibold" />
                 {/* {Array.from({ length: 2 }, (_, index) => (
                   <PinInput.Slot
                     key={index}
                     index={index}
-                    className="!text-[#155EEF] !ring-[#155EEF] text-[48px]"
-                    style={{ color: "#155EEF !important" }}
+                    className="!text-[#1F235B] !ring-[#1F235B] text-[48px]"
+                    style={{ color: "#1F235B !important" }}
                   />
                 ))} */}
                 <PinInput.Slot
                   index={3}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={4}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={5}
-                  className="!text-[#155EEF] !ring-[#155EEF] text-[48px] !w-14"
-                  style={{ color: "#155EEF !important" }}
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  style={{ color: "#1F235B !important" }}
                 />
               </PinInput.Group>
             </PinInput>
@@ -281,7 +279,10 @@ const OTPVerificationModal = ({
           <div className="text-start mb-6">
             <p className="text-sm text-text">
               Didn't get a code?{" "}
-              <button className="text-primary-500 underline hover:text-primary-600">
+              <button
+                onClick={handleResentOTP}
+                className="text-primary-500 underline hover:text-primary-600"
+              >
                 Click to resend.
               </button>
             </p>

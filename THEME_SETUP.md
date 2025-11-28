@@ -34,7 +34,7 @@ The theme uses CSS custom properties for all colors, making it easy to customize
 export const themes = {
   // ... existing themes
   custom: {
-    "--color-primary-500": "#155EEF",
+    "--color-primary-500": "#1F235B",
     "--color-background": "#your-bg",
     // ... other color definitions
   },

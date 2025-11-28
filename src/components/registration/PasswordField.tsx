@@ -8,6 +8,7 @@ interface PasswordFieldProps {
   name: string;
   label: string;
   placeholder: string;
+  required?: boolean;
   inputRef?: Ref<HTMLInputElement>;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onFocus?: () => void;
@@ -18,6 +19,7 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
   name,
   label,
   placeholder,
+  required = false,
   inputRef,
   onKeyDown,
   onFocus,
@@ -27,8 +29,8 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
 
   return (
     <div>
-      <Label htmlFor={name} className="text-sm font-medium text-gray-700">
-        {label}
+      <Label htmlFor={name} className="text-sm font-medium text-gray-700 mb-2">
+        {label} {required && <span className="text-error-500">*</span>}
       </Label>
       <Field name={name}>
         {({ field, meta, form }: FieldProps) => (
@@ -63,7 +65,11 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
                   : "right-3 top-1/2 -translate-y-1/2"
               } text-gray-400 hover:text-gray-600 focus:outline-none`}
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
             </button>
           </div>
         )}
