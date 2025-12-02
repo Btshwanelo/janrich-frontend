@@ -166,7 +166,7 @@ const Onboarding = () => {
                   >
                     {isSubmitting || isLoading
                       ? "Processing..."
-                      : "Get started"}
+                      : "Let’s make it official"}
                   </Button>
                 </Form>
               )}

@@ -22,10 +22,7 @@ import {
 } from "@/components/registration";
 
 const RegistrationScreen = () => {
-  const {
-    handleSubmit,
-    isLoading,
-  } = useRegistration();
+  const { handleSubmit, isLoading } = useRegistration();
 
   const nameRef = useRef<HTMLInputElement>(null);
   const surnameRef = useRef<HTMLInputElement>(null);
@@ -227,8 +224,8 @@ const RegistrationScreen = () => {
                     )}
                   </Field>
                   <Label htmlFor="agreeTerms" className="text-sm text-gray-700">
-                    I agree to the Terms and Conditions by logging and using
-                    this application
+                    Count me in! I agree to JanRiches Terms and Conditions and
+                    Privacy Policy
                   </Label>
                 </div>
                 <ErrorMessage

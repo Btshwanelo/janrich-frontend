@@ -28,19 +28,16 @@ export const PasswordValidation: React.FC<PasswordValidationProps> = ({
     <div className="space-y-2">
       {checks.map((check, index) => (
         <div key={index} className="flex items-center gap-2">
-          <img
-            src={check.test ? "/checked.svg" : "/check.svg"}
-            alt={check.test ? "Valid" : "Invalid"}
-            className="w-4 h-4"
-          />
+          {check.test ? (
+            <img
+              src={check.test ? "/checked.svg" : "/check.svg"}
+              alt={check.test ? "Valid" : "Invalid"}
+              className="w-4 h-4"
+            />
+          ) : null}
           <p className="text-xs text-[#535862]">{check.message}</p>
         </div>
       ))}
     </div>
   );
 };
-
-
-
-
-

@@ -32,6 +32,7 @@ export const SearchField: React.FC<SelectFieldProps> = ({
               placeholder={placeholder}
               size="md"
               isRequired={required}
+              shortcut={false}
               selectedKey={field.value}
               onSelectionChange={(key) => form.setFieldValue(name, key)}
               isInvalid={!!(meta.error && meta.touched)}

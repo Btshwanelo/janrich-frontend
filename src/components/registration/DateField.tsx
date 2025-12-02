@@ -1,6 +1,6 @@
 import React from "react";
 import { Field, FieldProps } from "formik";
-import { DatePicker } from "@/components/application/date-picker/date-picker";
+import { DatePicker } from "@/components/registration/DatePicker";
 import { Label } from "@/components/base/input/label";
 
 interface DateFieldProps {
@@ -14,11 +14,9 @@ export const DateField: React.FC<DateFieldProps> = ({
   label,
   required = false,
 }) => {
-  const [open, setOpen] = React.useState(false);
-
   return (
     <div>
-      <Label className="text-sm font-medium text-gray-700 block">
+      <Label className="text-sm font-medium text-gray-700 block mb-[6px]">
         {label} {required && <span className="text-error-500">*</span>}
       </Label>
       <Field name={name}>
@@ -27,10 +25,8 @@ export const DateField: React.FC<DateFieldProps> = ({
             <DatePicker
               value={field.value}
               onChange={(date) => form.setFieldValue(name, date)}
-              onApply={() => setOpen(false)}
-              onCancel={() => setOpen(false)}
               className={
-                "py-[0.4rem] w-full focus:outline-none focus:ring-2 focus:ring-primary-500 " +
+                " w-full focus:outline-none focus:ring-2 focus:ring-primary-500 " +
                 (meta.error && meta.touched
                   ? "border-error-500"
                   : "border-gray-300")

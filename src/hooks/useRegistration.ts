@@ -12,6 +12,7 @@ import {
 import { addPageError, clearAllPageErrors } from "@/lib/slices/errorSlice";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { DEFAULT_COUNTRY_CODE } from "@/constants/registration";
+import { resetOnboardingFlow } from "@/lib/slices/onboardingSlice";
 
 export interface RegistrationFormValues {
   name: string;
@@ -68,6 +69,9 @@ export const useRegistration = () => {
           password: password,
         };
 
+        dispatch(clearAllPageErrors());
+        dispatch(resetOnboardingFlow());
+
         console.log("Attempting login with:", loginCredentials);
 
         // Log in user
@@ -85,7 +89,8 @@ export const useRegistration = () => {
         );
 
         // Use window.location for more reliable redirect after state update
-        // Small delay to ensure Redux state is updated
+        // This ensures the redirect happens before PublicRouteGuard can interfere
+        // Small delay to ensure Redux state and cookie are updated
         setTimeout(() => {
           window.location.href = "/verification";
         }, 100);

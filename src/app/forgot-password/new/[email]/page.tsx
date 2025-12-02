@@ -87,7 +87,10 @@ const ResetPasswordScreen = () => {
               )}
 
               {/* Error Message */}
+              <div className="mb-6">
+
               <ErrorAlert autoClearOnUnmount={false} />
+              </div>
 
               {/* Submit Button */}
               <Button

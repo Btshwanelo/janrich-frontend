@@ -71,20 +71,31 @@ export const useOnboarding = () => {
         const email = user;
         setUserEmail(email);
 
+        console.log(
+          "values.communicationPreference",
+          values.communicationPreference
+        );
         // Send OTP for email verification
-        try {
-          await sendOTP({
-            email: user,
-          }).unwrap();
-          setShowOTPModal(true);
-        } catch (otpError: unknown) {
-          const errorMessage = extractErrorMessage(
-            otpError,
-            "Unable to send verification email. Please try again."
-          );
-          showErrorToast("OTP Send Failed", errorMessage, {
-            duration: 4000,
-          });
+        if (values.communicationPreference === "Email") {
+          console.log("cpm 1:", values.communicationPreference);
+          try {
+            await sendOTP({
+              email: user,
+            }).unwrap();
+            setShowOTPModal(true);
+          } catch (otpError: unknown) {
+            const errorMessage = extractErrorMessage(
+              otpError,
+              "Unable to send verification email. Please try again."
+            );
+            showErrorToast("OTP Send Failed", errorMessage, {
+              duration: 4000,
+            });
+          }
+        }
+
+        if (values.communicationPreference === "Whatsapp") {
+          router.push("/payment");
         }
       } catch (error: unknown) {
         const errorMessage = extractErrorMessage(
@@ -128,6 +139,3 @@ export const useOnboarding = () => {
     isLoading: isLoading || isSendingOTP,
   };
 };
-
-
-
