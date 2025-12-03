@@ -17,15 +17,20 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 }) => {
   return (
     <div
-      className="h-screen flex"
+      className="fixed inset-0 w-full h-full flex overflow-hidden"
       style={{
         background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
       }}
     >
       {/* Left Panel - Form (Scrollable) */}
-      <div className="flex-1 flex flex-col justify-center sm:p-0 pr-0">
-        <div className="w-full max-h-screen overflow-y-auto">
-          <div className="max-w-md mx-auto py-6">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div 
+          className="w-full h-full overflow-y-auto overflow-x-hidden"
+          style={{
+            background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
+          }}
+        >
+          <div className="max-w-md mx-auto py-6 sm:py-8 px-4 sm:px-0">
             <div className="text-center relative mb-4">
               <div className="mb-4">
                 <img
@@ -44,13 +49,15 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
               {/* Form Content */}
               <div className="px-6 py-8">{children}</div>
             </div>
+            {/* Extra padding at bottom to prevent white space when scrolling */}
+            <div className="h-8 sm:h-12" />
           </div>
         </div>
       </div>
 
       {/* Right Panel - Full Height Image with Testimonial */}
       {showTestimonial && (
-        <div className="hidden lg:flex flex-1 relative h-screen">
+        <div className="hidden lg:flex flex-1 relative h-screen overflow-hidden">
           <div className="w-full relative">
             {/* Background Image with Gradient Overlay */}
             <div
