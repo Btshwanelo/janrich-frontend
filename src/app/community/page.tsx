@@ -21,7 +21,7 @@ const page = () => {
             isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
           }`}
         >
-          <div className="flex justify-center align-middle items-centers mt-10 font-bold min-h-full">
+          <div className="flex justify-center align-middle items-centers mt-28 font-bold min-h-full">
             Coming soon...
           </div>
         </div>

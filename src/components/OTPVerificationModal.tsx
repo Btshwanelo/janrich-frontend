@@ -13,6 +13,7 @@ import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 interface OTPVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isLoading: boolean;
   contactInfo: string; // Can be phone number, email, etc.
   verificationMethod: "email" | "sms" | "whatsapp";
   onSuccess?: () => void;
@@ -28,6 +29,7 @@ const OTPVerificationModal = ({
   onClose,
   contactInfo,
   verificationMethod,
+  isLoading,
   onSuccess,
   handleResentOTP,
   otpLength = 6,
@@ -36,6 +38,7 @@ const OTPVerificationModal = ({
   const [otp, setOTP] = useState("");
   const [error, setError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   // API hooks
   const [verifyOTP, { isLoading: isVerifyingOTP }] =
@@ -59,7 +62,21 @@ const OTPVerificationModal = ({
 
   useEffect(() => {
     setError("");
+    // Reset cooldown when modal opens
+    if (isOpen) {
+      setResendCooldown(0);
+    }
   }, [isOpen]);
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => {
+        setResendCooldown(resendCooldown - 1);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
 
   const getVerificationTitle = () => {
     switch (verificationMethod) {
@@ -227,41 +244,34 @@ const OTPVerificationModal = ({
                 ))} */}
                 <PinInput.Slot
                   index={0}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[34px] sm:text-[48px] !w-10 sm:!w-14"
                   style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={1}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[34px] sm:text-[48px] !w-10 sm:!w-14"
                   style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={2}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[34px] sm:text-[48px] !w-10 sm:!w-14"
                   style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Separator className="text-[60px] text-[#D5D7DA] font-semibold" />
-                {/* {Array.from({ length: 2 }, (_, index) => (
-                  <PinInput.Slot
-                    key={index}
-                    index={index}
-                    className="!text-[#1F235B] !ring-[#1F235B] text-[48px]"
-                    style={{ color: "#1F235B !important" }}
-                  />
-                ))} */}
+
                 <PinInput.Slot
                   index={3}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[34px] sm:text-[48px] !w-10 sm:!w-14"
                   style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={4}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[34px] sm:text-[48px] !w-10 sm:!w-14"
                   style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={5}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-14"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[34px] sm:text-[48px] !w-10 sm:!w-14"
                   style={{ color: "#1F235B !important" }}
                 />
               </PinInput.Group>
@@ -279,12 +289,29 @@ const OTPVerificationModal = ({
           <div className="text-start mb-6">
             <p className="text-sm text-text">
               Didn't get a code?{" "}
-              <button
-                onClick={handleResentOTP}
-                className="text-primary-500 underline hover:text-primary-600"
-              >
-                Click to resend.
-              </button>
+              {resendCooldown > 0 ? (
+                <span className="text-gray-500">
+                  Resend code ({resendCooldown}s)
+                </span>
+              ) : (
+                <button
+                  onClick={() => {
+                    if (handleResentOTP) {
+                      handleResentOTP();
+                      // Set resend cooldown to 60 seconds after resend
+                      setResendCooldown(180);
+                    }
+                  }}
+                  disabled={isLoading || resendCooldown > 0}
+                  className={`${
+                    isLoading || resendCooldown > 0
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-primary-500 hover:text-primary-600"
+                  } underline font-medium transition-colors`}
+                >
+                  {isLoading ? "Sending..." : "Click to resend."}
+                </button>
+              )}
             </p>
           </div>
 

@@ -133,7 +133,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                   </p>
                 </div>
                 <div className="flex-1 bg-[#D1E9FF] rounded-xl p-2 min-w-fit">
-                  <p className="text-xs text-gray-500 mb-1">Payments to go</p>
+                  <p className="text-xs text-gray-500 mb-1">Months to go</p>
                   <p className="text-base sm:text-lg font-bold text-[#181D27]">
                     {paymentsToGo}
                   </p>

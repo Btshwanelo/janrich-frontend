@@ -30,6 +30,7 @@ const Onboarding = () => {
     handleOTPSuccess,
     showOTPModal,
     setShowOTPModal,
+    handleResentOTP,
     userEmail,
     userContact,
     isLoading,
@@ -38,7 +39,7 @@ const Onboarding = () => {
   return (
     <AuthGuard>
       <div
-        className="min-h-screen flex items-center justify-center px-6 py-8"
+        className="min-h-screen flex items-center justify-center px-2 py-8"
         style={{
           background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
         }}
@@ -194,8 +195,10 @@ const Onboarding = () => {
         onClose={() => setShowOTPModal(false)}
         contactInfo={userContact}
         verificationMethod="email"
+        isLoading={isLoading}
         email={userEmail}
         onSuccess={handleOTPSuccess}
+        handleResentOTP={handleResentOTP}
         otpLength={6}
       />
     </AuthGuard>

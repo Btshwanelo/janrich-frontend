@@ -17,7 +17,7 @@ const PlanSelectionScreen = () => {
   return (
     <AuthGuard>
       <div
-        className="min-h-screen flex items-center justify-center px-10 py-8"
+        className="min-h-screen flex items-center justify-center px-2 py-8"
         style={{
           background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
         }}

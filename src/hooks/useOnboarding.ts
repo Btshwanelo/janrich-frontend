@@ -117,6 +117,30 @@ export const useOnboarding = () => {
     ]
   );
 
+  const handleResentOTP = async () => {
+    try {
+      await sendOTP({
+        email: user,
+      }).unwrap();
+      setShowOTPModal(true);
+      showSuccessToast(
+        "OTP Resent!",
+        "Your OTP has been resent successfully.",
+        {
+          duration: 4000,
+        }
+      );
+    } catch (otpError: unknown) {
+      const errorMessage = extractErrorMessage(
+        otpError,
+        "Unable to send verification email. Please try again."
+      );
+      showErrorToast("OTP Send Failed", errorMessage, {
+        duration: 4000,
+      });
+    }
+  };
+
   const handleOTPSuccess = useCallback(() => {
     setShowOTPModal(false);
     showSuccessToast(
@@ -135,6 +159,7 @@ export const useOnboarding = () => {
     showOTPModal,
     setShowOTPModal,
     userEmail,
+    handleResentOTP,
     userContact: user,
     isLoading: isLoading || isSendingOTP,
   };

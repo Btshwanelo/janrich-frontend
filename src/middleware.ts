@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
   // Get authentication status from cookies or headers
   // Note: In a real app, you might want to verify the session server-side
   const isAuthenticated = request.cookies.get("auth-token")?.value === "true";
-
+  console.log("isAuthenticated", isAuthenticated);
   // Check if the current path is a protected route
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)

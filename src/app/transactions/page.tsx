@@ -152,7 +152,7 @@ const TransactionDetailPage = () => {
               {displayTransaction ? (
                 <>
                   {/* Transaction Details */}
-                  <div className="grid grid-cols-1 px-8 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 px-8 md:grid-cols-2 gap-6">
                     {/* Left Column */}
                     <div className="space-y-4">
                       <div>
@@ -266,7 +266,7 @@ const TransactionDetailPage = () => {
                   size="md"
                   //   iconLeading={AlertCircle}
                   onClick={handleDisputePayment}
-                  className=""
+                  className="w-fit mx-auto sm:mx-0"
                 >
                   Dispute Payment
                 </Button>

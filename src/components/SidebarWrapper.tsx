@@ -90,10 +90,10 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
                 ? "bg-primary-50 text-primary-600 font-medium"
                 : "text-[#535862] hover:bg-gray-100"
             }`}
-            title={isSidebarCollapsed ? "Dashboard" : ""}
+            title={isSidebarCollapsed ? "My Savings" : ""}
           >
             <Home className="w-5 h-5" />
-            {!isSidebarCollapsed && <span>Dashboard</span>}
+            {!isSidebarCollapsed && <span>My Savings</span>}
           </a>
 
           {/* <a
@@ -120,10 +120,10 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
                 ? "bg-primary-50 text-primary-600 font-medium"
                 : "text-[#535862] hover:bg-gray-100"
             }`}
-            title={isSidebarCollapsed ? "Community" : ""}
+            title={isSidebarCollapsed ? "My Savings" : ""}
           >
             <Users className="w-5 h-5" />
-            {!isSidebarCollapsed && <span>Community</span>}
+            {!isSidebarCollapsed && <span>Group Savings</span>}
           </a>
         </div>
       </nav>
