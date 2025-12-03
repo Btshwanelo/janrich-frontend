@@ -90,17 +90,6 @@ const RegistrationScreen = () => {
         >
           {({ values, setFieldValue }) => (
             <>
-              {/* <OTPVerificationModal
-                isOpen={showOTPModal}
-                onClose={() => setShowOTPModal(false)}
-                contactInfo={values.whatsappNumber || values.phoneNumber}
-                email={values.email}
-                onSuccess={handleOTPSuccess}
-                handleResentOTP={()=>console.log("qw")}
-                otpLength={6}
-                verificationMethod="whatsapp"
-              /> */}
-
               <Form className="space-y-4">
                 {/* Name and Surname */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -291,7 +280,7 @@ const RegistrationScreen = () => {
                   </Label>
                 </div>
                 {/* Error message container with fixed height to prevent layout shift */}
-                <div className="min-h-4">
+                <div className="min-h-[4px]">
                   <ErrorMessage
                     name="agreeTerms"
                     component="div"
@@ -300,7 +289,7 @@ const RegistrationScreen = () => {
                 </div>
 
                 {/* Error Message - Reserve space to prevent layout shift */}
-                <div className="min-h-2">
+                <div className="min-h-[4px]">
                   <ErrorAlert autoClearOnUnmount={false} />
                 </div>
 

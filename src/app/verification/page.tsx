@@ -154,14 +154,14 @@ const Verification = () => {
     dispatch(clearAllPageErrors());
 
     // Validation
-    if (!contact) {
-      dispatch(
-        addPageError({
-          message: "Phone number is required to resend OTP.",
-        })
-      );
-      return;
-    }
+    // if (!contact) {
+    //   dispatch(
+    //     addPageError({
+    //       message: "Phone number is required to resend OTP.",
+    //     })
+    //   );
+    //   return;
+    // }
 
     if (!user) {
       dispatch(
@@ -174,7 +174,7 @@ const Verification = () => {
 
     try {
       const result = await sendOTP({
-        whatsapp: contact,
+        whatsapp: '+27726589446',
         username: user,
       }).unwrap();
 
@@ -252,37 +252,37 @@ const Verification = () => {
                 value={otp}
                 onChange={handleOTPChange}
                 maxLength={otpLength}
-                containerClassName="gap-2 items-center justify-center"
+                containerClassName="gap-1 sm:gap-2 items-center justify-center"
               >
                 <PinInput.Slot
                   index={0}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-12 sm:!w-20"
                   style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={1}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-12 sm:!w-20"
                   style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={2}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-12 sm:!w-20"
                   style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Separator className="text-[60px] text-[#D5D7DA] font-semibold" />
                 <PinInput.Slot
                   index={3}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-12 sm:!w-20"
                   style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={4}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-12 sm:!w-20"
                   style={{ color: "#1F235B !important" }}
                 />
                 <PinInput.Slot
                   index={5}
-                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-20"
+                  className="!text-[#1F235B] !ring-[#1F235B] text-[48px] !w-12 sm:!w-20"
                   style={{ color: "#1F235B !important" }}
                 />
               </PinInput.Group>
@@ -307,7 +307,7 @@ const Verification = () => {
             color="primary"
             size="lg"
             isLoading={isVerifying || isVerifyingOTP}
-            className="w-full mb-4"
+            className="w-10/12 sm:w-full mb-4"
           >
             {isVerifying || isVerifyingOTP ? "Verifying..." : "Verify Whatsapp"}
           </Button>

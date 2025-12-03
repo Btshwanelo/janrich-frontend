@@ -18,10 +18,7 @@ import "react-phone-number-input/style.css";
 import { Label } from "@/components/base/input/label";
 import { DEFAULT_COUNTRY } from "@/constants/registration";
 import { ErrorAlert } from "@/components/base/error-alert";
-import {
-  addPageError,
-  clearAllPageErrors,
-} from "@/lib/slices/errorSlice";
+import { addPageError, clearAllPageErrors } from "@/lib/slices/errorSlice";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 
 const UpdateNumberVerification = () => {
@@ -33,10 +30,12 @@ const UpdateNumberVerification = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
 
   // Get customer profile data to use existing values for update
-  const { data: profileData, isLoading: isLoadingProfile } =
-    useGetProfileQuery(customer || "", {
+  const { data: profileData, isLoading: isLoadingProfile } = useGetProfileQuery(
+    customer || "",
+    {
       skip: !customer,
-    });
+    }
+  );
 
   const [updateCustomer, { isLoading: isUpdatingCustomer }] =
     useUpdateCustomerMutation();
@@ -54,9 +53,7 @@ const UpdateNumberVerification = () => {
 
     // Validation
     if (!phoneNumber) {
-      dispatch(
-        addPageError({ message: "Please enter a phone number." })
-      );
+      dispatch(addPageError({ message: "Please enter a phone number." }));
       return;
     }
 
@@ -78,12 +75,19 @@ const UpdateNumberVerification = () => {
       // Use profile data if available, otherwise use registration data with defaults
       const basicInfo = profileData?.message?.data?.basic_info;
       const customerName = fullName || basicInfo?.customer_name || "Customer";
-      const firstName = basicInfo?.first_name || customerName.split(" ")[0] || "Customer";
-      const lastName = basicInfo?.last_name || customerName.split(" ").slice(1).join(" ") || "";
+      const firstName =
+        basicInfo?.first_name || customerName.split(" ")[0] || "Customer";
+      const lastName =
+        basicInfo?.last_name ||
+        customerName.split(" ").slice(1).join(" ") ||
+        "";
       const email = user || basicInfo?.email || "";
       const territory = basicInfo?.territory || "";
       const title = basicInfo?.salutation || "";
-      const gender = profileData?.message?.data?.about_you?.profile_gender || basicInfo?.gender || "";
+      const gender =
+        profileData?.message?.data?.about_you?.profile_gender ||
+        basicInfo?.gender ||
+        "";
       const agreeToTerms = basicInfo?.agree_to_terms ?? 1;
 
       const result = await updateCustomer({
@@ -123,7 +127,8 @@ const UpdateNumberVerification = () => {
         router.push("/verification");
       } else {
         const errorMessage =
-          result.message?.message || "Failed to update phone number. Please try again.";
+          result.message?.message ||
+          "Failed to update phone number. Please try again.";
         dispatch(addPageError({ message: errorMessage }));
         showErrorToast("Update Failed", errorMessage);
       }
@@ -154,14 +159,10 @@ const UpdateNumberVerification = () => {
         <div className="absolute inset-0 flex items-center justify-center opacity-20">
           <Circle size="lg" className="text-white" />
         </div>
-        <div className="relative z-10 max-w-md w-full flex flex-col items-center">
+        <div className="relative z-10 max-w-md w-11/12 sm:w-full flex flex-col items-center">
           {/* Envelope Icon */}
           <div className="mb-8">
-            <img
-              src="/email-icon.svg"
-              alt="Phone Icon"
-              className="w-16 h-16"
-            />
+            <img src="/email-icon.svg" alt="Phone Icon" className="w-16 h-16" />
           </div>
 
           {/* Heading */}
@@ -209,7 +210,7 @@ const UpdateNumberVerification = () => {
             color="primary"
             size="lg"
             isLoading={isUpdatingCustomer || isLoadingProfile}
-            className="w-full mb-6"
+            className="w-full mb-4"
           >
             {isUpdatingCustomer || isLoadingProfile
               ? "Updating..."
