@@ -3,48 +3,54 @@ import { Inter, Cinzel } from "next/font/google";
 import { RouteProvider } from "@/providers/route-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { ToastProvider } from "@/components/base/toast";
+import { Toaster } from "sonner";
 import "./globals.css";
 import ReduxProvider from "@/components/ReduxProvider";
 
 const inter = Inter({
-    subsets: ["latin"],
-    display: "swap",
-    variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
 });
 
 const cinzel = Cinzel({
-    subsets: ["latin"],
-    display: "swap",
-    variable: "--Font-family-font-family-display",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--Font-family-font-family-display",
 });
 
 export const metadata: Metadata = {
-    title: "JanRich Frontend",
-    description: "JanRich Frontend Application",
+  title: "JanRich Frontend",
+  description: "JanRich Frontend Application",
 };
 
 export const viewport: Viewport = {
-    colorScheme: "light",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <html lang="en" className={`${inter.variable} ${cinzel.variable} scroll-smooth`} suppressHydrationWarning>
-            <body className="bg-gray-50 antialiased">
-                <RouteProvider>
-                    <ThemeProvider>
-                        <ReduxProvider>
-                            <ToastProvider>
-                                {children}
-                            </ToastProvider>
-                        </ReduxProvider>
-                    </ThemeProvider>
-                </RouteProvider>
-            </body>
-        </html>
-    );
+  return (
+    <html
+      lang="en"
+      className={`${inter.variable} ${cinzel.variable} scroll-smooth`}
+      suppressHydrationWarning
+    >
+      <body className="bg-gray-50 antialiased">
+        <RouteProvider>
+          <ThemeProvider>
+            <ReduxProvider>
+              <ToastProvider>
+                <Toaster />
+                {children}
+              </ToastProvider>
+            </ReduxProvider>
+          </ThemeProvider>
+        </RouteProvider>
+      </body>
+    </html>
+  );
 }
