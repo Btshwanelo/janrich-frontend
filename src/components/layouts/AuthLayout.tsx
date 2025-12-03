@@ -17,17 +17,24 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 }) => {
   return (
     <div
-      className="fixed inset-0 w-full h-full flex overflow-hidden"
+      className="fixed inset-0 w-full h-full flex"
       style={{
         background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
       }}
     >
       {/* Left Panel - Form (Scrollable) */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div 
+      <div className="flex-1 flex flex-col">
+        <div
+          data-auth-scroll-container
           className="w-full h-full overflow-y-auto overflow-x-hidden"
           style={{
             background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
+            scrollBehavior: "auto",
+            scrollPadding: 0,
+          }}
+          onScroll={(e) => {
+            // Prevent programmatic scroll resets
+            e.stopPropagation();
           }}
         >
           <div className="max-w-md mx-auto py-6 sm:py-8 px-4 sm:px-0">

@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Button } from "@/components/base/buttons/button";
 import { Checkbox } from "@/components/base/checkbox/checkbox";
@@ -31,8 +31,30 @@ const RegistrationScreen = () => {
   const whatsappRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
 
   const [showPasswordChecks, setShowPasswordChecks] = useState(false);
+  const [preserveScroll, setPreserveScroll] = useState<number | null>(null);
+
+  // Store scroll position ref
+  useEffect(() => {
+    scrollContainerRef.current = document.querySelector(
+      "[data-auth-scroll-container]"
+    ) as HTMLElement;
+  }, []);
+
+  // Restore scroll position when preserveScroll is set
+  useLayoutEffect(() => {
+    if (preserveScroll !== null) {
+      const container =
+        scrollContainerRef.current ||
+        (document.querySelector("[data-auth-scroll-container]") as HTMLElement);
+      if (container) {
+        container.scrollTop = preserveScroll;
+        setPreserveScroll(null);
+      }
+    }
+  }, [preserveScroll]);
 
   const { focusNextField } = useFieldNavigation([
     nameRef,
@@ -211,31 +233,76 @@ const RegistrationScreen = () => {
                 )}
 
                 {/* Terms and Conditions */}
-                <div className="flex items-start space-x-2">
+                <div
+                  className="flex items-start space-x-2 scroll-mt-0"
+                  style={{ scrollMargin: 0 }}
+                >
                   <Field name="agreeTerms">
-                    {({ field }: any) => (
-                      <Checkbox
-                        id="agreeTerms"
-                        isSelected={field.value}
-                        onChange={(isSelected) =>
-                          setFieldValue("agreeTerms", isSelected)
-                        }
-                      />
-                    )}
+                    {({ field }: any) => {
+                      const handleCheckboxChange = (isSelected: boolean) => {
+                        // Get current scroll position BEFORE any state changes
+                        const container =
+                          scrollContainerRef.current ||
+                          (document.querySelector(
+                            "[data-auth-scroll-container]"
+                          ) as HTMLElement);
+                        const scrollTop = container?.scrollTop || 0;
+
+                        // Store scroll position to restore in useLayoutEffect
+                        setPreserveScroll(scrollTop);
+
+                        // Update the field value
+                        setFieldValue("agreeTerms", isSelected);
+                      };
+
+                      return (
+                        <div
+                          onClick={(e) => {
+                            // Prevent default scroll behavior
+                            e.stopPropagation();
+                          }}
+                          onFocus={(e) => {
+                            // Prevent scroll into view
+                            const container =
+                              scrollContainerRef.current ||
+                              (document.querySelector(
+                                "[data-auth-scroll-container]"
+                              ) as HTMLElement);
+                            if (container) {
+                              const scrollTop = container.scrollTop;
+                              setTimeout(() => {
+                                container.scrollTop = scrollTop;
+                              }, 0);
+                            }
+                          }}
+                        >
+                          <Checkbox
+                            id="agreeTerms"
+                            isSelected={field.value}
+                            onChange={handleCheckboxChange}
+                          />
+                        </div>
+                      );
+                    }}
                   </Field>
                   <Label htmlFor="agreeTerms" className="text-sm text-gray-700">
                     Count me in! I agree to JanRiches Terms and Conditions and
                     Privacy Policy
                   </Label>
                 </div>
-                <ErrorMessage
-                  name="agreeTerms"
-                  component="div"
-                  className="text-error-500 text-xs mt-0"
-                />
+                {/* Error message container with fixed height to prevent layout shift */}
+                <div className="min-h-4">
+                  <ErrorMessage
+                    name="agreeTerms"
+                    component="div"
+                    className="text-error-500 text-xs mt-0"
+                  />
+                </div>
 
-                {/* Error Message */}
-                <ErrorAlert autoClearOnUnmount={false} />
+                {/* Error Message - Reserve space to prevent layout shift */}
+                <div className="min-h-2">
+                  <ErrorAlert autoClearOnUnmount={false} />
+                </div>
 
                 {/* Submit Button */}
                 <Button
