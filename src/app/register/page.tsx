@@ -302,13 +302,13 @@ const RegistrationScreen = () => {
                   isDisabled={isLoading}
                   isLoading={isLoading}
                 >
-                  {isLoading ? "Processing..." : "Get started"}
+                  {isLoading ? "Processing..." : "Let’s do this"}
                 </Button>
 
                 {/* Login Link */}
                 <div className="text-center">
                   <p className="text-sm text-gray-600">
-                    Already have an account?{" "}
+                    Already one of us?{" "}
                     <a
                       href="/login"
                       className="text-[#E31B54] hover:text-primary-600 font-medium"
