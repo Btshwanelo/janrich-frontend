@@ -37,7 +37,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             e.stopPropagation();
           }}
         >
-          <div className="max-w-md mx-auto py-6 sm:py-8 px-4 sm:px-0">
+          <div className="max-w-md mx-1 sm:mx-auto py-6 sm:py-8 sm:px-0">
             <div className="text-center relative mb-4">
               <div className="mb-4">
                 <img

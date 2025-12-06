@@ -40,6 +40,7 @@ export interface OnboardingState {
   isCompleted: boolean;
   isLoading: boolean;
   error: string | null;
+  savingGoal: number | null;
   // Onboarding flow state
   flow: OnboardingFlowState;
 }
@@ -60,6 +61,7 @@ const initialState: OnboardingState = {
   isLoading: false,
   error: null,
   flow: initialFlowState,
+  savingGoal: null,
 };
 
 // Onboarding API slice
@@ -109,6 +111,7 @@ const onboardingSlice = createSlice({
       state.customer = null;
       state.age = null;
       state.isCompleted = false;
+      state.savingGoal = null;
       state.error = null;
       state.flow = initialFlowState;
     },
@@ -151,6 +154,9 @@ const onboardingSlice = createSlice({
     resetOnboardingFlow: (state) => {
       state.flow = initialFlowState;
     },
+    setOnboardingGoal: (state, action) => {
+      state.savingGoal = action.payload.goal;
+    },
     updateOnboardingFlow: (
       state,
       action: PayloadAction<Partial<OnboardingFlowState>>
@@ -176,6 +182,7 @@ export const {
   completeOnboarding,
   resetOnboardingFlow,
   updateOnboardingFlow,
+  setOnboardingGoal,
 } = onboardingSlice.actions;
 
 export default onboardingSlice.reducer;

@@ -9,7 +9,7 @@ import { InputGroup } from "@/components/base/input/input-group";
 import { InputBase } from "@/components/base/input/input";
 import { HelpCircle } from "@untitledui/icons";
 import { amountConversion } from "@/utils/amountConversion";
-import { X } from "lucide-react";
+import { OnboardingHeader } from "@/components/onboarding";
 import { useOnboardingFlow } from "@/utils/onboardingState";
 import { useUpdateSavingsGoalMutation } from "@/lib/slices/authSlice";
 import { useSuccessToast, useErrorToast } from "@/components/base/toast";
@@ -119,18 +119,7 @@ export default function GoalPage() {
         }}
       >
         <div className="w-full">
-          <div className="mb-6">
-            <div className="border-b border-[#E9EAEB] px-8 py-2 flex bg-white justify-between">
-              <img
-                src="/jr-logo-black.svg"
-                alt="JanRich Logo"
-                className=" w-[37px] h-auto"
-              />
-              <Button color="link-gray">
-                <X />
-              </Button>
-            </div>
-          </div>
+          <OnboardingHeader />
           {/* Header */}
           <div className="text-center relative mb-6">
             {/* Progress Steps */}

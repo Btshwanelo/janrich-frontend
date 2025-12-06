@@ -51,6 +51,12 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
       isVerificationComplete &&
       !flow.isOnboardingComplete
     ) {
+      console.log("flow.isOnboardingComplete", {
+        isLoading,
+        isAuthenticated,
+        isVerificationComplete,
+        flow,
+      });
       const nextStep = getNextOnboardingStep(flow);
 
       // Define the routes for each onboarding step
@@ -79,8 +85,11 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
           "/payment-success",
           "/payment-cancelled",
         ];
-        
-        if (allowedRoutes.includes(pathname) || pathname.startsWith("/payment")) {
+
+        if (
+          allowedRoutes.includes(pathname) ||
+          pathname.startsWith("/payment")
+        ) {
           // Allow these routes to render, don't redirect
           return;
         }
@@ -170,7 +179,7 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
       "/payment-success",
       "/payment-cancelled",
     ];
-    
+
     // Check if we're on an allowed route or the target onboarding route
     if (
       allowedRoutes.includes(pathname) ||

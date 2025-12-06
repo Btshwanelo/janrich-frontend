@@ -65,7 +65,7 @@ export default function WelcomePage() {
       <div
         className="min-h-screen "
         style={{
-          background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
+          background: "linear-gradient(65deg, #9bbaf9 0%, #f7f7f7 65%)",
         }}
       >
         {/* Header/Hero Section with Gradient Background */}
@@ -112,7 +112,7 @@ export default function WelcomePage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto mt-2">
+        <div className="max-w-7xl mx-4 sm:mx-auto  mt-2">
           {/* JanRiches Member Details Section */}
           <div className="bg-[#1F235B] max-w-[616px] mx-auto rounded-lg p-6 sm:p-8 mb-3 justify-center align-middle text-center text-white">
             <h2 className="text-lg sm:text-xl font-semibold mb-2">
@@ -160,10 +160,10 @@ export default function WelcomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 py-10 px-5 gap-8 mb-12 bg-white">
             {/* Left Column */}
             <div className="flex flex-col items-start col-span-1">
-              <div className="mb-6">
-                <Zap className="w-12 h-12 sm:w-16 sm:h-16 text-[#1F235B] mb-4" />
+              <div className="mb-2">
+                <img src="/blaze-icon.svg" />
               </div>
-              <h2 className="text-2xl sm:text-3xl font-cinzel text-[#181D27] mb-4">
+              <h2 className="text-2xl sm:text-3xl font-cinzel text-[#181D27] mb-2">
                 HERE'S WHAT YOU CAN DO NOW
               </h2>
               <p className="text-base sm:text-lg text-[#535862] leading-relaxed">
@@ -177,15 +177,15 @@ export default function WelcomePage() {
               {/* Pay yourself first */}
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
-                    <Coins className="w-6 h-6 text-[#1F235B]" />
+                  <div className="">
+                    <img src="/bank-note-icon.svg" />
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#181D27] mb-1">
+                <div className="mt-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-[#181D27] mb-1">
                     Pay yourself first!
                   </h3>
-                  <p className="text-base text-[#535862]">
+                  <p className="text-sm sm:text-base text-[#535862]">
                     Use the bank details above to make your first deposit
                   </p>
                 </div>
@@ -193,16 +193,16 @@ export default function WelcomePage() {
 
               {/* Track Progress */}
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 ">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
-                    <BarChart3 className="w-6 h-6 text-[#1F235B]" />
+                <div className="flex-shrink-0 mt-1">
+                  <div className="">
+                    <img src="/track.svg" />
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#181D27] mb-1">
+                <div className="mt-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-[#181D27] mb-1">
                     Track Progress
                   </h3>
-                  <p className="text-base text-[#535862]">
+                  <p className="text-sm sm:text-base text-[#535862]">
                     Track your progress and watch your pot grow
                   </p>
                 </div>
@@ -211,15 +211,15 @@ export default function WelcomePage() {
               {/* Celebrate Wins */}
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
-                    <Trophy className="w-6 h-6 text-[#1F235B]" />
+                  <div className="">
+                    <img src="/cup-icon.svg" />
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#181D27] mb-1">
+                <div className="mt-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-[#181D27] mb-1">
                     Celebrate Wins
                   </h3>
-                  <p className="text-base text-[#535862]">
+                  <p className="text-sm sm:text-base text-[#535862]">
                     Celebrate your wins (and brag a little)
                   </p>
                 </div>
@@ -228,15 +228,15 @@ export default function WelcomePage() {
               {/* Repeat */}
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
-                    <RefreshCw className="w-6 h-6 text-[#1F235B]" />
+                  <div className="">
+                    <img src="/recycle-icon.svg" />
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#181D27] mb-1">
+                <div className="mt-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-[#181D27] mb-1">
                     Repeat!
                   </h3>
-                  <p className="text-base text-[#535862]">
+                  <p className="text-sm sm:text-base text-[#535862]">
                     Repeat! Because consistency = stress-free Januarys
                   </p>
                 </div>
@@ -245,17 +245,17 @@ export default function WelcomePage() {
           </div>
 
           {/* "We've Been Mentioned in the Press" Section */}
-          <div className="mb-12 max-w-[616px] mx-auto">
+          <div className="mb-12 max-w-[616px] px-6 mx-auto">
             <h2 className="text-base text-[#535862] mb-6 text-center">
               We've been mentioned in the press
             </h2>
             <div className="flex flex-col gap-8">
               {/* Placeholder for media logos - these would typically be actual logo images */}
-              <div className="flex gap-6 justify-center">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 justify-center">
                 <img src="/washinton-post.svg" alt="one" />
                 <img src="/tech-crunch.svg" alt="one" />
               </div>
-              <div className="flex gap-6 justify-center">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 justify-center">
                 <img src="/bloomberg.svg" alt="one" />
                 <img src="/gizmodo.svg" alt="one" />
                 <img src="/forbes.svg" alt="one" />

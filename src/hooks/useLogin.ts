@@ -67,7 +67,6 @@ export const useLogin = () => {
         );
         // Reset onboarding flow and set isOnboardingComplete to false for new logins
         dispatch(resetOnboardingFlow());
-        dispatch(startOnboarding()); // This sets isOnboardingComplete to false
         // Set authentication cookie
         setAuthCookie(true);
 

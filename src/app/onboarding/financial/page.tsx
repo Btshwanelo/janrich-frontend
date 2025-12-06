@@ -8,8 +8,8 @@ import AuthGuard from "@/components/AuthGuard";
 import { Select } from "@/components/base/select/select";
 import { Input } from "@/components/base/input/input";
 import { Slider } from "@/components/base/slider/slider";
-import { X } from "lucide-react";
 import { amountConversion } from "@/utils/amountConversion";
+import { OnboardingHeader } from "@/components/onboarding/OnboardingHeader";
 import {
   EMPLOYMENT_STATUS_OPTIONS,
   DEPOSIT_FREQUENCY_OPTIONS,
@@ -25,6 +25,7 @@ import { useAppSelector } from "@/lib/hooks";
 export default function FinancialPage() {
   const router = useRouter();
   const { customer, fullName } = useAppSelector((state) => state.auth);
+  const { savingGoal } = useAppSelector((state) => state.onboarding);
   const { markFinancialCompleted } = useOnboardingFlow();
   const [amount, setAmount] = useState([350000]);
   const [savingFor, setSavingFor] = useState<string | null>(null);
@@ -104,12 +105,15 @@ export default function FinancialPage() {
           FUND_SOURCE_OPTIONS
         ),
         custom_fund_source_other: "", // Optional field
-        custom_saving_for: mapSelectKeyToApiValue(savingFor, SAVING_FOR_OPTIONS),
+        custom_saving_for: mapSelectKeyToApiValue(
+          savingFor,
+          SAVING_FOR_OPTIONS
+        ),
         custom_saving_for_other: "", // Optional field
         custom_account_holder: fullName || accountNumber || "", // Use customer name or account number as fallback
         custom_branch_code: "", // Default empty, can be added later if needed
         custom_iban_account: accountNumber,
-        custom_annual_savings_goal: amount[0] || 0,
+        // custom_annual_savings_goal: amount[0] || 0,
         custom_household_size: 1, // Default to 1, can be added later if needed
         custom_pay_day: parseInt(payDay) || 1,
       };
@@ -153,25 +157,14 @@ export default function FinancialPage() {
   return (
     <AuthGuard>
       <div
-        className="min-h-screen flex justify-center"
+        className="min-h-screen flex pb-4 justify-center"
         style={{
           background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
         }}
       >
         <div className="w-full ">
           {/* Header with Logo and Close */}
-          <div className="mb-6">
-            <div className="border-b border-[#E9EAEB] px-8 py-2 flex bg-white justify-between">
-              <img
-                src="/jr-logo-black.svg"
-                alt="JanRich Logo"
-                className="w-[37px] h-auto"
-              />
-              <Button color="link-gray" onClick={handleCancel}>
-                <X />
-              </Button>
-            </div>
-          </div>
+          <OnboardingHeader />
 
           {/* Progress Steps */}
           <div className="text-center mb-6">
@@ -187,9 +180,9 @@ export default function FinancialPage() {
           </div>
 
           {/* Main Card */}
-          <div className="bg-white max-w-3xl mx-auto rounded-2xl p-6 shadow-lg">
+          <div className="bg-white max-w-3xl mx-4 sm:mx-auto rounded-2xl p-6  shadow-lg">
             {/* Savings Goal Section with Blue Gradient */}
-            <div className="relative h-48 w-full p-6 mb-6 rounded-lg overflow-hidden">
+            <div className="relative h-32 sm:h-48 w-full p-6 mb-6 rounded-lg overflow-hidden">
               <div className="absolute inset-0">
                 <img
                   src="/profile-bg.png"
@@ -197,11 +190,11 @@ export default function FinancialPage() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="relative z-10 h-full flex flex-col justify-between">
+              <div className="relative z-10 h-full flex flex-col gap-6 sm:gap-10">
                 <span className="text-base text-white">I want to save</span>
                 <div className="text-center">
-                  <p className="text-5xl sm:text-6xl font-bold font-cinzel text-white mb-4">
-                    {amountConversion(amount[0] || 0)}
+                  <p className="text-3xl sm:text-6xl font-bold font-cinzel text-white mb-2">
+                    {amountConversion(savingGoal || 0)}
                   </p>
                   {/* <div className="mb-2 [&_.bg-brand-solid]:bg-[#E31B54] [&_.ring-\\[\\#1F235B\\]]:ring-[#E31B54] [&_.text-\\[\\#E31B54\\]]:text-[#E31B54] [&_.bg-slider-handle-bg]:bg-white">
                     <Slider

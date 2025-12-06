@@ -10,7 +10,7 @@ import { Input } from "@/components/base/input/input";
 import { Label } from "@/components/base/input/label";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { X } from "lucide-react";
+import { OnboardingHeader } from "@/components/onboarding";
 import {
   BENEFICIARY_TYPE_OPTIONS,
   RELATION_OPTIONS,
@@ -136,25 +136,14 @@ export default function BeneficiaryPage() {
   return (
     <AuthGuard>
       <div
-        className="min-h-screen flex justify-center"
+        className="min-h-screen flex pb-4 justify-center"
         style={{
           background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
         }}
       >
         <div className="w-full">
           {/* Header with Logo and Close */}
-          <div className="mb-6">
-            <div className="border-b border-[#E9EAEB] px-8 py-2 flex bg-white justify-between">
-              <img
-                src="/jr-logo-black.svg"
-                alt="JanRich Logo"
-                className="w-[37px] h-auto"
-              />
-              <Button color="link-gray" onClick={handleCancel}>
-                <X />
-              </Button>
-            </div>
-          </div>
+          <OnboardingHeader />
 
           {/* Progress Steps */}
           <div className="text-center mb-6">
@@ -170,8 +159,8 @@ export default function BeneficiaryPage() {
           </div>
 
           {/* Title and Description */}
-          <div className="mb-6 max-w-3xl mx-auto">
-            <div className="max-w-[280px]">
+          <div className="mb-6 max-w-3xl mx-4 sm:mx-auto ">
+            <div className="max-w-[280px] px-2">
               <h2 className="text-base font-semibold text-[#414651] mb-2">
                 Beneficiary Details
               </h2>
@@ -182,7 +171,7 @@ export default function BeneficiaryPage() {
             </div>
           </div>
           {/* Main Card */}
-          <div className="bg-white max-w-3xl mx-auto rounded-2xl p-6 shadow-lg">
+          <div className="bg-white max-w-3xl mx-4 sm:mx-auto rounded-2xl p-6 shadow-lg">
             {/* Form Fields */}
             <div className="space-y-4">
               {/* Beneficiary Title - Full width */}
@@ -208,7 +197,7 @@ export default function BeneficiaryPage() {
                   </Select>
                 </div>
                 <Select
-                  label="What do we call you?"
+                  label="Title"
                   placeholder="Select an option"
                   items={TITLE_OPTIONS}
                   className="w-full"

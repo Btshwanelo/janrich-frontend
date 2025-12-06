@@ -9,18 +9,21 @@ import { InputGroup } from "@/components/base/input/input-group";
 import { InputBase } from "@/components/base/input/input";
 import { HelpCircle } from "@untitledui/icons";
 import { amountConversion } from "@/utils/amountConversion";
-import { X } from "lucide-react";
+import { OnboardingHeader } from "@/components/onboarding";
 import { useOnboardingFlow } from "@/utils/onboardingState";
 import { useUpdateSavingsGoalMutation } from "@/lib/slices/authSlice";
 import { useSuccessToast, useErrorToast } from "@/components/base/toast";
 import { useAppSelector } from "@/lib/hooks";
 import { NativeSelect } from "@/components/base/select/select-native";
+import { setOnboardingGoal } from "@/lib/slices/onboardingSlice";
+import { useDispatch } from "react-redux";
 
 export default function GoalPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { customer } = useAppSelector((state) => state.auth);
   const { markGoalCompleted } = useOnboardingFlow();
-  const [amount, setAmount] = useState("15 000");
+  const [amount, setAmount] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const minAmount = 500;
   const maxAmount = 5000000;
@@ -74,6 +77,7 @@ export default function GoalPage() {
         customer_id: customer,
         annual_savings_goal: numericValue,
       }).unwrap();
+      dispatch(setOnboardingGoal({ goal: numericValue }));
 
       // Mark goal as completed in onboarding state
       markGoalCompleted();
@@ -115,22 +119,11 @@ export default function GoalPage() {
       <div
         className="min-h-screen flex justify-center"
         style={{
-          background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
+          background: "linear-gradient(65deg, #9bbaf9 0%, #f7f7f7 65%)",
         }}
       >
         <div className="w-full">
-          <div className="mb-6">
-            <div className="border-b border-[#E9EAEB] px-8 py-2 flex bg-white justify-between">
-              <img
-                src="/jr-logo-black.svg"
-                alt="JanRich Logo"
-                className=" w-[37px] h-auto"
-              />
-              <Button color="link-gray">
-                <X />
-              </Button>
-            </div>
-          </div>
+          <OnboardingHeader />
           {/* Header */}
           <div className="text-center relative mb-6">
             {/* Progress Steps */}
@@ -151,7 +144,7 @@ export default function GoalPage() {
           </div>
 
           {/* Goal Card */}
-          <div className="bg-white  max-w-md mx-auto rounded-2xl p-6 shadow-lg">
+          <div className="bg-white  max-w-md mx-4 sm:mx-auto rounded-2xl p-6 shadow-lg">
             {/* Title */}
             <div className="flex  items-center justify-center mb-6">
               <h2 className="text-xl font-semibold text-center text-[#181D27]">

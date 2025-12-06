@@ -59,8 +59,10 @@ const Dashboard = () => {
     }
   }, [dataLedger, dispatch]);
 
-  const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
+  const savingsGoal = data?.message?.data?.financials?.annual_savings_goal;
   const transactions: Transaction[] = dataLedger?.message?.data || [];
+
+  console.log("savingsGoal", savingsGoal);
 
   // If savings goal is 0, set isOnboardingComplete to false and redirect to welcome
   useEffect(() => {
