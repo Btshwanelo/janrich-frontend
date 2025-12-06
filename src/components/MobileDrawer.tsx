@@ -81,7 +81,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
               }`}
             >
               <Home className="w-5 h-5" />
-              <span>Dashboard</span>
+              <span>My Savings</span>
             </a>
             {/* <a
               href="#"
@@ -105,7 +105,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
               }`}
             >
               <Users className="w-5 h-5" />
-              <span>Community</span>
+              <span>Group Savings</span>
             </a>
             {/* <a
               href="#"

@@ -58,7 +58,7 @@ const PaymentSuccessPage = () => {
               Payment Successful
             </h1>
             <p className="text-text text-base leading-relaxed">
-              Congratulations your Jan riches account has been successfully
+              Congratulations your Janriches account has been successfully
               created.
             </p>
           </div>
