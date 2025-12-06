@@ -157,7 +157,7 @@ export default function WelcomePage() {
           </div>
 
           {/* "Here's What You Can Do Now" Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 py-10 px-5 gap-8 mb-12 bg-white">
+          <div className="grid grid-cols-1 lg:grid-cols-3 py-10 px-5 gap-8 mb-12 mx-4 bg-white">
             {/* Left Column */}
             <div className="flex flex-col items-start col-span-1">
               <div className="mb-2">

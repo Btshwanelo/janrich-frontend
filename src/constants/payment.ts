@@ -24,7 +24,7 @@ export const PAYMENT_PLANS = {
 export const PAYFAST_CONFIG = {
   merchant_id: "10038198",
   merchant_key: "8yshtxb2mu1oa",
-  return_url: "/payment-success",
+  return_url: "/welcome",
   cancel_url: "/payment-cancelled",
   notify_url: "/api/payfast-notify",
   sandbox: true, // Sandbox mode for testing
@@ -33,8 +33,3 @@ export const PAYFAST_CONFIG = {
 } as const;
 
 export type PaymentPlanType = keyof typeof PAYMENT_PLANS;
-
-
-
-
-
