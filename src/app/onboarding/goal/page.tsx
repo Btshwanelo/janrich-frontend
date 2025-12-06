@@ -7,7 +7,7 @@ import CircularProgressStep from "@/components/CircularProgressStep";
 import AuthGuard from "@/components/AuthGuard";
 import { InputGroup } from "@/components/base/input/input-group";
 import { InputBase } from "@/components/base/input/input";
-import { HelpCircle } from "@untitledui/icons";
+import { HelpCircle, Mail01 } from "@untitledui/icons";
 import { amountConversion } from "@/utils/amountConversion";
 import { OnboardingHeader } from "@/components/onboarding";
 import { useOnboardingFlow } from "@/utils/onboardingState";
@@ -25,6 +25,9 @@ export default function GoalPage() {
   const { markGoalCompleted } = useOnboardingFlow();
   const [amount, setAmount] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
   const minAmount = 500;
   const maxAmount = 5000000;
 
@@ -34,6 +37,11 @@ export default function GoalPage() {
   const showErrorToast = useErrorToast();
 
   const handleAmountChange = (value: string) => {
+    // Clear error when user starts typing
+    if (errorMessage) {
+      setErrorMessage(undefined);
+    }
+
     // Ensure value is a string, convert if needed
     const stringValue = typeof value === "string" ? value : String(value || "");
 
@@ -57,9 +65,27 @@ export default function GoalPage() {
     const numericValue = parseInt(amount.replace(/\s/g, ""), 10);
 
     // Validate amount
-    if (numericValue < minAmount || numericValue > maxAmount) {
+    if (!numericValue || isNaN(numericValue)) {
+      setErrorMessage("Please enter a savings goal amount.");
       return;
     }
+
+    if (numericValue < minAmount) {
+      setErrorMessage(
+        `The minimum savings goal is ${amountConversion(minAmount, "R")}.`
+      );
+      return;
+    }
+
+    if (numericValue > maxAmount) {
+      setErrorMessage(
+        `The maximum savings goal is ${amountConversion(maxAmount, "R")}.`
+      );
+      return;
+    }
+
+    // Clear any previous error
+    setErrorMessage(undefined);
 
     if (!customer) {
       showErrorToast(
@@ -162,10 +188,14 @@ export default function GoalPage() {
             {/* Input Field */}
             <div className="mb-4">
               <InputGroup
-                prefix="ZAR"
+                // prefix="ZAR"
+                // icon={Mail01}
+                leadingAddon={<InputGroup.Prefix>ZAR</InputGroup.Prefix>}
                 size="md"
                 value={amount}
                 onChange={handleAmountChange}
+                isInvalid={!!errorMessage}
+                hint={errorMessage}
               >
                 <InputBase
                   type="text"
@@ -188,13 +218,7 @@ export default function GoalPage() {
               color="primary"
               size="md"
               className="w-full bg-[#1F235B] hover:bg-[#1F235B]/90"
-              isDisabled={
-                numericValue < minAmount ||
-                numericValue > maxAmount ||
-                !numericValue ||
-                isSaving ||
-                isUpdatingGoal
-              }
+              isDisabled={isSaving || isUpdatingGoal}
               isLoading={isSaving || isUpdatingGoal}
             >
               {isSaving || isUpdatingGoal
