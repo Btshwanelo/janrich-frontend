@@ -1,5 +1,4 @@
 import { useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   useLoginMutation,
@@ -9,7 +8,10 @@ import {
 } from "@/lib/slices/authSlice";
 import { addPageError, clearAllPageErrors } from "@/lib/slices/errorSlice";
 import { extractErrorMessage } from "@/utils/errorHelpers";
-import { resetOnboardingFlow } from "@/lib/slices/onboardingSlice";
+import {
+  resetOnboardingFlow,
+  startOnboarding,
+} from "@/lib/slices/onboardingSlice";
 
 export interface LoginFormValues {
   email: string;
@@ -19,8 +21,8 @@ export interface LoginFormValues {
 
 export const useLogin = () => {
   const dispatch = useAppDispatch();
-  const router = useRouter();
-  const { isLoading } = useAppSelector((state) => state.auth);
+  const { isLoading, isVerificationComplete: currentVerificationStatus } =
+    useAppSelector((state) => state.auth);
   const [login, { isLoading: isLoginLoading }] = useLoginMutation();
 
   // Clear errors on mount
@@ -40,7 +42,19 @@ export const useLogin = () => {
           password: values.password,
         }).unwrap();
 
+        console.log("results:", {
+          user: result.message.user,
+          sid: result.message.sid,
+          fullName: result.full_name,
+          homePage: result.home_page,
+          customer: result.message.customer.name,
+        });
+
         // Dispatch credentials to Redux store
+        // For regular logins, preserve existing verification status from persisted state
+        // If no persisted state, default to true (existing users are typically verified)
+        // For new registrations, this will be explicitly set to false in useRegistration
+        const isVerified = true;
         dispatch(
           setCredentials({
             user: result.message.user,
@@ -48,18 +62,19 @@ export const useLogin = () => {
             fullName: result.full_name,
             homePage: result.home_page,
             customer: result.message.customer.name,
+            isVerificationComplete: isVerified,
           })
         );
-
-        // Don't reset onboarding flow on login - let it persist
-        // The profile page will sync completion state based on actual data
-        // Only reset if this is truly a first-time user (we'll check savings goal in dashboard)
+        // Reset onboarding flow and set isOnboardingComplete to false for new logins
         dispatch(resetOnboardingFlow());
+        dispatch(startOnboarding()); // This sets isOnboardingComplete to false
         // Set authentication cookie
         setAuthCookie(true);
 
-        // Redirect to dashboard
-        router.push("/dashboard");
+        // Redirect based on verification status
+        // If not verified, redirect to verification page, otherwise to dashboard
+        const redirectPath = isVerified ? "/dashboard" : "/verification";
+        window.location.href = redirectPath;
       } catch (error: unknown) {
         const errorMessage = extractErrorMessage(
           error,
@@ -70,7 +85,7 @@ export const useLogin = () => {
         dispatch(setLoading(false));
       }
     },
-    [dispatch, login, router]
+    [dispatch, login]
   );
 
   return {

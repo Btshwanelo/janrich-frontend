@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { useAppSelector } from "@/lib/hooks";
 
 interface PublicRouteGuardProps {
@@ -15,14 +15,45 @@ export default function PublicRouteGuard({
   fallback,
   redirectTo = "/dashboard",
 }: PublicRouteGuardProps) {
-  const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, isVerificationComplete, isLoading } = useAppSelector(
+    (state) => state.auth
+  );
   const router = useRouter();
+  const pathname = usePathname();
+  const hasRedirectedRef = useRef(false);
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.push(redirectTo);
+    // Reset redirect flag when authentication state changes
+    if (isLoading) {
+      hasRedirectedRef.current = false;
+      return;
     }
-  }, [isAuthenticated, isLoading, router, redirectTo]);
+
+    // Don't redirect if we're on register page - let the registration hook handle the redirect
+    // This prevents the login screen from flashing before redirecting to verification
+    if (pathname === "/register") {
+      return;
+    }
+
+    if (!isLoading && isAuthenticated && !hasRedirectedRef.current) {
+      // If not verified, redirect to verification page
+      if (!isVerificationComplete) {
+        // Only redirect if not already on verification page
+        if (pathname !== "/verification" && !pathname.startsWith("/verification/")) {
+          hasRedirectedRef.current = true;
+          // Use window.location for full page reload to ensure state is properly read
+          window.location.href = "/verification";
+        }
+      } else {
+        // If verified, redirect to the specified redirectTo (default: dashboard)
+        // Only redirect if not already on the target route
+        if (pathname !== redirectTo) {
+          hasRedirectedRef.current = true;
+          router.push(redirectTo);
+        }
+      }
+    }
+  }, [isAuthenticated, isVerificationComplete, isLoading, router, redirectTo, pathname]);
 
   // // Show loading state while checking authentication
   // if (isLoading) {

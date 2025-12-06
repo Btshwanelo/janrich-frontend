@@ -12,7 +12,9 @@ interface AuthGuardProps {
 }
 
 export default function AuthGuard({ children, fallback }: AuthGuardProps) {
-  const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, isVerificationComplete, isLoading } = useAppSelector(
+    (state) => state.auth
+  );
   const flow = useAppSelector((state) => state.onboarding.flow);
   const router = useRouter();
   const pathname = usePathname();
@@ -27,12 +29,30 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
     }
   }, [isAuthenticated, isLoading]);
 
+  // Redirect to verification if authenticated but not verified
+  useEffect(() => {
+    if (
+      !isLoading &&
+      isAuthenticated &&
+      !isVerificationComplete &&
+      pathname !== "/verification" &&
+      !pathname.startsWith("/verification/")
+    ) {
+      router.push("/verification");
+    }
+  }, [isLoading, isAuthenticated, isVerificationComplete, router, pathname]);
+
   // Handle onboarding flow redirection
   useEffect(() => {
-    // Only check onboarding if user is authenticated and not loading
-    if (!isLoading && isAuthenticated && !flow.isOnboardingComplete) {
+    // Only check onboarding if user is authenticated, verified, and not loading
+    if (
+      !isLoading &&
+      isAuthenticated &&
+      isVerificationComplete &&
+      !flow.isOnboardingComplete
+    ) {
       const nextStep = getNextOnboardingStep(flow);
-      
+
       // Define the routes for each onboarding step
       const onboardingRoutes: Record<string, string> = {
         welcome: "/welcome",
@@ -47,18 +67,43 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
       // This prevents redirect loops
       if (targetRoute && pathname !== targetRoute) {
         // Check if current path is an onboarding-related route
-        const isOnboardingRoute = 
+        const isOnboardingRoute =
+          pathname === "/onboarding" ||
           pathname.startsWith("/welcome") ||
           pathname.startsWith("/onboarding/");
 
+        // Don't redirect from payment routes or /onboarding - they're part of the flow
+        const allowedRoutes = [
+          "/onboarding",
+          "/payment",
+          "/payment-success",
+          "/payment-cancelled",
+        ];
+        
+        if (allowedRoutes.includes(pathname) || pathname.startsWith("/payment")) {
+          // Allow these routes to render, don't redirect
+          return;
+        }
+
         // If we're on an onboarding route but not the correct one, redirect
         // If we're on a protected route (like /dashboard), redirect to onboarding
-        if (isOnboardingRoute || pathname.startsWith("/dashboard") || pathname.startsWith("/profile")) {
+        if (
+          isOnboardingRoute ||
+          pathname.startsWith("/dashboard") ||
+          pathname.startsWith("/profile")
+        ) {
           router.push(targetRoute);
         }
       }
     }
-  }, [isLoading, isAuthenticated, flow, router, pathname]);
+  }, [
+    isLoading,
+    isAuthenticated,
+    isVerificationComplete,
+    flow,
+    router,
+    pathname,
+  ]);
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -79,7 +124,26 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
         <div className="flex w-screen h-screen items-center justify-center  mt-16 lg:mt-0">
           <div className="text-center flex flex-col justify-cente align-middle items-center">
             <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-            <p className="text-gray-600">Redirecting...</p>
+            {/* <p className="text-gray-600">Redirecting...</p> */}
+          </div>
+        </div>
+      )
+    );
+  }
+
+  // If authenticated but not verified, show loading while redirecting
+  // But only if we're not already on the verification page
+  if (
+    !isVerificationComplete &&
+    pathname !== "/verification" &&
+    !pathname.startsWith("/verification/")
+  ) {
+    return (
+      fallback || (
+        <div className="flex w-screen h-screen items-center justify-center  mt-16 lg:mt-0">
+          <div className="text-center flex flex-col justify-cente align-middle items-center">
+            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+            {/* <p className="text-gray-600">Redirecting to verification...</p> */}
           </div>
         </div>
       )
@@ -87,7 +151,8 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
   }
 
   // If authenticated but onboarding not complete, show loading while redirecting
-  if (!flow.isOnboardingComplete) {
+  // But only if verification is complete (don't show onboarding message on verification page)
+  if (!flow.isOnboardingComplete && isVerificationComplete) {
     const nextStep = getNextOnboardingStep(flow);
     const onboardingRoutes: Record<string, string> = {
       welcome: "/welcome",
@@ -97,8 +162,21 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
     };
     const targetRoute = onboardingRoutes[nextStep];
 
-    // If we're already on the target route, render children (allow the onboarding page to render)
-    if (targetRoute && pathname === targetRoute) {
+    // Allow certain routes to render even if onboarding is not complete
+    // These routes are part of the onboarding/payment flow
+    const allowedRoutes = [
+      "/onboarding",
+      "/payment",
+      "/payment-success",
+      "/payment-cancelled",
+    ];
+    
+    // Check if we're on an allowed route or the target onboarding route
+    if (
+      allowedRoutes.includes(pathname) ||
+      pathname.startsWith("/payment") ||
+      (targetRoute && pathname === targetRoute)
+    ) {
       return <>{children}</>;
     }
 
@@ -108,7 +186,7 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
         <div className="flex w-screen h-screen items-center justify-center  mt-16 lg:mt-0">
           <div className="text-center flex flex-col justify-cente align-middle items-center">
             <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-            <p className="text-gray-600">Redirecting to onboarding...</p>
+            {/* <p className="text-gray-600">Redirecting to onboarding...</p> */}
           </div>
         </div>
       )

@@ -12,7 +12,7 @@ import {
 import { addPageError, clearAllPageErrors } from "@/lib/slices/errorSlice";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { DEFAULT_COUNTRY_CODE } from "@/constants/registration";
-import { resetOnboardingFlow } from "@/lib/slices/onboardingSlice";
+import { resetOnboardingFlow, startOnboarding } from "@/lib/slices/onboardingSlice";
 
 export interface RegistrationFormValues {
   name: string;
@@ -78,6 +78,7 @@ export const useRegistration = () => {
         const result = await login(loginCredentials).unwrap();
 
         // Dispatch credentials to Redux store
+        // Set isVerificationComplete to false for new registrations
         dispatch(
           setCredentials({
             user: result.message.user,
@@ -85,12 +86,17 @@ export const useRegistration = () => {
             fullName: result.full_name,
             homePage: result.home_page,
             customer: result.message.customer.name,
+            isVerificationComplete: false, // New registrations need verification
           })
         );
 
-        // Use window.location for more reliable redirect after state update
-        // This ensures the redirect happens before PublicRouteGuard can interfere
-        // Small delay to ensure Redux state and cookie are updated
+        // Reset onboarding flow and set isOnboardingComplete to false for new registrations
+        dispatch(resetOnboardingFlow());
+        dispatch(startOnboarding()); // This sets isOnboardingComplete to false
+
+        // Use window.location for immediate redirect to verification
+        // This forces a full page reload, ensuring middleware and guards see the updated state
+        // Small delay to ensure Redux state is persisted to localStorage before redirect
         setTimeout(() => {
           window.location.href = "/verification";
         }, 100);

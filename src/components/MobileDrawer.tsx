@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 import { clearAuthCookie, clearCredentials } from '@/lib/slices/authSlice'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from './base/buttons/button'
+import { clearOnboardingData } from '@/lib/slices/onboardingSlice'
 
 interface MobileDrawerProps {
   isOpen: boolean
@@ -17,11 +18,13 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
   const router = useRouter()
   const pathname = usePathname()
 
+
   const handleLogout = () => {
-    dispatch(clearCredentials())
-    clearAuthCookie()
-    router.push("/login")
-  }
+    dispatch(clearCredentials());
+    dispatch(clearOnboardingData());
+    clearAuthCookie();
+    router.push("/login");
+  };
 
   const handleLinkClick = () => {
     onClose()

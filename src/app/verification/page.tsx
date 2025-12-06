@@ -11,6 +11,7 @@ import AuthGuard from "@/components/AuthGuard";
 import {
   useSendWhatsappOTPMutation,
   useVerifyRegistrationOTPMutation,
+  setVerificationComplete,
 } from "@/lib/slices/authSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { ErrorAlert } from "@/components/base/error-alert";
@@ -114,6 +115,9 @@ const Verification = () => {
       }).unwrap();
 
       if (result.message?.result === "success") {
+        // Mark verification as complete
+        dispatch(setVerificationComplete());
+        
         showSuccessToast(
           "Verification Successful!",
           "Your WhatsApp number has been successfully verified.",

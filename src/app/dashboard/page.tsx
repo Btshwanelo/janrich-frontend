@@ -25,6 +25,7 @@ import { useSavingsModal } from "@/hooks/useSavingsModal";
 import { Transaction } from "@/types/dashboard";
 import { DASHBOARD_CONSTANTS } from "@/constants/dashboard";
 import { getMonthsRemainingInYear } from "@/utils/dateUtils";
+import { startOnboarding } from "@/lib/slices/onboardingSlice";
 
 const Dashboard = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -60,6 +61,14 @@ const Dashboard = () => {
 
   const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
   const transactions: Transaction[] = dataLedger?.message?.data || [];
+
+  // If savings goal is 0, set isOnboardingComplete to false and redirect to welcome
+  useEffect(() => {
+    if (!isProfileLoading && data && savingsGoal === 0) {
+      dispatch(startOnboarding()); // This sets isOnboardingComplete to false
+      router.push("/welcome");
+    }
+  }, [savingsGoal, isProfileLoading, data, dispatch, router]);
 
   // Handle deposit modal close
   const handleDepositModalClose = () => {

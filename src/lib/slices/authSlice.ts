@@ -331,6 +331,7 @@ export interface AuthState {
   fullName: string | null;
   homePage: string | null;
   isAuthenticated: boolean;
+  isVerificationComplete: boolean;
   isLoading: boolean;
   error: string | null;
   // Registration data
@@ -346,6 +347,7 @@ const initialState: AuthState = {
   fullName: null,
   homePage: null,
   isAuthenticated: false,
+  isVerificationComplete: false,
   isLoading: false,
   error: null,
   // Registration data
@@ -534,6 +536,7 @@ const authSlice = createSlice({
         fullName: string;
         homePage: string;
         customer: string;
+        isVerificationComplete?: boolean;
       }>
     ) => {
       state.user = action.payload.user;
@@ -542,9 +545,14 @@ const authSlice = createSlice({
       state.homePage = action.payload.homePage;
       state.customer = action.payload.customer;
       state.isAuthenticated = true;
+      // Default to false for new logins/registrations, preserve existing value if not provided
+      state.isVerificationComplete = action.payload.isVerificationComplete ?? false;
       state.error = null;
       // Set auth cookie for additional security
       setAuthCookie(true);
+    },
+    setVerificationComplete: (state) => {
+      state.isVerificationComplete = true;
     },
     clearCredentials: (state) => {
       state.user = null;
@@ -552,6 +560,7 @@ const authSlice = createSlice({
       state.fullName = null;
       state.homePage = null;
       state.isAuthenticated = false;
+      state.isVerificationComplete = false;
       state.error = null;
       // Clear registration data
       state.customer = null;
@@ -603,6 +612,7 @@ export const {
   setLoading,
   setError,
   setRegistrationData,
+  setVerificationComplete,
 } = authSlice.actions;
 
 // Helper functions for cookie management
