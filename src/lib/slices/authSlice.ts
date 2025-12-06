@@ -212,6 +212,32 @@ export interface LedgerResponse {
     data: LedgerEntry[];
   };
 }
+export interface SaveImageRequest {
+  customer_id: string;
+  image_base64: string;
+  file_extension: string;
+}
+
+export interface SaveImageResponse {
+  message: {
+    message: {
+      result: string;
+      customer_id: string;
+      message: string;
+      file_url: string;
+    };
+  };
+}
+export type GetImageRequest = string; // customer_id as string
+
+export interface GetImageResponse {
+  message: {
+    result: string;
+    customer_id: string;
+    file_url: string;
+    image_base64: string;
+  };
+}
 
 // Deposit interfaces
 export interface DepositRequest {
@@ -339,6 +365,8 @@ export interface AuthState {
   contact: string | null;
   address: string | null;
   registrationMessage: string | null;
+  // Profile image
+  profileImageBase64: string | null;
 }
 
 const initialState: AuthState = {
@@ -355,6 +383,8 @@ const initialState: AuthState = {
   contact: null,
   address: null,
   registrationMessage: null,
+  // Profile image
+  profileImageBase64: null,
 };
 
 // Auth API slice
@@ -502,11 +532,31 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
+    saveImage: builder.mutation<SaveImageResponse, SaveImageRequest>({
+      query: (imageData) => ({
+        url: "jan.saveimage",
+        method: "POST",
+        body: imageData,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
+    getImage: builder.query<GetImageResponse, GetImageRequest>({
+      query: (customerId) => ({
+        url: `jan.getimage?customer_id=${customerId}`,
+        method: "GET",
+      }),
+      providesTags: ["Auth"],
+      transformResponse: (response: GetImageResponse) => {
+        return response;
+      },
+    }),
   }),
 });
 
 export const {
   useLoginMutation,
+  useSaveImageMutation,
+  useGetImageQuery,
   useRegisterMutation,
   useGetProfileQuery,
   useGetBalanceQuery,
@@ -546,7 +596,8 @@ const authSlice = createSlice({
       state.customer = action.payload.customer;
       state.isAuthenticated = true;
       // Default to false for new logins/registrations, preserve existing value if not provided
-      state.isVerificationComplete = action.payload.isVerificationComplete ?? false;
+      state.isVerificationComplete =
+        action.payload.isVerificationComplete ?? false;
       state.error = null;
       // Set auth cookie for additional security
       setAuthCookie(true);
@@ -567,6 +618,8 @@ const authSlice = createSlice({
       state.contact = null;
       state.address = null;
       state.registrationMessage = null;
+      // Clear profile image
+      state.profileImageBase64 = null;
       // Clear persisted data
       clearAuthCookie();
     },
@@ -602,6 +655,14 @@ const authSlice = createSlice({
       state.contact = action.payload.contact;
       state.error = null;
     },
+    setProfileImage: (
+      state,
+      action: PayloadAction<{
+        imageBase64: string | null;
+      }>
+    ) => {
+      state.profileImageBase64 = action.payload.imageBase64;
+    },
   },
 });
 
@@ -613,6 +674,7 @@ export const {
   setError,
   setRegistrationData,
   setVerificationComplete,
+  setProfileImage,
 } = authSlice.actions;
 
 // Helper functions for cookie management

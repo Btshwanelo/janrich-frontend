@@ -46,8 +46,10 @@ import {
   useUpdateBeneficiaryMutation,
   useUpdateCustomerMutation,
   useUpdateProfileMutation,
+  useSaveImageMutation,
+  setProfileImage,
 } from "@/lib/slices/authSlice";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { Input } from "@/components/base/input/input";
 import {
   TITLE_OPTIONS,
@@ -76,7 +78,15 @@ export default function ProfileBeneficiaryScreen() {
   const [amount, setAmount] = useState([100000]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  const { user, customer } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const { user, customer, profileImageBase64 } = useAppSelector(
+    (state) => state.auth
+  );
+
+  // Format base64 image for use in img tag
+  const profileImageSrc = profileImageBase64
+    ? `data:image/png;base64,${profileImageBase64}`
+    : null;
   const {
     data: profileData,
     isLoading: isProfileLoading,
@@ -96,6 +106,9 @@ export default function ProfileBeneficiaryScreen() {
     useUpdateCustomerMutation();
   const [updateProfile, { isLoading: isUpdatingProfile }] =
     useUpdateProfileMutation();
+
+  // Save image mutation
+  const [saveImage, { isLoading: isSavingImage }] = useSaveImageMutation();
 
   // Toast hooks
   const showSuccessToast = useSuccessToast();
@@ -221,17 +234,88 @@ export default function ProfileBeneficiaryScreen() {
     }>
   >([]);
 
+  // Helper function to convert file to base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = (reader.result as string).split(",")[1]; // Remove data:image/...;base64, prefix
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  // Helper function to get file extension
+  const getFileExtension = (filename: string): string => {
+    return filename.split(".").pop()?.toLowerCase() || "png";
+  };
+
   // File upload functions
-  const uploadFile = (file: File, onProgress: (progress: number) => void) => {
-    // Add your upload logic here...
-    // This is dummy upload logic
-    let progress = 0;
-    const interval = setInterval(() => {
-      onProgress(++progress);
-      if (progress === 100) {
-        clearInterval(interval);
+  const uploadFile = async (
+    file: File,
+    onProgress: (progress: number) => void,
+    fileId: string
+  ) => {
+    if (!customer) {
+      onProgress(0);
+      setUploadedFiles((prev) =>
+        prev.map((uploadedFile) =>
+          uploadedFile.id === fileId
+            ? { ...uploadedFile, progress: 0, failed: true }
+            : uploadedFile
+        )
+      );
+      showErrorToast("Customer ID is required");
+      return;
+    }
+
+    try {
+      // Simulate progress
+      onProgress(25);
+
+      // Convert file to base64
+      const base64String = await fileToBase64(file);
+      onProgress(50);
+
+      // Get file extension
+      const fileExtension = getFileExtension(file.name);
+
+      // Call saveImage mutation
+      const result = await saveImage({
+        customer_id: customer,
+        image_base64: base64String,
+        file_extension: fileExtension,
+      }).unwrap();
+
+      onProgress(75);
+
+      // On success, update auth state with the base64 image
+      if (result?.message?.result === "success") {
+        dispatch(
+          setProfileImage({
+            imageBase64: base64String,
+          })
+        );
+        onProgress(100);
+        showSuccessToast("Profile image updated successfully");
+      } else {
+        throw new Error("Failed to save image");
       }
-    }, 100);
+    } catch (error: any) {
+      onProgress(0);
+      setUploadedFiles((prev) =>
+        prev.map((uploadedFile) =>
+          uploadedFile.id === fileId
+            ? { ...uploadedFile, progress: 0, failed: true }
+            : uploadedFile
+        )
+      );
+      showErrorToast(
+        error?.data?.message || "Failed to upload image. Please try again."
+      );
+    }
   };
 
   const handleDropFiles = (files: FileList) => {
@@ -248,15 +332,19 @@ export default function ProfileBeneficiaryScreen() {
     setUploadedFiles([...newFilesWithIds, ...uploadedFiles]);
 
     newFilesWithIds.forEach(({ id, fileObject }) => {
-      uploadFile(fileObject, (progress) => {
-        setUploadedFiles((prev) =>
-          prev.map((uploadedFile) =>
-            uploadedFile.id === id
-              ? { ...uploadedFile, progress }
-              : uploadedFile
-          )
-        );
-      });
+      uploadFile(
+        fileObject,
+        (progress) => {
+          setUploadedFiles((prev) =>
+            prev.map((uploadedFile) =>
+              uploadedFile.id === id
+                ? { ...uploadedFile, progress }
+                : uploadedFile
+            )
+          );
+        },
+        id
+      );
     });
   };
 
@@ -266,17 +354,29 @@ export default function ProfileBeneficiaryScreen() {
 
   const handleRetryFile = (id: string) => {
     const file = uploadedFiles.find((file) => file.id === id);
-    if (!file) return;
+    if (!file || !file.fileObject) return;
 
-    uploadFile(new File([], file.name, { type: file.type }), (progress) => {
-      setUploadedFiles((prev) =>
-        prev.map((uploadedFile) =>
-          uploadedFile.id === id
-            ? { ...uploadedFile, progress, failed: false }
-            : uploadedFile
-        )
-      );
-    });
+    setUploadedFiles((prev) =>
+      prev.map((uploadedFile) =>
+        uploadedFile.id === id
+          ? { ...uploadedFile, failed: false, progress: 0 }
+          : uploadedFile
+      )
+    );
+
+    uploadFile(
+      file.fileObject,
+      (progress) => {
+        setUploadedFiles((prev) =>
+          prev.map((uploadedFile) =>
+            uploadedFile.id === id
+              ? { ...uploadedFile, progress, failed: false }
+              : uploadedFile
+          )
+        );
+      },
+      id
+    );
   };
 
   const NavIcon = ({
@@ -510,7 +610,6 @@ export default function ProfileBeneficiaryScreen() {
 
       // Then update profile information
       await handleProfileUpdate();
-
     } catch (error) {
       console.error("Failed to update My Details:", error);
     }
@@ -592,7 +691,7 @@ export default function ProfileBeneficiaryScreen() {
                     <div className="relative -mt-8 sm:-mt-12">
                       <Avatar
                         size="2xl"
-                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
+                        src={profileImageSrc || "/raincoat_9189581.png"}
                         alt="Profile"
                         verified={true}
                         contrastBorder={true}
@@ -857,7 +956,7 @@ export default function ProfileBeneficiaryScreen() {
                                   size="sm"
                                 />
                               </div>
-                              <div className="flex gap-6 items-start">
+                              <div className="flex flex-col sm:flex-row gap-6 items-start">
                                 <div className="flex-shrink-0">
                                   <Avatar
                                     size="2xl"
@@ -869,14 +968,15 @@ export default function ProfileBeneficiaryScreen() {
                                         ? URL.createObjectURL(
                                             uploadedFiles[0].fileObject
                                           )
-                                        : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
+                                        : profileImageSrc ||
+                                          "/raincoat_9189581.png"
                                     }
                                     alt="Profile"
                                     contrastBorder={true}
-                                    className="shadow-lg border-4 border-white w-28 h-28"
+                                    className="shadow-lg border-4 border-gray-200 w-28 h-28"
                                   />
                                 </div>
-                                <div className="flex-1">
+                                <div className="w-full">
                                   <FileUpload.Root>
                                     <FileUpload.DropZone
                                       onDropFiles={handleDropFiles}

@@ -42,14 +42,6 @@ export const useLogin = () => {
           password: values.password,
         }).unwrap();
 
-        console.log("results:", {
-          user: result.message.user,
-          sid: result.message.sid,
-          fullName: result.full_name,
-          homePage: result.home_page,
-          customer: result.message.customer.name,
-        });
-
         // Dispatch credentials to Redux store
         // For regular logins, preserve existing verification status from persisted state
         // If no persisted state, default to true (existing users are typically verified)

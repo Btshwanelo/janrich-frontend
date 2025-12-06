@@ -3,7 +3,12 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
-import { useGetProfileQuery, useGetLedgerQuery } from "@/lib/slices/authSlice";
+import {
+  useGetProfileQuery,
+  useGetLedgerQuery,
+  useGetImageQuery,
+  setProfileImage,
+} from "@/lib/slices/authSlice";
 import {
   setTransactions,
   setCurrentTransaction,
@@ -45,6 +50,11 @@ const Dashboard = () => {
     isLoading: isLedgerLoading,
     error: ledgerError,
   } = useGetLedgerQuery(customer);
+  const {
+    data: dataProfileImg,
+    isLoading: isProfileImgLoading,
+    error: profileImgError,
+  } = useGetImageQuery(customer);
 
   // Store transactions in ledger slice on successful API response
   useEffect(() => {
@@ -58,6 +68,20 @@ const Dashboard = () => {
       );
     }
   }, [dataLedger, dispatch]);
+
+  // Store profile image in auth slice on successful API response
+  useEffect(() => {
+    if (
+      dataProfileImg?.message?.result === "success" &&
+      dataProfileImg.message.image_base64
+    ) {
+      dispatch(
+        setProfileImage({
+          imageBase64: dataProfileImg.message.image_base64,
+        })
+      );
+    }
+  }, [dataProfileImg, dispatch]);
 
   const savingsGoal = data?.message?.data?.financials?.annual_savings_goal;
   const transactions: Transaction[] = dataLedger?.message?.data || [];

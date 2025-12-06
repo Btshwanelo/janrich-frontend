@@ -16,7 +16,7 @@ const PasswordResetSuccessPage = () => {
       <div
         className="min-h-screen flex justify-center p-6"
         style={{
-          background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
+          background: "linear-gradient(65deg, #9bbaf9 0%, #f7f7f7 65%)",
         }}
       >
         <div className="text-center max-w-md mt-[48px] w-full">
@@ -54,12 +54,7 @@ const PasswordResetSuccessPage = () => {
           </div>
 
           {/* Action Button */}
-          <Button
-            color="primary"
-            size="md"
-            onClick={handleLogin}
-            className=""
-          >
+          <Button color="primary" size="md" onClick={handleLogin} className="">
             Log in
           </Button>
         </div>

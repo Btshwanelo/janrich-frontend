@@ -28,11 +28,18 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
   onCollapseChange,
 }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const { user, fullName } = useAppSelector((state) => state.auth);
+  const { user, fullName, profileImageBase64 } = useAppSelector(
+    (state) => state.auth
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
+
+  // Format base64 image for use in img tag
+  const profileImageSrc = profileImageBase64
+    ? `data:image/png;base64,${profileImageBase64}`
+    : null;
 
   const handleToggle = () => {
     const newState = !isSidebarCollapsed;
@@ -140,7 +147,17 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
             } py-2 mt-4 w-full rounded-lg hover:bg-gray-100 transition-colors cursor-pointer outline-none`}
             aria-label="User menu"
           >
-            <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+            <div className="w-8 h-8 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
+              {profileImageSrc ? (
+                <img
+                  src={profileImageSrc}
+                  alt="profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User01 className="w-5 h-5 text-gray-500" />
+              )}
+            </div>
             {!isSidebarCollapsed && (
               <div className="flex-1 text-left">
                 <div className="text-sm font-medium">

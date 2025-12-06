@@ -41,7 +41,7 @@ const Onboarding = () => {
       <div
         className="min-h-screen flex items-center justify-center px-2 py-8"
         style={{
-          background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
+          background: "linear-gradient(65deg, #9bbaf9 0%, #f7f7f7 65%)",
         }}
       >
         <div className="w-full max-w-md">
