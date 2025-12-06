@@ -22,10 +22,11 @@ const publicRoutes = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Get authentication status from cookies or headers
-  // Note: In a real app, you might want to verify the session server-side
-  const isAuthenticated = request.cookies.get("auth-token")?.value === "true";
-  console.log("isAuthenticated", isAuthenticated);
+  // Get authentication status from cookie (synced from localStorage persist:root)
+  // The cookie is set by the client-side syncAuthFromLocalStorage function
+  // which reads from localStorage.getItem("persist:root") and extracts isAuthenticated
+  const authToken = request.cookies.get("auth-token")?.value;
+  const isAuthenticated = authToken === "true";
   // Check if the current path is a protected route
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)

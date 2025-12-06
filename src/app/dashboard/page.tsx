@@ -8,7 +8,6 @@ import {
   setTransactions,
   setCurrentTransaction,
 } from "@/lib/slices/ledgerSlice";
-import SavingsGoalModal from "@/components/SavingsGoalModal";
 import { DepositModal } from "@/components/dashboard/DepositModal";
 import SidebarWrapper from "@/components/SidebarWrapper";
 import MobileTopNav from "@/components/MobileTopNav";
@@ -26,10 +25,6 @@ import { useSavingsModal } from "@/hooks/useSavingsModal";
 import { Transaction } from "@/types/dashboard";
 import { DASHBOARD_CONSTANTS } from "@/constants/dashboard";
 import { getMonthsRemainingInYear } from "@/utils/dateUtils";
-import {
-  useOnboardingFlow,
-  getNextOnboardingStep,
-} from "@/utils/onboardingState";
 
 const Dashboard = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -37,12 +32,6 @@ const Dashboard = () => {
   const router = useRouter();
 
   const { user, fullName, customer } = useAppSelector((state) => state.auth);
-  const {
-    flow,
-    isOnboardingComplete,
-    markDepositModalShown,
-    completeOnboarding,
-  } = useOnboardingFlow();
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const {
     data,
@@ -72,32 +61,8 @@ const Dashboard = () => {
   const savingsGoal = data?.message?.data?.financials?.annual_savings_goal || 0;
   const transactions: Transaction[] = dataLedger?.message?.data || [];
 
-  // Check onboarding state and redirect if needed
-  useEffect(() => {
-    if (!isProfileLoading && data) {
-      // Main check: if onboarding is not complete, redirect based on flow state
-      if (!isOnboardingComplete) {
-        const nextStep = getNextOnboardingStep(flow);
-
-        if (nextStep === "savings") {
-          // Show savings goal modal (handled by useSavingsModal hook)
-          // Don't redirect, let the modal show
-        } else if (nextStep === "welcome") {
-          router.push("/welcome");
-        } else if (nextStep === "profile") {
-          router.push("/profile");
-        } else if (nextStep === "deposit") {
-          // Show deposit modal
-          setIsDepositModalOpen(true);
-        }
-      }
-    }
-  }, [isProfileLoading, data, router, isOnboardingComplete, flow]);
-
   // Handle deposit modal close
   const handleDepositModalClose = () => {
-    markDepositModalShown();
-    completeOnboarding();
     setIsDepositModalOpen(false);
   };
 
@@ -114,10 +79,6 @@ const Dashboard = () => {
   } = usePagination({
     items: transactions,
     itemsPerPage: DASHBOARD_CONSTANTS.ITEMS_PER_PAGE,
-  });
-  const { isModalOpen, handleModalClose, handleModalSave } = useSavingsModal({
-    savingsGoal: data?.message?.data?.financials?.annual_savings_goal,
-    refetch,
   });
 
   // Handle retry function
@@ -140,12 +101,6 @@ const Dashboard = () => {
 
         {/* Left Sidebar */}
         <SidebarWrapper onCollapseChange={setIsSidebarCollapsed} />
-        <SavingsGoalModal
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
-          customerId={customer || undefined}
-          onSave={handleModalSave}
-        />
         <DepositModal
           isOpen={isDepositModalOpen}
           onClose={handleDepositModalClose}

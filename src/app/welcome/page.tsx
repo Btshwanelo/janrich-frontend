@@ -1,210 +1,292 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/base/buttons/button";
 import AuthGuard from "@/components/AuthGuard";
 import { useOnboardingFlow } from "@/utils/onboardingState";
 import { useAppSelector } from "@/lib/hooks";
+import { useGetProfileQuery } from "@/lib/slices/authSlice";
 import { Avatar } from "@/components/base/avatar/avatar";
+import {
+  Zap,
+  Trophy,
+  BarChart3,
+  RefreshCw,
+  Coins,
+  ArrowRight,
+} from "lucide-react";
 
 export default function WelcomePage() {
   const router = useRouter();
-  const { fullName } = useAppSelector((state) => state.auth);
-  const onBoardingFlow = useAppSelector((state) => state.onboarding.flow);
-  const { flow, markWelcomeShown } = useOnboardingFlow();
+  const { fullName, customer } = useAppSelector((state) => state.auth);
+  const { markWelcomeShown } = useOnboardingFlow();
+  const { data: profileData } = useGetProfileQuery(customer || "", {
+    skip: !customer,
+  });
 
   const handleGoToDashboard = () => {
-    // Mark welcome as shown
     markWelcomeShown();
-    // Redirect to profile page
-    router.push("/profile");
+    // Redirect to goal page (next step in onboarding)
+    router.push("/onboarding/goal");
   };
 
-  // Prevent back navigation - if user hasn't completed savings goal, redirect
-  useEffect(() => {
-    if (onBoardingFlow.isOnboardingComplete) {
-      router.push("/dashboard");
-    }
-    if (
-      !onBoardingFlow.isOnboardingComplete &&
-      !onBoardingFlow.savingsGoalCreated
-    ) {
-      router.push("/dashboard");
-    }
-    if (!onBoardingFlow.isOnboardingComplete && onBoardingFlow.welcomeShown) {
-      router.push("/profile");
-    }
-  }, [router, flow.savingsGoalCreated]);
+  // Extract first name from fullName
+  const firstName = fullName?.split(" ")[0] || "Saver";
+
+  // Get customer ID and format member number
+  const customerId =
+    profileData?.message?.data?.basic_info?.customer_id || customer || "";
+  const memberNumber = customerId ? `JROO${customerId}` : "JROO###";
+
+  // Bank details (from the design)
+  const bankDetails = {
+    accountName: "Absa Investment Club",
+    bank: "ABSA",
+    accountNumber: "9391836719",
+    reference: `Use your Member Number (${memberNumber})`,
+  };
+
+  // Sample avatars for the community section
+  const communityAvatars = [
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
+  ];
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-          {/* Header */}
-          <div className="border-t pt-6 mb-2">
-            <h1 className="text-4xl sm:text-5xl text-[#181D27] font-cinzel mb-4">
+      <div
+        className="min-h-screen "
+        style={{
+          background: "linear-gradient(45deg, #9bbaf9 0%, #f7f7f7 40%)",
+        }}
+      >
+        {/* Header/Hero Section with Gradient Background */}
+        <div className=" pt-8 sm:pt-12 max-w-[616px] mx-auto mb-5">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-5">
+            {/* Three Profile Pictures */}
+            <div className="flex justify-center relative items-center gap-10 ">
+              <Avatar
+                size="xl"
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
+                alt="Community member"
+                className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-gray-200"
+              />
+              <Avatar
+                size="xl"
+                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
+                alt="Community member"
+                className="w-16 h-16 sm:w-24 mb-5 sm:h-24 absolute z-10 border-2 border-gray-200"
+              />
+              <Avatar
+                size="xl"
+                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop"
+                alt="Community member"
+                className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-gray-200"
+              />
+            </div>
+
+            {/* Main Heading */}
+            <h1 className="text-2xl text-[#252B37] font-bold font-cinzel text-center">
               WELCOME TO JANRICHES
             </h1>
-          </div>
 
-          {/* Introduction Section */}
-          <div className="mb-4 space-y-6">
-            <p className="text-lg text-[#535862]">
-              We are thrilled to welcome you to the Janriches community, a
-              vibrant social savings club that is transforming the way we
-              approach financial wellness in our lives. As we reflect on our
-              journey together, we celebrate the remarkable successes that our
-              members have achieved through commitment, perseverance, and the
-              power of collective saving.
+            {/* Subtitle */}
+            <p className="text-3xl text-[#252B37] text-center font-cinzel">
+              WHERE YOU PAY YOURSELF FIRST!
             </p>
 
-            {/* Testimonial 1 */}
-            <p className="text-[#535862] mb-2">
-              Janriches has become more than just a savings club; it is a
-              movement that empowers individuals to take control of their
-              financial futures. Our members have shared inspiring testimonials
-              that highlight the profound impact Janriches has had on their
-              lives. For instance, Muimeleli M., a member since 2016, shares,
-              "JanRiches didn’t only teach me the importance of saving and
-              paying myself first. With the savings, I was able to pay my
-              youngest brother's varsity fees, build my family house, and also
-              build a house for my uncle. Janriches savings continues to help me
-              see and treat money differently, and I get to travel
-              internationally every year with my savings."
+            {/* Welcome Message */}
+            <p className="  text-black text-center text-lg max-w-3xl mx-auto leading-relaxed">
+              Welcome, {firstName}! The savings squad just got stronger! You've
+              officially joined the JanRiches crew, the savers who beat
+              Januworry and walk into the new year with vibes AND money!
             </p>
           </div>
+        </div>
 
-          {/* First Image */}
-          <div className="mb-4">
-            <img
-              src="/welcome-img-1.jpg"
-              alt="Community members celebrating"
-              className="w-full h-[480px] rounded-lg object-cover"
-            />
-            <p className="text-xs text-gray-500 mt-2">
-              Image courtesy of Fauxels via Pexels
-            </p>
-          </div>
-
-          {/* The Importance of Saving Culture Section */}
-          <div className="mb-4 space-y-6">
-            <p className="text-lg text-[#535862]">
-              Ipsum sit mattis nulla quam nulla. Gravida id gravida ac enim
-              mauris id. Non pellentesque congue eget consectetur turpis.
-              Sapien, dictum molestie sem tempor. Diam elit, orci, tincidunt
-              aenean tempus. Quis velit eget ut tortor tellus. Sed vel, congue
-              felis elit erat nam nibh orci.
-            </p>
-            <h2 className="text-xl sm:text-2xl font-semibold text-[#535862]">
-              The Importance of Saving Culture in the Black SA Community
+        <div className="max-w-7xl mx-auto mt-2">
+          {/* JanRiches Member Details Section */}
+          <div className="bg-[#1F235B] max-w-[616px] mx-auto rounded-lg p-6 sm:p-8 mb-3 justify-center align-middle text-center text-white">
+            <h2 className="text-lg sm:text-xl font-semibold mb-2">
+              Your JanRiches Member Number:
             </h2>
-            <p className="text-lg text-[#535862]">
-              Financial instability and debt have long been challenges in the
-              Black South African community, especially during the festive
-              season. At Janriches, we're changing this narrative by encouraging
-              disciplined saving and financial planning. Our members learn to
-              prioritize their financial goals and build a culture of saving
-              that benefits not just themselves, but their entire families and
-              communities.
+            <p className="text-4xl sm:text-5xl lg:text-6xl font-bold font-cinzel mb-4">
+              {customerId}
             </p>
-          </div>
 
-          {/* A Community of Financial Savvy Section */}
-          <div className="mb-12 space-y-6">
-            <h2 className="text-xl sm:text-2xl font-cinzel text-[#535862]">
-              A COMMUNITY OF FINANCIAL SAVVY
-            </h2>
-            <p className="text-lg text-[#535862] leading-relaxed">
-              At Janriches, we are proud to foster a culture of financial
-              discipline and transparency. Nyiko C, who joined us in January
-              2024, expressed how the club helped him exceed his savings goals.
-              "The great thing about JanRiches is that it gives me the
-              transparency of seeing my savings and the discipline as I cannot
-              access the money when I want to, but have to wait until the set
-              time in January." This commitment to saving is what sets us apart
-              and creates a sense of security among our members.
-            </p>
-            <p className="text-lg text-[#535862] leading-relaxed">
-              At Janriches, we are proud to foster a culture of financial
-              discipline and transparency. Nyiko C, who joined us in January
-              2024, expressed how the club helped him exceed his savings goals.
-              "The great thing about JanRiches is that it gives me the
-              transparency of seeing my savings and the discipline as I cannot
-              access the money when I want to, but have to wait until the set
-              time in January." This commitment to saving is what sets us apart
-              and creates a sense of security among our members.
-            </p>
-          </div>
-
-          {/* In Conclusion Section */}
-          <div className="mb-12 space-y-6">
-            <h2 className="text-xl sm:text-2xl font-cinzel text-[#535862]">
-              IN CONCLUSION
-            </h2>
-            <p className="text-lg text-[#535862] leading-relaxed">
-              As you embark on this journey with Janriches, remember that every
-              rand saved is a step toward financial freedom. Embrace the culture
-              of saving, share your experiences with the community, and watch as
-              you build a prosperous future for yourself, your family, and your
-              community. Together, we're not just saving money—we're building a
-              stronger, more financially empowered community.
-            </p>
-          </div>
-
-          {/* Second Image */}
-          <div className="mb-12">
-            <img
-              src="/welcome-img-2.jpg"
-              alt="Community members celebrating together"
-              className="w-full h-[980px] rounded-lg object-cover"
-            />
-            <p className="text-xs text-gray-500 mt-2">
-              Image courtesy of Michael Burrows via Pexels
-            </p>
-          </div>
-
-          {/* Footer Section */}
-          <div className="bg-[#FAFAFA] rounded-lg p-8 mb-8">
-            <h2 className="text-2xl sm:text-3xl font-cinzel text-[#535862] mb-4">
-              HERE'S TO ABUNDANCE
-            </h2>
-            <p className="text-lg text-[#535862]">
-              Thank you for being a part of Janriches. Here’s to a future filled
-              with abundance, growth, and financial freedom!
-            </p>
-          </div>
-          {/* Call to Action */}
-          <div className="flex flex-col sm:flex-row items-center border-t pt-4 justify-start gap-4 sm:gap-6">
-            <div className="flex items-center flex-row mr-2">
-              <div className="relative">
-                <Avatar
-                  size="md"
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
-                  alt="Jan Riches Executive"
-                  className="w-10 h-10 z-10"
-                />
-                <Avatar
-                  size="md"
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
-                  alt="Jan Riches Executive"
-                  className="w-10 h-10 z-20  -left-4"
-                />
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-[#535862]">
-                  Jan Riches Executive
+            <div className="space-y-4">
+              <h3 className="text-base font-semibold text-[#B2CCFF] mb-4">
+                JanRiches Bank Details:
+              </h3>
+              <div className="space-y-2 text-base text-[#B2CCFF]">
+                <p>{bankDetails.accountName}</p>
+                <p>
+                  <span className="font-bold">Bank:</span> {bankDetails.bank}
+                </p>
+                <p>
+                  <span className="font-bold">Account Number:</span>{" "}
+                  {bankDetails.accountNumber}
+                </p>
+                <p>
+                  <span className="font-bold">Reference:</span>{" "}
+                  {bankDetails.reference}
                 </p>
               </div>
             </div>
-            <Button
-              onClick={handleGoToDashboard}
-              color="primary"
-              size="lg"
-              className="w-full sm:w-auto"
-            >
-              Go to Dashboard
-            </Button>
+          </div>
+          {/* Community Avatars Row */}
+          <div className="flex items-center max-w-[616px] mx-auto relative justify-center mb-3 gap-2">
+            {communityAvatars.map((src, index) => (
+              <Avatar
+                key={index}
+                size="sm"
+                src={src}
+                alt="Community member"
+                className="w-8 h-8 sm:w-10 sm:h-10 -ml-4 first:ml-0 border-2 border-white"
+              />
+            ))}
+            <span className="text-sm sm:text-base ml-2">+5</span>
+          </div>
+
+          {/* "Here's What You Can Do Now" Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 py-10 px-5 gap-8 mb-12 bg-white">
+            {/* Left Column */}
+            <div className="flex flex-col items-start col-span-1">
+              <div className="mb-6">
+                <Zap className="w-12 h-12 sm:w-16 sm:h-16 text-[#1F235B] mb-4" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-cinzel text-[#181D27] mb-4">
+                HERE'S WHAT YOU CAN DO NOW
+              </h2>
+              <p className="text-base sm:text-lg text-[#535862] leading-relaxed">
+                Powerful, self-serve product and growth analytics to help you
+                convert, engage, and retain more users.
+              </p>
+            </div>
+
+            {/* Right Column - Action Items */}
+            <div className=" grid grid-cols-2 col-span-2">
+              {/* Pay yourself first */}
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
+                    <Coins className="w-6 h-6 text-[#1F235B]" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#181D27] mb-1">
+                    Pay yourself first!
+                  </h3>
+                  <p className="text-base text-[#535862]">
+                    Use the bank details above to make your first deposit
+                  </p>
+                </div>
+              </div>
+
+              {/* Track Progress */}
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 ">
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
+                    <BarChart3 className="w-6 h-6 text-[#1F235B]" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#181D27] mb-1">
+                    Track Progress
+                  </h3>
+                  <p className="text-base text-[#535862]">
+                    Track your progress and watch your pot grow
+                  </p>
+                </div>
+              </div>
+
+              {/* Celebrate Wins */}
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
+                    <Trophy className="w-6 h-6 text-[#1F235B]" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#181D27] mb-1">
+                    Celebrate Wins
+                  </h3>
+                  <p className="text-base text-[#535862]">
+                    Celebrate your wins (and brag a little)
+                  </p>
+                </div>
+              </div>
+
+              {/* Repeat */}
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
+                    <RefreshCw className="w-6 h-6 text-[#1F235B]" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#181D27] mb-1">
+                    Repeat!
+                  </h3>
+                  <p className="text-base text-[#535862]">
+                    Repeat! Because consistency = stress-free Januarys
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* "We've Been Mentioned in the Press" Section */}
+          <div className="mb-12 max-w-[616px] mx-auto">
+            <h2 className="text-base text-[#535862] mb-6 text-center">
+              We've been mentioned in the press
+            </h2>
+            <div className="flex flex-col gap-8">
+              {/* Placeholder for media logos - these would typically be actual logo images */}
+              <div className="flex gap-6 justify-center">
+                <img src="/washinton-post.svg" alt="one" />
+                <img src="/tech-crunch.svg" alt="one" />
+              </div>
+              <div className="flex gap-6 justify-center">
+                <img src="/bloomberg.svg" alt="one" />
+                <img src="/gizmodo.svg" alt="one" />
+                <img src="/forbes.svg" alt="one" />
+              </div>
+            </div>
+          </div>
+
+          {/* Call to Action/Closing Section */}
+          <div className="text-center space-y-4 pb-8 max-w-[616px] mx-auto">
+            <p className="text-base sm:text-lg text-black">
+              Check your inbox or WhatsApp, we've sent your Welcome Pack with
+              everything you need to start strong
+            </p>
+            <p className="text-base sm:text-lg text-black">
+              Asijiki, saver! You've just joined hundreds of disciplined savers
+              changing the way we do money, one deposit at a time.
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-cinzel text-black">
+              THE JOURNEY TO A STRESS-FREE JANUARY STARTS TODAY.
+            </h2>
+            <div className="flex justify-center pt-4">
+              <Button
+                onClick={handleGoToDashboard}
+                color="primary"
+                size="lg"
+                iconTrailing={<ArrowRight className="w-5 h-5" />}
+                className=""
+              >
+                Let's do this
+              </Button>
+            </div>
           </div>
         </div>
       </div>

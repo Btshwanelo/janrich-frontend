@@ -9,14 +9,13 @@
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   startOnboarding as startOnboardingAction,
-  markSavingsGoalCreated as markSavingsGoalCreatedAction,
   markWelcomeShown as markWelcomeShownAction,
-  markDepositModalShown as markDepositModalShownAction,
-  markProfileTabCompleted as markProfileTabCompletedAction,
+  markGoalCompleted as markGoalCompletedAction,
+  markFinancialCompleted as markFinancialCompletedAction,
+  markBeneficiaryCompleted as markBeneficiaryCompletedAction,
   completeOnboarding as completeOnboardingAction,
   resetOnboardingFlow as resetOnboardingFlowAction,
   selectOnboardingFlow,
-  selectIsProfileComplete,
   selectIsOnboardingComplete,
   type OnboardingFlowState,
 } from "@/lib/slices/onboardingSlice";
@@ -26,20 +25,17 @@ import {
  */
 export const useOnboardingFlow = () => {
   const flow = useAppSelector(selectOnboardingFlow);
-  const isProfileComplete = useAppSelector(selectIsProfileComplete);
   const isOnboardingComplete = useAppSelector(selectIsOnboardingComplete);
   const dispatch = useAppDispatch();
 
   return {
     flow,
-    isProfileComplete,
     isOnboardingComplete,
     startOnboarding: () => dispatch(startOnboardingAction()),
-    markSavingsGoalCreated: () => dispatch(markSavingsGoalCreatedAction()),
     markWelcomeShown: () => dispatch(markWelcomeShownAction()),
-    markDepositModalShown: () => dispatch(markDepositModalShownAction()),
-    markProfileTabCompleted: (tab: "details" | "beneficiary" | "financial") =>
-      dispatch(markProfileTabCompletedAction(tab)),
+    markGoalCompleted: () => dispatch(markGoalCompletedAction()),
+    markFinancialCompleted: () => dispatch(markFinancialCompletedAction()),
+    markBeneficiaryCompleted: () => dispatch(markBeneficiaryCompletedAction()),
     completeOnboarding: () => dispatch(completeOnboardingAction()),
     resetOnboardingFlow: () => dispatch(resetOnboardingFlowAction()),
   };
@@ -50,26 +46,21 @@ export const useOnboardingFlow = () => {
  */
 export const getNextOnboardingStep = (
   flow: OnboardingFlowState
-): "savings" | "welcome" | "profile" | "deposit" | "complete" => {
-  if (!flow.savingsGoalCreated) {
-    return "savings";
-  }
-
+): "welcome" | "goal" | "financial" | "beneficiary" | "complete" => {
   if (!flow.welcomeShown) {
     return "welcome";
   }
 
-  const isProfileComplete =
-    flow.profileCompleted.details &&
-    flow.profileCompleted.beneficiary &&
-    flow.profileCompleted.financial;
-
-  if (!isProfileComplete) {
-    return "profile";
+  if (!flow.goalCompleted) {
+    return "goal";
   }
 
-  if (!flow.depositModalShown) {
-    return "deposit";
+  if (!flow.financialCompleted) {
+    return "financial";
+  }
+
+  if (!flow.beneficiaryCompleted) {
+    return "beneficiary";
   }
 
   return "complete";

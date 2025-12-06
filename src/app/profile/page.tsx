@@ -78,13 +78,6 @@ export default function ProfileBeneficiaryScreen() {
 
   const { user, customer } = useAppSelector((state) => state.auth);
   const {
-    flow,
-    isProfileComplete,
-    isOnboardingComplete,
-    markProfileTabCompleted,
-    completeOnboarding,
-  } = useOnboardingFlow();
-  const {
     data: profileData,
     isLoading: isProfileLoading,
     error: profileError,
@@ -151,41 +144,6 @@ export default function ProfileBeneficiaryScreen() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [countryCode, setCountryCode] = useState("");
   const [raceOther, setRaceOther] = useState("");
-  // Check onboarding state and enforce tab completion
-  useEffect(() => {
-    // If user hasn't completed welcome, redirect
-    if (!flow.welcomeShown && !flow.isOnboardingComplete) {
-      router.push("/dashboard");
-      return;
-    }
-
-    // If user hasn't created savings goal, redirect to dashboard
-    if (!flow.savingsGoalCreated && !flow.isOnboardingComplete) {
-      router.push("/dashboard");
-      return;
-    }
-  }, [router, flow]);
-
-  // Check if user tries to navigate away before completing all tabs
-  useEffect(() => {
-    if (!flow.welcomeShown) return; // Only enforce if in onboarding flow
-
-    // If profile is complete, allow navigation
-    if (flow.isOnboardingComplete) {
-      return;
-    }
-
-    // Force user to stay on profile page until all tabs are completed
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (!flow.isOnboardingComplete) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [flow]);
 
   // Track if we've already synced completion state to prevent infinite loops
   const hasSyncedCompletionRef = React.useRef<string | null>(null);
@@ -247,63 +205,10 @@ export default function ProfileBeneficiaryScreen() {
       setBeneficiaryCell(data.beneficiary.beneficiary_cell || "");
       setBeneficiaryRelation(data.beneficiary.beneficiary_relation || "");
 
-      // Only sync profile completion state if user is NOT in onboarding flow
-      // If they're in onboarding (welcomeShown is false), don't auto-complete based on data
-      // This ensures first-time users go through the full onboarding process
-      if (flow.welcomeShown && hasSyncedCompletionRef.current !== customerId) {
-        // User has already been through onboarding, sync state with actual data
-        // Check if details tab is complete (has required fields)
-        const detailsComplete =
-          customerName &&
-          data.basic_info.phone &&
-          data.about_you.birth_date &&
-          data.about_you.profile_gender &&
-          data.about_you.nationality &&
-          data.about_you.country_of_residence &&
-          data.about_you.race &&
-          data.about_you.communication_preference;
-
-        // Check if beneficiary tab is complete
-        const beneficiaryComplete =
-          data.beneficiary.beneficiary_type &&
-          data.beneficiary.beneficiary_name &&
-          data.beneficiary.beneficiary_surname &&
-          data.beneficiary.beneficiary_cell &&
-          data.beneficiary.beneficiary_relation;
-
-        // Check if financial tab is complete
-        const financialComplete =
-          data.financials.employment_status &&
-          data.financials.deposit_frequency &&
-          data.financials.customer_bank &&
-          data.financials.fund_source &&
-          data.financials.saving_for &&
-          data.financials.account_holder &&
-          data.financials.iban_account;
-
-        // Only update Redux state if it doesn't match actual data
-        // Use a ref to prevent multiple syncs and infinite loops
-        // Read current flow.profileCompleted inside the effect to get latest value
-        // const currentProfileCompleted = flow.profileCompleted;
-        // if (detailsComplete && !currentProfileCompleted.details) {
-        //   markProfileTabCompleted("details");
-        // }
-        // if (beneficiaryComplete && !currentProfileCompleted.beneficiary) {
-        //   markProfileTabCompleted("beneficiary");
-        // }
-        // if (financialComplete && !currentProfileCompleted.financial) {
-        //   markProfileTabCompleted("financial");
-        // }
-
-        // Mark that we've synced for this customer to prevent re-syncing
-        hasSyncedCompletionRef.current = customerId;
-      }
+      // Mark that we've synced for this customer to prevent re-syncing
+      hasSyncedCompletionRef.current = customerId;
     }
-    // Only depend on profileData and flow.welcomeShown to prevent infinite loops
-    // flow.profileCompleted changes when we call markProfileTabCompleted, which would cause a loop
-    // We read flow.profileCompleted inside the effect to get the current value
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileData, flow.welcomeShown]);
+  }, [profileData]);
   const [uploadedFiles, setUploadedFiles] = useState<
     Array<{
       id: string;
@@ -455,7 +360,6 @@ export default function ProfileBeneficiaryScreen() {
       const result = await updateFinancialDetails(financialData).unwrap();
 
       // Mark financial tab as completed
-      markProfileTabCompleted("financial");
 
       // Show success toast
       showSuccessToast(
@@ -496,7 +400,6 @@ export default function ProfileBeneficiaryScreen() {
       const result = await updateBeneficiary(beneficiaryData).unwrap();
 
       // Mark beneficiary tab as completed
-      markProfileTabCompleted("beneficiary");
 
       // Show success toast
       showSuccessToast(
@@ -608,15 +511,6 @@ export default function ProfileBeneficiaryScreen() {
       // Then update profile information
       await handleProfileUpdate();
 
-      // Mark details tab as completed
-      markProfileTabCompleted("details");
-
-      // If all tabs are complete, redirect to dashboard (which will show deposit modal)
-      if (isProfileComplete) {
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1500);
-      }
     } catch (error) {
       console.error("Failed to update My Details:", error);
     }
@@ -745,33 +639,6 @@ export default function ProfileBeneficiaryScreen() {
                   <Tabs
                     selectedKey={selectedTab}
                     onSelectionChange={(key) => {
-                      // Only allow tab switching if current tab is completed or onboarding is complete
-                      if (flow.welcomeShown && !isProfileComplete) {
-                        // In onboarding flow, check if previous tabs are completed
-                        const tabOrder = [
-                          "details",
-                          "beneficiary",
-                          "financial",
-                        ];
-                        const currentIndex = tabOrder.indexOf(selectedTab);
-                        const targetIndex = tabOrder.indexOf(key as string);
-
-                        // Allow navigation to next tab if current is completed, or backwards
-                        if (targetIndex > currentIndex) {
-                          const currentTabCompleted =
-                            flow.profileCompleted[
-                              selectedTab as keyof typeof flow.profileCompleted
-                            ];
-                          if (!currentTabCompleted) {
-                            showErrorToast(
-                              "Complete Current Tab",
-                              "Please complete the current tab before moving to the next one.",
-                              { duration: 3000 }
-                            );
-                            return;
-                          }
-                        }
-                      }
                       setSelectedTab(key as string);
                     }}
                     className="w-full"
@@ -781,16 +648,7 @@ export default function ProfileBeneficiaryScreen() {
                       size="sm"
                       items={PROFILE_TABS.map((tab) => ({
                         ...tab,
-                        label: (
-                          <span className="flex items-center gap-2">
-                            {tab.label}
-                            {flow.profileCompleted[
-                              tab.id as keyof typeof flow.profileCompleted
-                            ] && (
-                              <CheckCircle2 className="w-4 h-4 text-green-600" />
-                            )}
-                          </span>
-                        ),
+                        label: tab.label,
                       }))}
                       className="flex-nowrap"
                     >

@@ -145,6 +145,7 @@ export interface BeneficiaryRequest {
   beneficiary_type: string;
   beneficiary_name: string;
   beneficiary_title: string;
+  beneficiary_surname?: string;
   beneficiary_cell: string;
   beneficiary_relation: string;
 }
@@ -605,17 +606,41 @@ export const {
 } = authSlice.actions;
 
 // Helper functions for cookie management
+// Sync localStorage persist:root to cookie for middleware access
+export const syncAuthFromLocalStorage = () => {
+  if (typeof window !== "undefined") {
+    try {
+      const persistedState = localStorage.getItem("persist:root");
+      if (persistedState) {
+        const parsed = JSON.parse(persistedState);
+        if (parsed.auth) {
+          const authState = JSON.parse(parsed.auth);
+          const isAuthenticated = authState?.isAuthenticated === true;
+          setAuthCookie(isAuthenticated);
+          return isAuthenticated;
+        }
+      }
+    } catch (error) {
+      console.error("Error syncing auth from localStorage:", error);
+    }
+    // If no persisted state or error, set to false
+    setAuthCookie(false);
+    return false;
+  }
+  return false;
+};
+
 export const setAuthCookie = (isAuthenticated: boolean) => {
   if (typeof window !== "undefined") {
     document.cookie = `auth-token=${isAuthenticated}; path=/; max-age=${
       isAuthenticated ? 86400 : 0
-    }`;
+    }; SameSite=Lax`;
   }
 };
 
 export const clearAuthCookie = () => {
   if (typeof window !== "undefined") {
-    document.cookie = "auth-token=false; path=/; max-age=0";
+    document.cookie = "auth-token=false; path=/; max-age=0; SameSite=Lax";
   }
 };
 export default authSlice.reducer;

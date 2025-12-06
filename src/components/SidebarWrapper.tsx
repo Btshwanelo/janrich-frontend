@@ -18,6 +18,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Button } from "./base/buttons/button";
 import { Dropdown } from "./base/dropdown/dropdown";
 import { Button as AriaButton } from "react-aria-components";
+import { clearOnboardingData } from "@/lib/slices/onboardingSlice";
 
 interface SidebarWrapperProps {
   onCollapseChange?: (isCollapsed: boolean) => void;
@@ -41,6 +42,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
 
   const handleLogout = () => {
     dispatch(clearCredentials());
+    dispatch(clearOnboardingData());
     clearAuthCookie();
     router.push("/login");
   };

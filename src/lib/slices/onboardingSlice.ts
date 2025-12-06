@@ -27,14 +27,10 @@ export interface OnboardingResponse {
 
 export interface OnboardingFlowState {
   isOnboardingComplete: boolean; // Main flag to check if onboarding is done
-  savingsGoalCreated: boolean;
   welcomeShown: boolean;
-  depositModalShown: boolean; // Track if deposit modal has been shown
-  profileCompleted: {
-    details: boolean;
-    beneficiary: boolean;
-    financial: boolean;
-  };
+  goalCompleted: boolean;
+  financialCompleted: boolean;
+  beneficiaryCompleted: boolean;
 }
 
 export interface OnboardingState {
@@ -50,14 +46,10 @@ export interface OnboardingState {
 
 const initialFlowState: OnboardingFlowState = {
   isOnboardingComplete: true, // Default to true - user has completed onboarding
-  savingsGoalCreated: false,
   welcomeShown: false,
-  depositModalShown: false,
-  profileCompleted: {
-    details: false,
-    beneficiary: false,
-    financial: false,
-  },
+  goalCompleted: false,
+  financialCompleted: false,
+  beneficiaryCompleted: false,
 };
 
 const initialState: OnboardingState = {
@@ -131,20 +123,26 @@ const onboardingSlice = createSlice({
       // Set onboarding as incomplete when user starts the flow
       state.flow.isOnboardingComplete = false;
     },
-    markSavingsGoalCreated: (state) => {
-      state.flow.savingsGoalCreated = true;
-    },
     markWelcomeShown: (state) => {
       state.flow.welcomeShown = true;
     },
-    markProfileTabCompleted: (
-      state,
-      action: PayloadAction<"details" | "beneficiary" | "financial">
-    ) => {
-      state.flow.profileCompleted[action.payload] = true;
+    markGoalCompleted: (state) => {
+      state.flow.goalCompleted = true;
     },
-    markDepositModalShown: (state) => {
-      state.flow.depositModalShown = true;
+    markFinancialCompleted: (state) => {
+      state.flow.financialCompleted = true;
+    },
+    markBeneficiaryCompleted: (state) => {
+      state.flow.beneficiaryCompleted = true;
+      // Mark onboarding as complete when all steps are done
+      if (
+        state.flow.welcomeShown &&
+        state.flow.goalCompleted &&
+        state.flow.financialCompleted &&
+        state.flow.beneficiaryCompleted
+      ) {
+        state.flow.isOnboardingComplete = true;
+      }
     },
     completeOnboarding: (state) => {
       // Explicitly mark onboarding as complete
@@ -160,10 +158,6 @@ const onboardingSlice = createSlice({
       state.flow = {
         ...state.flow,
         ...action.payload,
-        profileCompleted: {
-          ...state.flow.profileCompleted,
-          ...(action.payload.profileCompleted || {}),
-        },
       };
     },
   },
@@ -175,10 +169,10 @@ export const {
   setLoading,
   setError,
   startOnboarding,
-  markSavingsGoalCreated,
   markWelcomeShown,
-  markDepositModalShown,
-  markProfileTabCompleted,
+  markGoalCompleted,
+  markFinancialCompleted,
+  markBeneficiaryCompleted,
   completeOnboarding,
   resetOnboardingFlow,
   updateOnboardingFlow,
@@ -191,15 +185,11 @@ export const selectOnboardingFlow = (state: RootState) =>
   state.onboarding?.flow || initialFlowState;
 export const selectIsOnboardingComplete = (state: RootState) =>
   state.onboarding?.flow?.isOnboardingComplete ?? true; // Default to true
-export const selectSavingsGoalCreated = (state: RootState) =>
-  state.onboarding?.flow?.savingsGoalCreated || false;
 export const selectWelcomeShown = (state: RootState) =>
   state.onboarding?.flow?.welcomeShown || false;
-export const selectProfileCompleted = (state: RootState) =>
-  state.onboarding?.flow?.profileCompleted || initialFlowState.profileCompleted;
-export const selectIsProfileComplete = (state: RootState) => {
-  const profileCompleted = state.onboarding?.flow?.profileCompleted;
-  if (!profileCompleted) return false;
-  const { details, beneficiary, financial } = profileCompleted;
-  return details && beneficiary && financial;
-};
+export const selectGoalCompleted = (state: RootState) =>
+  state.onboarding?.flow?.goalCompleted || false;
+export const selectFinancialCompleted = (state: RootState) =>
+  state.onboarding?.flow?.financialCompleted || false;
+export const selectBeneficiaryCompleted = (state: RootState) =>
+  state.onboarding?.flow?.beneficiaryCompleted || false;

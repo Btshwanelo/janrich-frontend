@@ -1,16 +1,24 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/base/buttons/button";
 import { useRouter } from "next/navigation";
 import PublicRouteGuard from "@/components/PublicRouteGuard";
 import AuthGuard from "@/components/AuthGuard";
+import { useOnboardingFlow } from "@/utils/onboardingState";
 
 const PaymentSuccessPage = () => {
   const router = useRouter();
+  const { startOnboarding } = useOnboardingFlow();
+
+  // Start onboarding flow when payment is successful
+  useEffect(() => {
+    startOnboarding();
+  }, [startOnboarding]);
+
   const handleAccessAccount = () => {
-    // Handle navigation to account
-    router.push("/dashboard");
+    // Redirect to welcome page to start onboarding flow
+    router.push("/welcome");
   };
 
   return (

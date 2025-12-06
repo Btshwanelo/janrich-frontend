@@ -26,7 +26,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = memo(
       <header className="bg-white border-b border-gray-200 px-4 lg:px-8 py-4 lg:py-5 mt-16 lg:mt-0">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <h1 className="text-base lg:text-2xl font-cinzel text-[#181D27]">
-            Welcome back, {displayName}
+            Welcome, {displayName}
           </h1>
           <div className="flex items-center gap-2 lg:gap-3">
             {/* <Button
