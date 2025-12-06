@@ -1,6 +1,12 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+interface Testimonial {
+  quote: string;
+  author: string;
+  memberSince: string;
+}
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -9,12 +15,55 @@ interface AuthLayoutProps {
   showTestimonial?: boolean;
 }
 
+const testimonials: Testimonial[] = [
+  {
+    quote:
+      "JanRiches showed me the importance of saving and paying myself first. With my savings, I was able to fund my youngest brother's university fees, build our family house, and even a home for my uncle. JanRiches has transformed how I view money, enabling me to travel abroad annually.",
+    author: "Muimeleli M",
+    memberSince: "2016",
+  },
+  {
+    quote:
+      "I've been using JanRiches for over 5 years now, and it's completely changed my financial habits. The automated savings feature helped me build an emergency fund that saved me during a difficult time. I'm now saving for my dream home!",
+    author: "Sarah K",
+    memberSince: "2019",
+  },
+  {
+    quote:
+      "JanRiches made saving effortless. I never thought I could save as much as I have. The platform's insights helped me understand my spending patterns and make better financial decisions. Highly recommend!",
+    author: "David T",
+    memberSince: "2020",
+  },
+  {
+    quote:
+      "As a young professional, JanRiches taught me financial discipline early. I've achieved goals I never thought possible - from paying off student loans to starting my own business. The community support is incredible!",
+    author: "Amanda L",
+    memberSince: "2021",
+  },
+];
+
 const AuthLayout: React.FC<AuthLayoutProps> = ({
   children,
   title,
   subtitle,
   showTestimonial = true,
 }) => {
+  const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
+
+  const nextTestimonial = () => {
+    setCurrentTestimonialIndex((prev) =>
+      prev === testimonials.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonialIndex((prev) =>
+      prev === 0 ? testimonials.length - 1 : prev - 1
+    );
+  };
+
+  const currentTestimonial = testimonials[currentTestimonialIndex];
+
   return (
     <div
       className="fixed inset-0 w-full h-full flex"
@@ -79,17 +128,15 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             <div className="absolute bottom-8 left-8 right-8">
               <div className="bg-white/30 backdrop-blur-sm border border-white/30 rounded-2xl p-8 text-white">
                 <blockquote className="text-2xl font-medium mb-6">
-                  "JanRiches showed me the importance of saving and paying
-                  myself first. With my savings, I was able to fund my youngest
-                  brother's university fees, build our family house, and even a
-                  home for my uncle. JanRiches has transformed how I view money,
-                  enabling me to travel abroad annually."
+                  "{currentTestimonial.quote}"
                 </blockquote>
 
                 <div className="flex items-center justify-between">
                   <div className="w-full">
                     <div className="flex justify-between">
-                      <div className="font-semibold text-lg">Muimeleli M</div>
+                      <div className="font-semibold text-lg">
+                        {currentTestimonial.author}
+                      </div>
                       <div className="flex items-center mb-4">
                         {/* {[...Array(5)].map((_, i) => (
                           <svg
@@ -103,16 +150,40 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
-                      <div className="">
+                      <div className="flex items-center gap-4">
                         <div className="text-sm opacity-90">
-                          Member since 2016{" "}
+                          Member since {currentTestimonial.memberSince}
+                        </div>
+                        <div className="flex gap-2">
+                          {testimonials.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() =>
+                                setCurrentTestimonialIndex(index)
+                              }
+                              className={`w-2 h-2 rounded-full transition-all ${
+                                index === currentTestimonialIndex
+                                  ? "bg-white w-6"
+                                  : "bg-white/50 hover:bg-white/70"
+                              }`}
+                              aria-label={`Go to testimonial ${index + 1}`}
+                            />
+                          ))}
                         </div>
                       </div>
                       <div className="flex gap-6 ml-auto">
-                        <button className="w-10 h-10 border rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+                        <button
+                          onClick={prevTestimonial}
+                          className="w-10 h-10 border rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+                          aria-label="Previous testimonial"
+                        >
                           <ChevronLeft className="w-5 h-5" />
                         </button>
-                        <button className="w-10 h-10 border rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+                        <button
+                          onClick={nextTestimonial}
+                          className="w-10 h-10 border rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+                          aria-label="Next testimonial"
+                        >
                           <ChevronRight className="w-5 h-5" />
                         </button>
                       </div>
